@@ -1,0 +1,7 @@
+matplotlib
+scikit-learn
+pytest~=5.4.3
+pylint
+requests
+flask
+flask_restful
