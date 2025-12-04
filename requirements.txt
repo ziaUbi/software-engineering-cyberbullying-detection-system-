@@ -5,3 +5,4 @@ pylint
 requests
 flask
 flask-restful
+jsonschema
