@@ -4,7 +4,7 @@ import requests
 import random
 
 from service_class.UniqueRandomGenerator import UniqueRandomGenerator
-from service_class.ServiceClassParameters import ServiceClassParameters
+from service_class.service_class_parameters import ServiceClassParameters
 
 class RecordSender:
 
@@ -102,8 +102,3 @@ class RecordSender:
                     print(f"Failed to send record: {record}")
             except requests.RequestException as e:
                 print(f"Error sending record: {e}")
-
-
-if __name__ == "__main__":
-    # Test the RecordSender class
-    rs = RecordSender()

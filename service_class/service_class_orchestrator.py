@@ -19,28 +19,20 @@ class ServiceClassOrchestrator:
         """
 
         self.basedir = basedir
-
-        # Load the parameters of the Service Class
-        ServiceClassParameters.loadParameters(self.basedir)
-
-        self.csv_logger = Logger(self.basedir, ServiceClassParameters.LOCAL_PARAMETERS["phase"])
-
-        self.serviceReceiver = ServiceReceiver(basedir=self.basedir, csv_logger=self.csv_logger)
-
+        ServiceClassParameters.loadParameters(self.basedir) # Load the parameters of the Service Class
+        self.logger = Logger(self.basedir, ServiceClassParameters.LOCAL_PARAMETERS["phase"])
+        self.serviceReceiver = ServiceReceiver(basedir=self.basedir, logger=self.logger)
         self.recordSender = RecordSender(basedir=self.basedir)
-
 
 
     def start(self):
         """
         Start the Service Class Orchestrator.
         """
-
         print("Service Class started.")
 
         # Start the Service Receiver server
-        self.serviceReceiver.start_server()
-
+        self.serviceReceiver.start_receiver()
 
         if ServiceClassParameters.LOCAL_PARAMETERS["phase"] == "all_phases":
             print("All phases will be tested.")
@@ -50,7 +42,7 @@ class ServiceClassOrchestrator:
             print(" Evaluation: " + str(ServiceClassParameters.LOCAL_PARAMETERS["evaluation_sessions"]))
 
             # Writing headers to the CSV file
-            self.csv_logger.write_header("phase,timestamp,status")
+            self.logger.write_header("phase,timestamp,status")
 
             # Dictionary to store the phases and a boolean value to indicate if the labels should be sent
             phases_and_labels = {
@@ -71,22 +63,22 @@ class ServiceClassOrchestrator:
                 bucket = self.recordSender.prepare_bucket(ServiceClassParameters.LOCAL_PARAMETERS[f"{phase}_sessions"], include_labels)
 
                 # Updating CSV file with the phase
-                self.csv_logger.log(f"{phase},{time.time()},start")
+                self.logger.log(f"{phase},{time.time()},start")
 
                 # Sending the bucket
                 self.recordSender.send_bucket(bucket)
 
                 # Updating CSV file
-                self.csv_logger.log(f"{phase},{time.time()},records_sent")
+                self.logger.log(f"{phase},{time.time()},records_sent")
 
                 if phase == "development":
                     print("Waiting for the production configuration message.")
 
                     # Waiting for the production configuration message
-                    configuration = self.serviceReceiver.get_configuration()
+                    configuration = self.serviceReceiver.rcv_configuration()
 
                     # Updating CSV file
-                    self.csv_logger.log(f"{phase},{time.time()},{configuration['configuration']}")
+                    self.logger.log(f"{phase},{time.time()},{configuration['configuration']}")
 
                     if configuration["configuration"] != "production":
                         # Restart the development phase
@@ -98,10 +90,10 @@ class ServiceClassOrchestrator:
 
                     # Waiting for the labels
                     for _ in range(ServiceClassParameters.LOCAL_PARAMETERS[f"{phase}_sessions"]):
-                        label = self.serviceReceiver.get_label()
+                        label = self.serviceReceiver.rcv_label()
 
                     # Updating CSV file
-                    self.csv_logger.log(f"{phase},{time.time()},labels_received")
+                    self.logger.log(f"{phase},{time.time()},labels_received")
 
                 print(f"{phase.capitalize()} phase completed.")
 
@@ -111,7 +103,7 @@ class ServiceClassOrchestrator:
             print("Development phase will be tested, by developing " + str(ServiceClassParameters.LOCAL_PARAMETERS["classifiers_to_develop"]) + " classifiers.")
 
             # Writing headers to the CSV file
-            self.csv_logger.write_header("developed_classifier,timestamp,status")
+            self.logger.write_header("developed_classifier,timestamp,status")
 
             for i in range(1, ServiceClassParameters.LOCAL_PARAMETERS["classifiers_to_develop"] + 1):
                 print(f"Developing classifier {i}.")
@@ -120,19 +112,19 @@ class ServiceClassOrchestrator:
                 bucket = self.recordSender.prepare_bucket(ServiceClassParameters.LOCAL_PARAMETERS["development_sessions"], include_labels=True)
 
                 # Updating CSV file with the classifier
-                self.csv_logger.log(f"{i},{time.time()},start")
+                self.logger.log(f"{i},{time.time()},start")
 
                 # Sending the bucket
                 self.recordSender.send_bucket(bucket)
 
                 # Updating CSV file
-                self.csv_logger.log(f"{i},{time.time()},records_sent")
+                self.logger.log(f"{i},{time.time()},records_sent")
 
         elif ServiceClassParameters.LOCAL_PARAMETERS["phase"] == "production":
             print("Production phase will be tested, by considering " + str(ServiceClassParameters.LOCAL_PARAMETERS["production_sessions"]) + " sessions.")
 
             # Writing headers to the CSV file
-            self.csv_logger.write_header("sessions,timestamp,status")
+            self.logger.write_header("sessions,timestamp,status")
 
             for i in range(1, ServiceClassParameters.LOCAL_PARAMETERS["production_sessions"]+1):
 
@@ -142,19 +134,19 @@ class ServiceClassOrchestrator:
                 bucket = self.recordSender.prepare_bucket(i, include_labels=False)
 
                 # Updating CSV file with the session
-                self.csv_logger.log(f"{i},{time.time()},start")
+                self.logger.log(f"{i},{time.time()},start")
 
                 # Sending the bucket
                 self.recordSender.send_bucket(bucket)
 
                 # Updating CSV file
-                self.csv_logger.log(f"{i},{time.time()},records_sent")
+                self.logger.log(f"{i},{time.time()},records_sent")
 
             print("All production phases completed.")
 
         else:
-            print("Invalid value for the phase parameter.")
-            print("Please, choose between 'all_phases', 'development' or 'production'.")
+            print("Phase parameter value invalid.")
+            print("Choose between 'all_phases', 'development' or 'production'.")
             return
 
         print("Service Class stopped.")
