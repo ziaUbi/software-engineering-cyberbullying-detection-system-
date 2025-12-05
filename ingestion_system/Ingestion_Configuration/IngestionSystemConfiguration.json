@@ -1,0 +1,13 @@
+{
+    "missing_samples_threshold": 3,
+    "current_phase": "development",
+    "production_sessions": 5000,
+    "development_sessions": 500,
+    "evaluation_sessions": 50,
+    "ip_preparation": "127.0.0.1",
+    "ip_evaluation": "93.67.96.103",
+    "port_preparation": 5002,
+    "port_evaluation": 5030,
+    "ip_ingestion": "0.0.0.0",
+    "port_ingestion": 5001
+}

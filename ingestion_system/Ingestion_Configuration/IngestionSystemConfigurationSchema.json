@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "missing_samples_threshold": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "current_phase": {
+      "type": "string",
+      "enum": ["development", "production", "evaluation"]
+    },
+    "production_sessions": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "development_sessions": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "evaluation_sessions": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ip_preparation": {
+      "type": "string",
+      "format": "ipv4"
+    },
+    "ip_evaluation": {
+      "type": "string",
+      "format": "ipv4"
+    },
+    "port_preparation": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "port_evaluation": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "ip_ingestion": {
+      "type": "string",
+      "format": "ipv4"
+    },
+    "port_ingestion": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    }
+  },
+  "required": [
+    "missing_samples_threshold",
+    "current_phase",
+    "production_sessions",
+    "development_sessions",
+    "evaluation_sessions",
+    "ip_preparation",
+    "ip_evaluation",
+    "port_preparation",
+    "port_evaluation",
+    "ip_ingestion",
+    "port_ingestion"
+  ]
+}
