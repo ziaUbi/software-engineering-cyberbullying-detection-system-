@@ -1,7 +1,7 @@
 import time
 
 from development_system.configuration_parameters import ConfigurationParameters
-from development_system.json_validator_reader_and_writer import JsonHandler
+from development_system.json_handler_validator import JsonHandlerValidator
 from development_system.learning_set import LearningSet
 from development_system.message_manager import MessageManager
 from development_system.testing_orchestrator import TestingOrchestrator

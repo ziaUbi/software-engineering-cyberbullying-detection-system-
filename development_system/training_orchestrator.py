@@ -5,7 +5,7 @@ import joblib
 
 from development_system.classifier import Classifier
 from development_system.configuration_parameters import ConfigurationParameters
-from development_system.json_handler import JsonValidatorReaderAndWriter
+from development_system.json_handler_validator import JsonHandlerValidator
 from development_system.learning_plot_controller import LearninPlotController
 from development_system.trainer import Trainer
 
@@ -21,7 +21,7 @@ class TrainingOrchestrator:
         #self.plot_view = LearningPlotView()
         self.plot_controller = LearningPlotController()
         self.service_flag = None
-        self.json_handler = JsonValidatorReaderAndWriter()
+        self.json_handler = JsonHandlerValidator()
 
     def train_classifier(self, set_average_hyperparams):
         """

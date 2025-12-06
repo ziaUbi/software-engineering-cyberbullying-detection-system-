@@ -1,15 +1,18 @@
-from development_system.json_handler import JsonValidatorReaderAndWriter
+from development_system.json_handler_validator import JsonHandlerValidator
 
 
 class ConfigurationParameters:
-    """Class representing configuration parameters of the development system."""
+    """Static class for configuration parameters of the development system"""
+    def __new__(cls, *args, **kwargs):
+        if cls is ConfigurationParameters:
+            raise TypeError(f"'{cls.__name__}' cannot be instantiated")
+        return object.__new__(cls, *args, **kwargs)
+    
     params = {}
 
     @staticmethod
     def load_configuration():
         """Load configuration parameters from a JSON file."""
-        read_conf = JsonValidatorReaderAndWriter()  # instance of JsonHandler class
-        read_conf.validate_json("conf/development_parameters.json", "schemas/development_parameters_schema.json")
-        filepath = "conf/development_parameters.json"
-
-        ConfigurationParameters.params = read_conf.read_configuration_parameters(filepath)
+        filepath = "configuration/dev_parameters.json"
+        JsonHandlerValidator.validate_json(filepath, "schemas/dev_parameters_schema.json")
+        ConfigurationParameters.params = JsonHandlerValidator.read_configuration_parameters(filepath)
