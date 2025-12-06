@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CyberbullyingDetectionRecord",
+  "description": "Schema for a single ingestion record of the cyberbullying detection system.",
+  "type": "object",
+
+  "properties": {
+    "source": {
+      "type": "string",
+      "enum": ["tweet", "audio", "events", "label"],
+      "description": "Type of record being sent."
+    },
+
+    "value": {
+      "type": "object",
+      "description": "Record data payload.",
+      "properties": {
+        "UUID": {
+          "type": "string",
+          "description": "Unique session identifier."
+        },
+
+        "text": {
+          "type": "string",
+          "description": "Tweet text (only for source=tweet)."
+        },
+
+        "file_path": {
+          "type": "string",
+          "description": "Audio file path or identifier (only for source=audio)."
+        },
+
+        "duration_seconds": {
+          "type": "number",
+          "description": "Audio duration in seconds (optional)."
+        },
+
+        "time_series": {
+          "type": "array",
+          "description": "List of event time-series elements (only for source=events).",
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": { "type": "number" },
+              "event": { "type": "string" }
+            },
+            "required": ["timestamp", "event"]
+          }
+        },
+
+        "label": {
+          "type": "string",
+          "enum": ["cyberbullying", "not_cyberbullying"],
+          "description": "Label for supervised classification (only for source=label)."
+        }
+      },
+
+      "required": ["UUID"]
+    }
+  },
+
+  "required": ["source", "value"]
+}
