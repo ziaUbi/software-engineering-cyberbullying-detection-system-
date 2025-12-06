@@ -1,0 +1,68 @@
+{
+  "title": "GlobalNetConf",
+  "type": "object",
+  "required": [
+    "Segregation System",
+    "Development System",
+    "Production System",
+    "Messaging System",
+    "Service Class"
+  ],
+  "properties": {
+    "Segregation System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Development System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Production System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Messaging System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Service Class": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

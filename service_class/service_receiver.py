@@ -5,8 +5,8 @@ import threading
 import jsonschema
 from flask import Flask, request, jsonify
 
-from service_class.ServiceClassParameters import ServiceClassParameters
-from service_class.CSVLogger import CSVLogger
+from service_class.service_class_parameters import ServiceClassParameters
+from service_class.logger import Logger
 
 
 class ServiceReceiver:
@@ -15,14 +15,14 @@ class ServiceReceiver:
 
     """
 
-    def __init__(self, host: str = '0.0.0.0', port: int = None, basedir: str = ".", csv_logger: CSVLogger = None):
+    def __init__(self, host: str = '0.0.0.0', port: int = None, basedir: str = ".", logger: Logger = None):
         """
         Initialize the Flask communication server.
 
         :param host: The host address for the Flask server.
         :param port: The port number for the Flask server.
         :param basedir: The base directory for the Flask server.
-        :param csv_logger: The CSVLogger instance to be used for logging.
+        :param logger: The Logger instance to be used for logging.
         """
 
         if port is None:
@@ -32,7 +32,7 @@ class ServiceReceiver:
         self.host = host
         self.port = port
 
-        self.csv_logger = csv_logger
+        self.csv_logger = logger
 
         # Queue to store received configuration messages
         self.configuration_queue = queue.Queue()
@@ -155,7 +155,7 @@ class ServiceReceiver:
                 # JSON label is invalid
                 return jsonify({"status": "error", "message": "Invalid JSON label"}), 400
 
-    def start_server(self):
+    def start_receiver(self):
         """
         Start the Flask server in a separate thread.
         """
@@ -167,7 +167,7 @@ class ServiceReceiver:
         thread = threading.Thread(target=self.app.run, kwargs={'host': self.host, 'port': self.port}, daemon=True)
         thread.start()
 
-    def get_label(self) -> dict:
+    def rcv_label(self) -> dict:
         """
         Get last label from the queue.
 
@@ -176,7 +176,7 @@ class ServiceReceiver:
 
         return self.label_queue.get(block=True)
 
-    def get_configuration(self) -> dict:
+    def rcv_configuration(self) -> dict:
         """
         Get last configuration from the queue.
 
@@ -203,3 +203,4 @@ class ServiceReceiver:
         except jsonschema.ValidationError as e:
             print(f"Invalid JSON data: {e}")
             return
+        
