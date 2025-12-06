@@ -1,5 +1,5 @@
 {
-    "missing_samples_threshold": 3,
+    "maxNumMissingSamples": 3,
     "current_phase": "development",
     "production_sessions": 5000,
     "development_sessions": 500,

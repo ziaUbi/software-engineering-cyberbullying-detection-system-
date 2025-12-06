@@ -11,8 +11,7 @@
     "source": "audio",
     "value": {
       "UUID": "123e4567-e89b-12d3-a456-426614174000",
-      "file_path": "audio/123e4567.wav",
-      "duration_seconds": 3.52
+      "file_path": "audio/123e4567.wav"
     }
   },
   {

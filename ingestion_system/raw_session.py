@@ -1,52 +1,45 @@
-"""
-Module: raw_session
-This module represents a raw session composed of multiple records (4/5).
+# raw_session.py
+from dataclasses import dataclass
+from typing import Optional, Dict, Any, List
 
-Author: Martina Fabiani
-"""
+
 import json
-
 
 class RawSession:
     """
-    Represents a raw session, which aggregates records and stores session data.
-
+    Represents a raw session, aggregating heterogeneous records coming from 
+    multiple client-side systems (tweet, audio, events, label). 
+    
     Attributes:
-        uuid (str): Unique identifier for the session.
-        tweet (str): tweets associated with the session.
-        audio_data (file): audio data associated with the session.
-        events (list timeseries): List of events recorded during the session.
-        label (str): Optional label for the session.
+        uuid (str): Unique identifier of the session.
+        tweet: Record coming from the tweet client system.
+        audio: Record coming from the audio client system.
+        events: Time-series events describing contextual information.
+        label: Label used for evaluation (may be None during production).
     """
 
-    def __init__(self, uuid, tweet, audio_data, events, label=None):
+    def __init__(self, uuid, tweet=None, audio=None, events=None, label=None):
         """
-        Initialize a raw session instance.
-
-        Args:
-            uuid (str): Unique identifier for the session.
-            tweet (str): tweets associated with the session.
-            audio_data (file): audio data associated with the session.
-            events (list timeseries): List of events recorded during the session.
-            label (str): Optional label for the session.
+        Initialize a RawSession instance.
         """
         self.uuid = uuid
         self.tweet = tweet
-        self.audio_data = audio_data
+        self.audio = audio
         self.events = events
         self.label = label
 
-    def to_json(self):
+    def to_json(self) -> str:
         """
-        Convert the instance attributes to a JSON string.
-
+        Convert the RawSession instance into a JSON string.
+        Useful for sending the session to the Preparation System.
+        
         Returns:
-            str: JSON string representing the instance attributes.
+            str: JSON representation of the RawSession.
         """
         return json.dumps({
             "uuid": self.uuid,
             "tweet": self.tweet,
-            "audio_data": self.audio_data,  # Note: Ensure audio_data is serializable
+            "audio": self.audio,
             "events": self.events,
             "label": self.label
         })
