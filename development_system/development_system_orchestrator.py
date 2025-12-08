@@ -39,6 +39,7 @@ class DevelopmentSystemOrchestrator:
             # ================================ Stop&Go interaction ================================
             # In user_responses.json there must be only one value equal to 1, the others must be 0
 
+            # Get learning set, if needed, and set the average hyperparameters 
             if user_responses["Start"] == 1 or user_responses["ClassifierCheck"] == 1:
 
                 if user_responses["Start"] == 1:
@@ -58,80 +59,80 @@ class DevelopmentSystemOrchestrator:
                     # save learning sets in .sav files
                     LearningSets.save_learning_sets(learning_set)
 
-                # SET AVERAGE HYPERPARAMETERS
-                set_average_hyperparams = True #in this case at the start, the average hyperparams must be set
+                set_average_hyperparams = True
                 self.training_orchestrator.train_classifier(set_average_hyperparams)
                 print("Average hyperparameters set")
-                #if service flag is true, ends. If it is false, go to the next step
+                # if service flag is true, automate next step 
                 if self.service_flag:
                     for key in user_responses.keys():
                         user_responses[key] = 0
                     user_responses["IterationCheck"] = 1
 
+            # Find right number of iterations
             elif user_responses["IterationCheck"] == 1:
                 print("Iteration Check Phase")
-                # SET NUMBER ITERATIONS
-                # TRAIN
-                    # GENERATE LEARNING REPORT
-                    # CHECK LEARNING PLOT
-                set_average_hyperparams = False  # in this case, the average hyperparams are already set
+                set_average_hyperparams = False
                 self.training_orchestrator.train_classifier(set_average_hyperparams)
                 print("Number of iterations set")
-                # if the testing is false, go to the validation phase
+                # if service flag is true, automate next step 
                 if self.service_flag:
                     for key in user_responses.keys():
                         user_responses[key] = 0
                     user_responses["Validation"] = 1
 
+            # Validate the classifier with grid search
             elif user_responses["Validation"] == 1:
                 print("Validation phase")
-                # SET HYPERPARAMETERS (loop)
-                # TRAIN               (loop)
-                    # GENERATE VALIDATION REPORT
-                    # CHECK VALIDATION RESULT
                 result = self.validation_orchestrator.validation()
                 print("Validation phase done")
-                # if the validation is correct, go to the test phase.
-                # if the validation is not correct, go at the beginning.
+                # if service flag is true, automate next step 
                 if self.service_flag:
                     for key in user_responses.keys():
                         user_responses[key] = 0
+                    # if the validation is correct, go to the test phase
                     if result:
                         user_responses["GenerateTest"] = 1
+                    # else restart from the beginning
                     else:
                         user_responses["ClassifierCheck"] = 1
 
+            # Test the classifier
             elif user_responses["GenerateTest"] == 1:
                 print("Test phase")
                 # GENERATE TEST REPORT
                 # CHECK TEST RESULT
                 result = self.testing_orchestrator.test()
                 print("Test phase done")
-                # if the test is correct, send the classifier to production system.
-                # if the test is not correct, send the configuration to messaging system.
+                # if service flag is true, automate next step 
                 if self.service_flag:
                     for key in user_responses.keys():
                         user_responses[key] = 0
+                    # if the test is correct, send the classifier to production system
                     if result:
                         user_responses["TestOK"] = 1
-
-            elif user_responses["TestOK"] == 0:
-                print("TestNotOK")
-                # SEND CONFIGURATION
-                if self.service_flag:
-                    print("send configuration")
-                    response = self.message_manager.send_configuration()
-                    print("Response from Module Messaging System:", response)
-                    user_responses["TestOK"] = 2    #2 for sending timestamp
-
+                    # else send the configuration to messaging system
+                    #else:
+                    #    user_responses["TestOK"] = 0
+            
+            # Test resulst is ok
             elif user_responses["TestOK"] == 1:
                 print("TestOK")
                 # SEND CLASSIFIER
                 if self.service_flag:
-                    print("send classifier:")
+                    print("Send classifier:")
                     response = self.message_manager.send_classifier()
                     print("Response from Module Production System:", response)
-                    user_responses["TestOK"] = 2    #2 for sending timestamp
+                    user_responses["TestOK"] = 2    # 2 for sending timestamp
+
+            # Test results is not ok
+            elif user_responses["TestOK"] == 0:
+                print("TestNotOK")
+                # SEND CONFIGURATION
+                if self.service_flag:
+                    print("Send configuration")
+                    response = self.message_manager.send_configuration()
+                    print("Response from Module Messaging System:", response)
+                    user_responses["TestOK"] = 2    # 2 for sending timestamp
 
             # if service is false, the loop must end
             if not self.service_flag:
