@@ -2,8 +2,8 @@ import time
 
 from development_system.configuration_parameters import ConfigurationParameters
 from development_system.json_handler_validator import JsonHandlerValidator
-from development_system.learning_set import LearningSet
-from development_system.message_manager import MessageManager
+from development_system.learning_sets import LearningSets
+from development_system.learning_sets_receiver_and_classifier_sender import LearningSetsReceiverAndClassifierSender
 from development_system.testing_orchestrator import TestingOrchestrator
 from development_system.training_orchestrator import TrainingOrchestrator
 from development_system.validation_orchestrator import ValidationOrchestrator
@@ -16,9 +16,7 @@ class DevelopmentSystemOrchestrator:
         """Initialize the orchestrator."""
         ConfigurationParameters.load_configuration()
         self.service_flag = ConfigurationParameters.params['service_flag']
-        #self.json_handler = JsonHandler()
-        #self.dev_mess_broker = LearningSetReceiverAndClassifierSender(host='0.0.0.0', port=5004)  # instance of DevelopmentSystemMessageBroker class
-        self.learning_sets = LearningSet([], [], [])
+        self.message_manager = LearningSetsReceiverAndClassifierSender(host='0.0.0.0', port=5004)
         self.training_orchestrator = TrainingOrchestrator()
         self.validation_orchestrator = ValidationOrchestrator()
         self.testing_orchestrator = TestingOrchestrator()
@@ -27,40 +25,38 @@ class DevelopmentSystemOrchestrator:
     def develop(self):
         """Handle development logic."""
 
-        # Read the responses of the user for the stop and go and the value to start the continuous execution
-        JsonHandler.validate_json("responses/user_responses.json", "schemas/user_responses_schema.json")
-        user_responses = JsonHandler.read_json_file("responses/user_responses.json")
+        # Read the responses of the user for the Stop&Go interaction
+        JsonHandlerValidator.validate_json("responses/user_responses.json", "schemas/user_responses_schema.json")
+        user_responses = JsonHandlerValidator.read_json_file("responses/user_responses.json")
 
         print("Service Flag: ", self.service_flag)
 
+        # Start the server to receive learning sets if service_flag is True
         if self.service_flag:
-            # start the server
-            self.dev_mess_broker.start_server()
+            self.message_manager.start_server()
 
-        # loop for the non-stop-and-go execution
         while True:
-            # Definition of the stop&go structure
-            # The user must insert only a value equal to 1 in the JSON file, the only considered value 0 is the testNotOK
+            # ================================ Stop&Go interaction ================================
+            # In user_responses.json there must be only one value equal to 1, the others must be 0
+
             if user_responses["Start"] == 1 or user_responses["ClassifierCheck"] == 1:
 
                 if user_responses["Start"] == 1:
                     print("Start")
 
                     if self.service_flag:
-                        print("waiting for learning set")
-                        message = self.dev_mess_broker.rcv_learning_set()
-
-                        response = self.dev_mess_broker.send_timestamp(time.time(), "start")
-                        print("Start timestamp sent")
+                        print("waiting for learning set...")
+                        message = self.message_manager.get_learning_set()
+                        print("learning set received")
+                        response = self.message_manager.send_timestamp(time.time(), "start")
+                        print("start timestamp sent")
                         print("Response from Module Service System:", response)
-                        #convert the received string into a dictionary and the dictionary to a learning set object
-                        learning_set = LearningSet.from_dict(JsonHandler.string_to_dict(message['message']))
-
-                        # save the three type of sets in a different Json file
-                        self.learning_set.save_learning_set(learning_set)
+                        # convert the received string into a dictionary and the dictionary to a learning set object
+                        learning_set = LearningSets.from_dict(JsonHandlerValidator.string_to_dict(message['message']))
                     else:
-                        learning_set = self.learning_set.create_learning_set_from_json("intermediate_results/dataset_split.json")
-                        self.learning_set.save_learning_set(learning_set)
+                        learning_set = LearningSets.from_json("intermediate_results/dataset_split.json")
+                    # save learning sets in .sav files
+                    LearningSets.save_learning_sets(learning_set)
 
                 # SET AVERAGE HYPERPARAMETERS
                 set_average_hyperparams = True #in this case at the start, the average hyperparams must be set
@@ -124,7 +120,7 @@ class DevelopmentSystemOrchestrator:
                 # SEND CONFIGURATION
                 if self.service_flag:
                     print("send configuration")
-                    response = self.dev_mess_broker.send_configuration()
+                    response = self.message_manager.send_configuration()
                     print("Response from Module Messaging System:", response)
                     user_responses["TestOK"] = 2    #2 for sending timestamp
 
@@ -133,7 +129,7 @@ class DevelopmentSystemOrchestrator:
                 # SEND CLASSIFIER
                 if self.service_flag:
                     print("send classifier:")
-                    response = self.dev_mess_broker.send_classifier()
+                    response = self.message_manager.send_classifier()
                     print("Response from Module Production System:", response)
                     user_responses["TestOK"] = 2    #2 for sending timestamp
 
@@ -143,7 +139,7 @@ class DevelopmentSystemOrchestrator:
 
             if user_responses["TestOK"] == 2:
                 print("End timestamp sent")
-                response = self.dev_mess_broker.send_timestamp(time.time(), "end")
+                response = self.message_manager.send_timestamp(time.time(), "end")
                 print("Response from Module Service System:", response)
                 # restart from the beginning
                 for key in user_responses.keys():

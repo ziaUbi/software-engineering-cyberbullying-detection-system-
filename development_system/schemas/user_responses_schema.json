@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "Start": { "type": "integer", "enum": [0, 1] },
+    "IterationCheck": { "type": "integer", "enum": [0, 1] },
+    "Validation": { "type": "integer", "enum": [0, 1] },
+    "ClassifierCheck": { "type": "integer", "enum": [0, 1] },
+    "GenerateTest": { "type": "integer", "enum": [0, 1] },
+    "TestOK": { "type": "integer", "enum": [0, 1] }
+  },
+  "required": ["Start", "IterationCheck", "Validation", "ClassifierCheck", "GenerateTest", "TestOK"],
+  "additionalProperties": false
+}

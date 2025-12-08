@@ -6,21 +6,25 @@ import pandas as pd
 
 from development_system.prepared_session import PreparedSession
 
-class LearningSet:
+class LearningSets:
     """
-    Represents a collection of datasets used in machine learning, including
-    training, validation, and test sets.
+    Represents the three sets using for development: training, validation, and testing.
 
     Attributes:
         training_set (List[PreparedSession]): A list of `PreparedSession` objects used for training.
         validation_set (List[PreparedSession]): A list of `PreparedSession` objects used for validation.
         test_set (List[PreparedSession]): A list of `PreparedSession` objects used for testing.
-
+    
+    Methods
+    --------
+        extract_features_and_labels(data_set): Extracts features and labels from a given dataset.
+        create_learning_set_from_json(json_file_path): Creates a LearningSet object from a JSON file.
+        save_learning_set(learning_set): Saves the learning set to .sav files using joblib
     """
 
     def __init__(self, training_set: List[PreparedSession], validation_set: List[PreparedSession], test_set: List[PreparedSession]):
         """
-        Initializes a new instance of the `LearningSet` class.
+        Initializes a new instance of the `LearningSets` class.
 
         Args:
             training_set (List[PreparedSession]): Training dataset as a list of `PreparedSession` objects.
@@ -160,16 +164,54 @@ class LearningSet:
             raise ValueError("test_set must be a list of PreparedSession objects.")
         self._test_set = value
 
+
     @staticmethod
-    def create_learning_set_from_json(json_file_path: str):
+    def save_learning_sets(learning_sets):
         """
-        Creates a LearningSet object by loading data from a JSON file.
+        Saves the training, validation, and test sets of a LearningSet instance to .sav files using joblib.
 
         Args:
-            json_file_path (str): Path to the JSON file containing the learning set data.
+            learning_set (LearningSet): An instance containing training, validation, and test sets.
 
         Returns:
-            LearningSet: An object containing the training, validation, and test sets.
+            None
+        """
+        # Converts data using the to_dictionary method
+        training_data = [session.to_dictionary() for session in learning_sets.training_set]
+        validation_data = [session.to_dictionary() for session in learning_sets.validation_set]
+        test_data = [session.to_dictionary() for session in learning_sets.test_set]
+
+        # Save data in the respective file .sav using joblib
+        joblib.dump(training_data, 'data/training_set.sav')
+        joblib.dump(validation_data, 'data/validation_set.sav')
+        joblib.dump(test_data, 'data/test_set.sav')
+
+    @classmethod
+    def from_dict(cls, data: dict) -> 'LearningSets':
+        """
+        Creates a LearningSet object from a dictionary.
+
+        :params: data (dict): A dictionary containing the learning set data
+        :returns LearningSet: A new instance of LearningSet.
+        Raises:
+            ValueError: If data is not a dictionary.
+        """
+        if not isinstance(data, dict):
+            raise ValueError("Input data must be a dictionary.")
+
+        return cls(
+            training_set=[PreparedSession.from_dictionary(session) for session in data["training_set"]],
+            validation_set=[PreparedSession.from_dictionary(session) for session in data["validation_set"]],
+            test_set=[PreparedSession.from_dictionary(session) for session in data["test_set"]],
+        )
+    
+    @staticmethod
+    def from_json(json_file_path: str):
+        """
+        Creates a LearningSet object from a JSON file.
+
+        :param: json_file_path (str): Path to the JSON file containing the learning set data
+        :returns LearningSet: A new instance of LearningSet.
 
         Raises:
             FileNotFoundError: If the specified JSON file is not found.
@@ -191,46 +233,4 @@ class LearningSet:
         test_set = [PreparedSession.from_dictionary(session) for session in current_data.get('test_set', [])]
 
         # Create and return the LearningSet object
-        return LearningSet(training_set=training_set, validation_set=validation_set, test_set=test_set)
-
-
-    @staticmethod
-    def save_learning_set(learning_set):
-        """
-        Saves the training, validation, and test sets of a LearningSet instance to .sav files using joblib.
-
-        Args:
-            learning_set (LearningSet): An instance containing training, validation, and test sets.
-
-        Returns:
-            None
-        """
-        # Converts data using the to_dictionary method
-        training_data = [session.to_dictionary() for session in learning_set.training_set]
-        validation_data = [session.to_dictionary() for session in learning_set.validation_set]
-        test_data = [session.to_dictionary() for session in learning_set.test_set]
-
-        # Save data in the respective file .sav using joblib
-        joblib.dump(training_data, 'data/training_set.sav')
-        joblib.dump(validation_data, 'data/validation_set.sav')
-        joblib.dump(test_data, 'data/test_set.sav')
-
-    @classmethod
-    def from_dict(cls, data: dict) -> 'LearningSet':
-        """
-        Creates a LearningSet instance from a dictionary.
-
-        Args:
-            data (dict): A dictionary containing the learning set data.
-
-        Returns:
-            LearningSet: A new instance of LearningSet.
-        """
-        if not isinstance(data, dict):
-            raise ValueError("Input data must be a dictionary.")
-
-        return cls(
-            training_set=[PreparedSession.from_dictionary(session) for session in data["training_set"]],
-            validation_set=[PreparedSession.from_dictionary(session) for session in data["validation_set"]],
-            test_set=[PreparedSession.from_dictionary(session) for session in data["test_set"]],
-        )
+        return LearningSets(training_set=training_set, validation_set=validation_set, test_set=test_set)

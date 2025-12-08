@@ -103,18 +103,18 @@ class JsonHandlerValidator:
         """
         Reads the IP address and port of a specified system from a JSON file.
 
-        :param json_filepath: Path to the JSON file containing system configurations
-        :param system_name: Name of the system whose address is to be fetched
+        :param filepath: Path to the JSON file containing system configurations
+        :param system_name: Name of the system whose ip address is to be fetched
 
-        :returns dict: A dictionary containing the IP address and port of the specified system.
-                        Example: {"ip": "192.168.149.66", "port": 8001}
+        :returns dict: A dictionary containing the IP address and port of the specified system
+                        Example: {"ip": "192.168.1.1", "port": 5004}
         :returns None: If the system name is not found or an error occurs.
         """
         try:
             # Load the JSON file
             systems_data = JsonHandlerValidator.read_json_file(filepath)
 
-            # Fetch the system configuration
+            # Get the system configuration
             system_info = systems_data.get(system_name)
             if system_info:
                 return system_info
@@ -152,14 +152,13 @@ class JsonHandlerValidator:
         """
         Converts a JSON-formatted string back to a dictionary.
 
-        :param string: The JSON string to convert.
-
-        :returns dict: The dictionary representation of the string.
+        :param string: The JSON string to convert
+        :returns dict: The dictionary representation of the string
         """
         try:
             return json.loads(string)
         except json.JSONDecodeError as e:
-            raise ValueError(f"Unable to parse string into dictionary: {e}")
+            raise ValueError(f"Unable to convert string into dictionary: {e}")
 
 
     @staticmethod
@@ -167,11 +166,10 @@ class JsonHandlerValidator:
         """
         Converts a dictionary to a JSON-formatted string.
 
-        :param dictionary (dict): The dictionary to convert.
-
-        :returns str: A JSON-formatted string representation of the dictionary.
+        :param dict: The dictionary to convert
+        :returns string: A JSON-formatted string representation of the dictionary
         """
         try:
             return json.dumps(dictionary, indent=4)
         except TypeError as e:
-            raise ValueError(f"Unable to convert dictionary to string: {e}")
+            raise ValueError(f"Unable to convert dictionary into string: {e}")
