@@ -1,0 +1,34 @@
+{
+    "Ingestion System": {
+        "ip": "192.168.10.10",
+        "port": 5101
+    },
+    "Preparation System": {
+        "ip": "192.168.10.20",
+        "port": 5102
+    },
+    "Segregation System": {
+        "ip": "192.168.10.30",
+        "port": 5103
+    },
+    "Development System": {
+        "ip": "192.168.10.40",
+        "port": 5104
+    },
+    "Production System": {
+        "ip": "192.168.10.50",
+        "port": 5105
+    },
+    "Evaluation System": {
+        "ip": "192.168.10.60",
+        "port": 5130
+    },
+    "Messaging System": {
+        "ip": "192.168.10.70",
+        "port": 5110
+    },
+    "Service Class": {
+        "ip": "192.168.10.80",
+        "port": 5120
+    }
+}

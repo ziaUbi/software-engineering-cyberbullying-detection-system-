@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "properties": {
+        "evaluation_phase": {
+            "type": "boolean"
+        },
+        "max_session_evaluation": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "max_session_production": {
+            "type": "integer",
+            "minimum": 100
+        }
+    },
+    "required": [
+        "evaluation_phase",
+        "max_session_evaluation",
+        "max_session_production"
+    ]
+}
