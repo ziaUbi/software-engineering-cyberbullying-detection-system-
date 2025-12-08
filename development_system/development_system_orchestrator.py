@@ -2,7 +2,7 @@ import time
 
 from development_system.configuration_parameters import ConfigurationParameters
 from development_system.json_handler_validator import JsonHandlerValidator
-from development_system.learning_sets import LearningSets
+from development_system.training.learning_sets import LearningSets
 from development_system.learning_sets_receiver_and_classifier_sender import LearningSetsReceiverAndClassifierSender
 from development_system.testing_orchestrator import TestingOrchestrator
 from development_system.training_orchestrator import TrainingOrchestrator

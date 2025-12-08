@@ -3,10 +3,10 @@ import joblib
 
 from sklearn.metrics import log_loss
 
-from development_system.classifier import Classifier
 from development_system.configuration_parameters import ConfigurationParameters
-from development_system.json_validator_reader_and_writer import JsonValidatorReaderAndWriter
-from development_system.learning_set import LearningSet
+from development_system.json_handler_validator import JsonHandlerValidator
+from learning_sets import LearningSets
+from classifier import Classifier
 
 class Trainer:
     """Class responsible for training a classifier."""
@@ -14,8 +14,7 @@ class Trainer:
     def __init__(self):
         """Initialize trainer parameters."""
         self.classifier = Classifier()
-        self.json_handler = JsonValidatorReaderAndWriter()
-        self.learning_set = LearningSet([], [], [])
+
 
     def read_number_iterations(self):
         """
@@ -24,14 +23,13 @@ class Trainer:
             Returns:
                 int: The number of iterations.
         """
-        self.json_handler.validate_json("intermediate_results/iterations.json", "schemas/iterations_schema.json")
-        data=self.json_handler.read_json_file("intermediate_results/iterations.json")
-        iterations =  data["iterations"]
-        return iterations
+        JsonHandlerValidator.validate_json("intermediate_results/iterations.json", "schemas/iterations_schema.json")
+        data = JsonHandlerValidator.read_json_file("intermediate_results/iterations.json")
+        return data["iterations"]
 
 
-    def set_average_hyperparameters(self):
-        """Set the average hyperparameters."""
+    def set_avg_hyperparameters(self):
+        """Set the average hyperparameters (neurons and layers) to the classifier."""
 
         avg_neurons = math.ceil((ConfigurationParameters.params['max_neurons'] + ConfigurationParameters.params['min_neurons']) / 2)
         avg_layers = math.ceil((ConfigurationParameters.params['max_layers'] + ConfigurationParameters.params['min_layers']) / 2)
@@ -39,14 +37,15 @@ class Trainer:
         self.classifier.set_num_neurons(avg_neurons)
         self.classifier.set_num_layers(avg_layers)
 
+
     def set_hyperparameters(self, num_layers: int, num_neurons: int):
         """ Set the hyperparameters.
              Args:
-                num_layers (int): The number of layers to set.
-                num_neurons (int): The number of neurons to set.
+                num_layers (int): The number of layers to set
+                num_neurons (int): The number of neurons to set
         """
-        self.classifier.set_num_layers(num_layers)
         self.classifier.set_num_neurons(num_neurons)
+        self.classifier.set_num_layers(num_layers)
 
 
     def train(self, iterations, validation: bool = False):
@@ -60,14 +59,14 @@ class Trainer:
                 object: The trained classifier.
         """
         # extract the training set and the features and labels
-        training_data = joblib.load("data/training_set.sav")
-        result = self.learning_set.extract_features_and_labels(training_data)
+        training_set = LearningSets.get_training_set()
+        result = LearningSets.extract_features_and_labels(training_set)
 
         training_features = result[0]
         training_labels = result[1]
         #if we have to find the number of iterations use the saved classifier
         if not validation:
-            self.classifier =  joblib.load("data/classifier_trainer.sav")
+            self.classifier =  joblib.load("data/classifier_before_training.sav")
 
         self.classifier.set_num_iterations(iterations)
 

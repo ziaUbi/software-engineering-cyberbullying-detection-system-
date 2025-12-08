@@ -3,11 +3,11 @@ import random
 
 import joblib
 
-from development_system.classifier import Classifier
 from development_system.configuration_parameters import ConfigurationParameters
 from development_system.json_handler_validator import JsonHandlerValidator
-from development_system.learning_plot_controller import LearninPlotController
-from development_system.trainer import Trainer
+from development_system.training.learning_plot_model import LearningPlotModel
+from development_system.training.learning_plot_view import LearningPlotView
+from development_system.training.trainer import Trainer
 
 
 class TrainingOrchestrator:
@@ -16,64 +16,52 @@ class TrainingOrchestrator:
     def __init__(self):
         """Initialize the orchestrator."""
         self.trainer = Trainer()
-        self.classifier = Classifier()
-        #self.plot_model = LearningPlotModel()
-        #self.plot_view = LearningPlotView()
-        self.plot_controller = LearningPlotController()
-        self.service_flag = None
-        self.json_handler = JsonHandlerValidator()
+        self.service_flag = ConfigurationParameters.params['service_flag']
 
-    def train_classifier(self, set_average_hyperparams):
+    def train_classifier(self, set_avg_hyperparams):
         """
             Train the classifier with specified or dynamically determined hyperparameters.
             Args:
-                set_average_hyperparams (bool):
+                set_avg_hyperparams (bool):
                     If True, sets average hyperparameters (neurons and layers)
                     and saves the configured classifier. If False, adjusts the number of iterations dynamically.
         """
-        if set_average_hyperparams:
-            self.trainer.set_average_hyperparameters()
-            # both for the test and the service phase, we save the classifier with the layers and neurons setted
-            self.classifier.set_num_neurons(self.trainer.classifier.get_num_neurons())
-            self.classifier.set_num_layers(self.trainer.classifier.get_num_layers())
-            joblib.dump(self.classifier, "data/classifier_trainer.sav")
+        if set_avg_hyperparams:
+            self.trainer.set_avg_hyperparameters()
+            joblib.dump(self.trainer.classifier, "data/classifier_before_training.sav")
 
         else:
-
-            self.service_flag = ConfigurationParameters.params['service_flag']
-            #if testing is true, the iterations are read from the file, otherwise are randomly generated
+            #if service flag is true, simulate user decisions, else read from json iterations
             if self.service_flag:
                 iterations = random.randint(50, 150)
 
                 while True:
-
                     classifier = self.trainer.train(iterations)
-                    # GENERATE LEARNING REPORT
-                    learning_error = self.plot_model.generate_learning_report(classifier)
-                    # CHECK LEARNING PLOT
-                    self.plot_view.show_learning_plot(learning_error)
-
+                    # Generate learning report
+                    loss_curve = LearningPlotModel.get_loss_curve()
+                    LearningPlotView.show_learning_plot(loss_curve)
+                    # Simulate user decision on learning plot
                     choice = random.randint(0, 4)
                     if choice == 0:  # 20%
-                        print("CHECK LEARNING PLOT OK)")
+                        print("ITERATIONS OK")
                         # if # iterations is correct save the new classifier
                         self.classifier.set_num_iterations(iterations)
-                        joblib.dump(self.classifier, "data/classifier_trainer.sav")
+                        joblib.dump(self.classifier, "data/classifier_before_training.sav")
                         break
                     if choice <= 2:  # 40%
-                        print("CHECK LEARNING PLOT INCREASE 1/3")
+                        print("INCREASE ITERATIONS BY 1/3")
                         iterations = math.ceil(iterations * (1 + 1 / 3))
                     else:  # 40%
-                        print("CHECK LEARNING PLOT decrease 1/3")
+                        print("DECREASE ITERATIONS BY 1/3")
                         iterations = math.ceil(iterations * (1 - 1 / 3))
+            
             else:
                 iterations = self.trainer.read_number_iterations()
                 classifier = self.trainer.train(iterations)
-                # GENERATE LEARNING REPORT
-                learning_error = self.plot_model.generate_learning_report(classifier)
-                # CHECK LEARNING PLOT
-                self.plot_view.show_learning_plot(learning_error)
+                # Generate learning report
+                loss_curve = LearningPlotModel.get_loss_curve()
+                LearningPlotView.show_learning_plot(loss_curve)
 
-            print("number of iterations= ", iterations)
-            print("learning report generated")
-            print("learning error =", learning_error.get_learning_error())
+            print("Learning report generated")
+            print("number of iterations = ", iterations)
+            print("training error =", classifier.get_training_error())

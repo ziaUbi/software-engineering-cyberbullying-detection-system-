@@ -5,7 +5,7 @@ import random
 import joblib
 
 from development_system.configuration_parameters import ConfigurationParameters
-from development_system.trainer import Trainer
+from development_system.training.trainer import Trainer
 from development_system.validation_report_model import ValidationReportModel
 from development_system.validation_report_view import ValidationReportView
 
@@ -35,7 +35,7 @@ class ValidationOrchestrator:
         classifier_trainer = Trainer()
         # reads the iterations from the classifier saved
         if self.service_flag:
-            classifier = joblib.load("data/classifier_trainer.sav")
+            classifier = joblib.load("data/classifier_before_training")
             iterations = classifier.get_num_iterations()
         # reads the iterations from the json
         else:

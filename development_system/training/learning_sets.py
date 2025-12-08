@@ -8,34 +8,65 @@ from development_system.prepared_session import PreparedSession
 
 class LearningSets:
     """
-    Represents the three sets using for development: training, validation, and testing.
-
-    Attributes:
-        training_set (List[PreparedSession]): A list of `PreparedSession` objects used for training.
-        validation_set (List[PreparedSession]): A list of `PreparedSession` objects used for validation.
-        test_set (List[PreparedSession]): A list of `PreparedSession` objects used for testing.
+    Static class representing the three sets using for development: training, validation, and testing.
+    Sets are represented as lists of PreparedSession objects. 
+    Each set is stored in a separate .sav file using joblib.
     
     Methods
     --------
         extract_features_and_labels(data_set): Extracts features and labels from a given dataset.
-        create_learning_set_from_json(json_file_path): Creates a LearningSet object from a JSON file.
+        from_json(json_file_path): Creates a LearningSet object from a JSON file.
+        from_dict(dict): Creates a LearningSet object from a dictionary.
         save_learning_set(learning_set): Saves the learning set to .sav files using joblib
     """
+    def __new__(cls, *args, **kwargs):
+        if cls is LearningSets:
+            raise TypeError(f"'{cls.__name__}' cannot be instantiated")
+        return object.__new__(cls, *args, **kwargs)
 
-    def __init__(self, training_set: List[PreparedSession], validation_set: List[PreparedSession], test_set: List[PreparedSession]):
+
+    @staticmethod
+    def save_learning_sets(learning_sets):
         """
-        Initializes a new instance of the `LearningSets` class.
+        Saves the training, validation, and test sets of a LearningSet instance to .sav files using joblib.
 
         Args:
-            training_set (List[PreparedSession]): Training dataset as a list of `PreparedSession` objects.
-            validation_set (List[PreparedSession]): Validation dataset as a list of `PreparedSession` objects.
-            test_set (List[PreparedSession]): Test dataset as a list of `PreparedSession` objects.
+            learning_set (LearningSet): An instance containing training, validation, and test sets.
+
+        Returns:
+            None
         """
-        self._training_set = training_set
-        self._validation_set = validation_set
-        self._test_set = test_set
+        # Converts data using the to_dictionary method
+        training_data = [session.to_dictionary() for session in learning_sets.training_set]
+        validation_data = [session.to_dictionary() for session in learning_sets.validation_set]
+        test_data = [session.to_dictionary() for session in learning_sets.test_set]
+
+        # Save data in the respective file .sav using joblib
+        joblib.dump(training_data, 'data/training_set.sav')
+        joblib.dump(validation_data, 'data/validation_set.sav')
+        joblib.dump(test_data, 'data/test_set.sav')
 
 
+    @staticmethod
+    def get_training_set():
+        """Loads and returns the training set from the .sav file."""
+        training_data = joblib.load('data/training_set.sav')
+        return training_data
+    
+
+    @staticmethod
+    def get_validation_set():
+        """Loads and returns the validation set from the .sav file."""
+        validation_data = joblib.load('data/validation_set.sav')
+        return validation_data
+    
+
+    @staticmethod
+    def get_test_set():
+        """Loads and returns the test set from the .sav file."""
+        test_data = joblib.load('data/test_set.sav')
+        return test_data
+    
 
     @staticmethod
     def extract_features_and_labels(data_set):
@@ -89,102 +120,6 @@ class LearningSets:
 
         return [features, labels]
 
-    @property
-    def training_set(self) -> List[PreparedSession]:
-        """
-        Gets the training dataset.
-
-        Returns:
-            List[PreparedSession]: The training dataset.
-        """
-        return self._training_set
-
-    @training_set.setter
-    def training_set(self, value: List[PreparedSession]):
-        """
-        Sets the training dataset.
-
-        Args:
-            value (List[PreparedSession]): A new list of `PreparedSession` objects for training.
-
-        Raises:
-            ValueError: If the input is not a list of `PreparedSession` objects.
-        """
-        if not isinstance(value, list) or not all(isinstance(item, PreparedSession) for item in value):
-            raise ValueError("training_set must be a list of PreparedSession objects.")
-        self._training_set = value
-
-    @property
-    def validation_set(self) -> List[PreparedSession]:
-        """
-        Gets the validation dataset.
-
-        Returns:
-            List[PreparedSession]: The validation dataset.
-        """
-        return self._validation_set
-
-    @validation_set.setter
-    def validation_set(self, value: List[PreparedSession]):
-        """
-        Sets the validation dataset.
-
-        Args:
-            value (List[PreparedSession]): A new list of `PreparedSession` objects for validation.
-
-        Raises:
-            ValueError: If the input is not a list of `PreparedSession` objects.
-        """
-        if not isinstance(value, list) or not all(isinstance(item, PreparedSession) for item in value):
-            raise ValueError("validation_set must be a list of PreparedSession objects.")
-        self._validation_set = value
-
-    @property
-    def test_set(self) -> List[PreparedSession]:
-        """
-        Gets the test dataset.
-
-        Returns:
-            List[PreparedSession]: The test dataset.
-        """
-        return self._test_set
-
-    @test_set.setter
-    def test_set(self, value: List[PreparedSession]):
-        """
-        Sets the test dataset.
-
-        Args:
-            value (List[PreparedSession]): A new list of `PreparedSession` objects for testing.
-
-        Raises:
-            ValueError: If the input is not a list of `PreparedSession` objects.
-        """
-        if not isinstance(value, list) or not all(isinstance(item, PreparedSession) for item in value):
-            raise ValueError("test_set must be a list of PreparedSession objects.")
-        self._test_set = value
-
-
-    @staticmethod
-    def save_learning_sets(learning_sets):
-        """
-        Saves the training, validation, and test sets of a LearningSet instance to .sav files using joblib.
-
-        Args:
-            learning_set (LearningSet): An instance containing training, validation, and test sets.
-
-        Returns:
-            None
-        """
-        # Converts data using the to_dictionary method
-        training_data = [session.to_dictionary() for session in learning_sets.training_set]
-        validation_data = [session.to_dictionary() for session in learning_sets.validation_set]
-        test_data = [session.to_dictionary() for session in learning_sets.test_set]
-
-        # Save data in the respective file .sav using joblib
-        joblib.dump(training_data, 'data/training_set.sav')
-        joblib.dump(validation_data, 'data/validation_set.sav')
-        joblib.dump(test_data, 'data/test_set.sav')
 
     @classmethod
     def from_dict(cls, data: dict) -> 'LearningSets':
@@ -205,6 +140,7 @@ class LearningSets:
             test_set=[PreparedSession.from_dictionary(session) for session in data["test_set"]],
         )
     
+
     @staticmethod
     def from_json(json_file_path: str):
         """
