@@ -4,7 +4,7 @@ class ValidationReportView:
     """Shows the validation report"""
 
     @staticmethod
-    def show_validation_report(classifiers, validation_tolerance):
+    def show_validation_report(model):
         """
             Display and save the validation report.
 
@@ -12,8 +12,8 @@ class ValidationReportView:
                 validation_report (ValidationReport):
                     The validation report object containing the results of the validation process.
         """
-        report = {'report': classifiers,
-                  'validation_tolerance': validation_tolerance}
+        report = {'report': model['top_5_classifiers'],
+                  'validation_tolerance': model['validation_tolerance']}
         print("Validation Report:")
         print(report)
         

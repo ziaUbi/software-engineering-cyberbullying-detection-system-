@@ -51,6 +51,11 @@ class ValidationReportModel:
             classifier_report = {'index': i}
             classifier_report.update(top_classifier.classifier_report())
             top_5_classifiers.append(classifier_report)
-            #joblib.dump(top_classifier, "data/classifier" + str(i) + ".sav")
+            # save the top classifier and remove it from the list
+            joblib.dump(top_classifier, "data/classifier" + str(i) + ".sav")
+            self.classifiers.remove(top_classifier)
 
-        return top_5_classifiers, ConfigurationParameters.params['validation_tolerance']
+        return {
+            'top_5_classifiers': top_5_classifiers,
+            'validation_tolerance': ConfigurationParameters.params['validation_tolerance']
+        }

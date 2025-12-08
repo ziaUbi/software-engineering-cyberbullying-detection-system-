@@ -21,11 +21,6 @@ class ValidationOrchestrator:
     def validation(self):
         """
             Perform a grid search for hyperparameters and generate the validation report.
-
-            Returns:
-                ValidationReport or bool:
-                    - If in service mode, returns the generated validation report.
-                    - If in testing mode, returns `True` if all classifiers in the report are valid, otherwise `False`.
         """
         classifier_trainer = Trainer()
         # if service flag is true, load the classifier with average hyperparameters

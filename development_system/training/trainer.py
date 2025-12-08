@@ -42,8 +42,8 @@ class Trainer:
             Returns:
                 int: The number of iterations.
         """
-        JsonHandlerValidator.validate_json("intermediate_results/iterations.json", "schemas/iterations_schema.json")
-        data = JsonHandlerValidator.read_json_file("intermediate_results/iterations.json")
+        JsonHandlerValidator.validate_json("inputs/iterations.json", "schemas/iterations_schema.json")
+        data = JsonHandlerValidator.read_json_file("inputs/iterations.json")
         return data["iterations"]
 
 

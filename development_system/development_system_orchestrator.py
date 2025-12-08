@@ -55,7 +55,7 @@ class DevelopmentSystemOrchestrator:
                         # convert the received string into a dictionary and the dictionary to a learning set object
                         learning_set = LearningSets.from_dict(JsonHandlerValidator.string_to_dict(message['message']))
                     else:
-                        learning_set = LearningSets.from_json("intermediate_results/dataset_split.json")
+                        learning_set = LearningSets.from_json("inputs/learning_sets.json")
                     # save learning sets in .sav files
                     LearningSets.save_learning_sets(learning_set)
 
