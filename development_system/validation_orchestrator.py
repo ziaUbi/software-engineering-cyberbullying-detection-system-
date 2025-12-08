@@ -19,7 +19,7 @@ class ValidationOrchestrator:
         self.validation_report = None
         self.validation_report_model = ValidationReportModel()
         self.validation_report_view = ValidationReportView()
-        self.service_flag = None
+        self.service_flag = ConfigurationParameters.params['service_flag']
 
     def validation(self):
         """
@@ -30,7 +30,6 @@ class ValidationOrchestrator:
                     - If in service mode, returns the generated validation report.
                     - If in testing mode, returns `True` if all classifiers in the report are valid, otherwise `False`.
         """
-        self.service_flag = ConfigurationParameters.params['service_flag']
         # Grid Search
         classifier_trainer = Trainer()
         # reads the iterations from the classifier saved
@@ -60,7 +59,8 @@ class ValidationOrchestrator:
             # SET HYPERPARAMETERS
             classifier_trainer.set_hyperparameters(num_layers, num_neurons)
             # TRAIN
-            classifier = classifier_trainer.train(iterations, validation=True)
+            classifier_trainer.train(iterations, validation=True)
+            classifier = classifier_trainer.validate()
             #append the clasifier into the classifiers list
             self.classifiers.append(copy.deepcopy(classifier))
 

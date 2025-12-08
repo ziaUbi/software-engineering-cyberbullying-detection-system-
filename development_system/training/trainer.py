@@ -10,10 +10,29 @@ from classifier import Classifier
 
 class Trainer:
     """Class responsible for training a classifier."""
-
     def __init__(self):
         """Initialize trainer parameters."""
         self.classifier = Classifier()
+
+    
+    def save_classifier(self, path: str):
+        """
+            Save the classifier to a .sav file.
+
+            Args:
+                path (str): The path where to save the classifier.
+        """
+        joblib.dump(self.classifier, path)
+
+
+    def load_classifier(self, path: str):
+        """
+            Load the classifier from a .sav file.
+
+            Args:
+                path (str): The path from where to load the classifier.
+        """
+        self.classifier = joblib.load(path)
 
 
     def read_number_iterations(self):
@@ -29,7 +48,8 @@ class Trainer:
 
 
     def set_avg_hyperparameters(self):
-        """Set the average hyperparameters (neurons and layers) to the classifier."""
+        """Set the average hyperparameters (neurons and layers) to the classifier.
+        Save the configured classifier to a .sav file."""
 
         avg_neurons = math.ceil((ConfigurationParameters.params['max_neurons'] + ConfigurationParameters.params['min_neurons']) / 2)
         avg_layers = math.ceil((ConfigurationParameters.params['max_layers'] + ConfigurationParameters.params['min_layers']) / 2)
@@ -64,17 +84,10 @@ class Trainer:
 
         training_features = result[0]
         training_labels = result[1]
-        #if we have to find the number of iterations use the saved classifier
-        if not validation:
-            self.classifier =  joblib.load("data/classifier_before_training.sav")
 
         self.classifier.set_num_iterations(iterations)
-
         # Train the classifier
         self.classifier.fit(x=training_features, y=training_labels)
-
-        if validation:
-            self.validate()                     #validation phase
 
         return self.classifier
 
@@ -87,8 +100,8 @@ class Trainer:
             is then set for the classifier.
         """
         # extract the validation set and the features and labels
-        validation_data = joblib.load("data/validation_set.sav")
-        result = self.learning_set.extract_features_and_labels(validation_data)
+        validation_set = LearningSets.get_validation_set()
+        result = LearningSets.extract_features_and_labels(validation_set)
 
         validation_features = result[0]
         validation_labels = result[1]
@@ -97,3 +110,4 @@ class Trainer:
                                     y_pred=self.classifier.predict_proba(validation_features))
 
         self.classifier.set_validation_error(validation_error)
+        return self.classifier

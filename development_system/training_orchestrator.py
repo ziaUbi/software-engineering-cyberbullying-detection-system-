@@ -28,7 +28,7 @@ class TrainingOrchestrator:
         """
         if set_avg_hyperparams:
             self.trainer.set_avg_hyperparameters()
-            joblib.dump(self.trainer.classifier, "data/classifier_before_training.sav")
+            self.trainer.save_classifier("data/classifier_avg_hyperparams.sav")
 
         else:
             #if service flag is true, simulate user decisions, else read from json iterations
@@ -36,6 +36,7 @@ class TrainingOrchestrator:
                 iterations = random.randint(50, 150)
 
                 while True:
+                    self.trainer.load_classifier("data/classifier_avg_hyperparams.sav")
                     classifier = self.trainer.train(iterations)
                     # Generate learning report
                     loss_curve = LearningPlotModel.get_loss_curve()
@@ -44,9 +45,6 @@ class TrainingOrchestrator:
                     choice = random.randint(0, 4)
                     if choice == 0:  # 20%
                         print("ITERATIONS OK")
-                        # if # iterations is correct save the new classifier
-                        self.classifier.set_num_iterations(iterations)
-                        joblib.dump(self.classifier, "data/classifier_before_training.sav")
                         break
                     if choice <= 2:  # 40%
                         print("INCREASE ITERATIONS BY 1/3")
