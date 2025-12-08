@@ -30,11 +30,6 @@
           "description": "Audio file path or identifier (only for source=audio)."
         },
 
-        "duration_seconds": {
-          "type": "number",
-          "description": "Audio duration in seconds (optional)."
-        },
-
         "time_series": {
           "type": "array",
           "description": "List of event time-series elements (only for source=events).",
