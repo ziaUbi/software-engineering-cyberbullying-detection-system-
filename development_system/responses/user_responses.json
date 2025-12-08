@@ -1,0 +1,8 @@
+{
+  "Start": 1,
+  "IterationCheck": 0,
+  "Validation" : 0,
+  "ClassifierCheck" : 0,
+  "GenerateTest": 0,
+  "TestOK" : 0
+}

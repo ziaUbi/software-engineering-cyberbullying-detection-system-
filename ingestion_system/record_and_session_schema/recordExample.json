@@ -1,0 +1,36 @@
+[
+  {
+    "source": "tweet",
+    "value": {
+      "UUID": "123e4567-e89b-12d3-a456-426614174000",
+      "text": "What an awful referee! You should quit football."
+    }
+  },
+
+  {
+    "source": "audio",
+    "value": {
+      "UUID": "123e4567-e89b-12d3-a456-426614174000",
+      "file_path": "audio/123e4567.wav"
+    }
+  },
+  {
+    "source": "events",
+    "value": {
+      "UUID": "123e4567-e89b-12d3-a456-426614174000",
+      "time_series": [
+        { "timestamp": 0.0, "event": "goal" },
+        { "timestamp": 5.3, "event": "foul" },
+        { "timestamp": 7.8, "event": "crowd_cheer" }
+      ]
+    }
+  },
+
+  {
+    "source": "label",
+    "value": {
+      "UUID": "123e4567-e89b-12d3-a456-426614174000",
+      "label": "cyberbullying"      
+    }
+  }
+]
