@@ -68,7 +68,7 @@ class Trainer:
         self.classifier.set_num_layers(num_layers)
 
 
-    def train(self, iterations, validation: bool = False):
+    def train(self, iterations):
         """
             Train the classifier.
             Args:

@@ -33,7 +33,7 @@ class TrainingOrchestrator:
         else:
             #if service flag is true, simulate user decisions, else read from json iterations
             if self.service_flag:
-                iterations = random.randint(50, 150)
+                iterations = random.randint(200, 300)
 
                 while True:
                     self.trainer.load_classifier("data/classifier_avg_hyperparams.sav")
