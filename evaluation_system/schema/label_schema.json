@@ -1,0 +1,17 @@
+{
+  "title": "Label",
+  "type": "object",
+  "required": [
+    "uuid",
+    "cyberbullying"
+  ],
+  "properties": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "cyberbullying": {
+      "type": "string"
+    }
+  }
+}

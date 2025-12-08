@@ -1,0 +1,105 @@
+
+{
+  "title": "NetConf",
+  "type": "object",
+  "required": [
+    "Ingestion System",
+    "Preparation System",
+    "Segregation System",
+    "Development System",
+    "Production System",
+    "Evaluation System",
+    "Messaging System",
+    "Service Class"
+  ],
+  "properties": {
+    "Ingestion System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Preparation System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Segregation System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Development System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Production System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Evaluation System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Messaging System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Service Class": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}
