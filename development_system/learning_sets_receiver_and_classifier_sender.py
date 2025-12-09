@@ -71,35 +71,29 @@ class LearningSetsReceiverAndClassifierSender:
         return message
     
 
-    def send_classifier(self, test=False) -> Optional[Dict]:
+    def send_classifier(self) -> Optional[Dict]:
         """
-        Send the winner classifier to the target module production system.
-        :param test: Boolean which is True only to test the function locally
+        Send the winner classifier to the target production system.
+        
+        :params test: Boolean which is True only to test the function locally
         :return: The response from the target, if any.
         """
-        # Retrieve ip address and port of the target system
-        if not test:
-            classifier_file = "data/classifier.sav"
-            self.json_handler.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
-            endpoint = self.json_handler.get_system_address("conf/netconf.json", "Production System")
+        # Retrieve ip address and port of the target system        
+        JsonHandlerValidator.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
+        endpoint = JsonHandlerValidator.get_system_address("conf/netconf.json", "Production System")
+        target_ip = endpoint["ip"]
+        target_port = endpoint["port"]
 
-            target_ip = endpoint["ip"]
-            target_port = endpoint["port"]
-        else:
-            #this is true only for the local testing
-            classifier_file = "data/mock_classifier.json"
-            target_ip = "127.0.0.1"
-            target_port = 5001
-
-        with open(classifier_file, "rb") as f:
+        with open("data/classifier.sav", "rb") as f:
             file_content = f.read()
-            message = file_content.decode('latin1')  # Encode binary content to a string format
+            message = file_content.decode('latin1')
 
         url = f"http://{target_ip}:{target_port}/send"
         payload = {
             "port": self.port,
             "message": message
         }
+
         try:
             response = requests.post(url, json=payload)
             if response.status_code == 200:
@@ -111,22 +105,18 @@ class LearningSetsReceiverAndClassifierSender:
         return None
 
 
-    def send_configuration(self, test=False) -> Optional[Dict]:
+    def send_configuration(self) -> Optional[Dict]:
         """
-        Send the configuration to the target module messaging system.
-        :param test: Boolean which is True only to test the function locally
+        Send the configuration to the target messaging system.
+        
+        :params test: Boolean which is True only to test the function locally
         :return: The response from the target, if any.
         """
-        if not test:
-            self.json_handler.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
-            endpoint = self.json_handler.get_system_address("conf/netconf.json", "Messaging System")
+        JsonHandlerValidator.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
+        endpoint = JsonHandlerValidator.get_system_address("conf/netconf.json", "Messaging System")
 
-            target_ip = endpoint["ip"]
-            target_port = endpoint["port"]
-        else:
-            # this is true only for the local testing
-            target_ip = "127.0.0.1"
-            target_port = 5001
+        target_ip = endpoint["ip"]
+        target_port = endpoint["port"]
 
         restart_config = {"action": "restart"}
 
@@ -155,8 +145,8 @@ class LearningSetsReceiverAndClassifierSender:
         :return: True if the timestamp was sent successfully, False otherwise
         """
         # Retrieve ip address and port of the service class
-        self.json_handler.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
-        endpoint = self.json_handler.get_system_address("conf/netconf.json", "Service Class")
+        JsonHandlerValidator.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
+        endpoint = JsonHandlerValidator.get_system_address("conf/netconf.json", "Service Class")
         target_ip = endpoint["ip"]
         target_port = endpoint["port"]
 

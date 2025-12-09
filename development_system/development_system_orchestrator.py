@@ -99,8 +99,6 @@ class DevelopmentSystemOrchestrator:
             # Test the classifier
             elif user_responses["GenerateTest"] == 1:
                 print("Test phase")
-                # GENERATE TEST REPORT
-                # CHECK TEST RESULT
                 result = self.testing_orchestrator.test()
                 print("Test phase done")
                 # if service flag is true, automate next step 
