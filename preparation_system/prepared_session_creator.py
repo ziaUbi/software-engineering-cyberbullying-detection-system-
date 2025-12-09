@@ -45,37 +45,45 @@ class PreparedSessionCreator:
 
     def create_prepared_session(self, raw_session: Any) -> PreparedSession:
         """
-        Orchestrates feature extraction including Stopword removal.
+        Orchestrates feature extraction based on the user configuration.
+        Only extracts features listed in self.config.features.
         """
         
-        # --- 1. PREPROCESSING TESTO (Stopwords & Cleaning) ---
-        # Otteniamo la lista di token puliti (senza punteggiatura e senza stopwords)
-        clean_tokens = self._preprocess_text(raw_session.tweet)
+        enabled_features = self.config.features
 
-        # --- 2. EXTRACT TEXT FEATURES ---
-        # Feature A: Lunghezza del tweet (basata sui token puliti)
-        tweet_len = len(clean_tokens)
+        # Inizializziamo i valori di default (nel caso la feature sia disabilitata)
+        clean_tokens = []
+        tweet_len = 0
+        bow_vector = []       # Sarà [] se disabilitato
+        audio_decibels = []   # Sarà [] se disabilitato
+        event_ids = []        # Sarà [] se disabilitato
 
-        # Feature B: Bag of Words (usando i token puliti)
-        bow_vector = self._create_bow_vector(clean_tokens)
+        if "tweetLength" in enabled_features or "badWords" in enabled_features:
+            clean_tokens = self._preprocess_text(raw_session.tweet)
 
-        # --- 3. EXTRACT AUDIO FEATURES ---
-        audio_decibels = self._extract_audio_features(raw_session.audio)
+        if "tweetLength" in enabled_features:
+            tweet_len = len(clean_tokens)
 
-        # --- 4. EXTRACT EVENT FEATURES ---
-        event_ids = self._extract_event_features(raw_session.events)
+        if "badWords" in enabled_features:
+            bow_vector = self._create_bow_vector(clean_tokens)
+        
+        if "audioDecibels" in enabled_features:
+            audio_decibels = self._extract_audio_features(raw_session.audio)
 
-        # --- 5. LABEL ---
+        if "matchEvents" in enabled_features:
+            event_ids = self._extract_event_features(raw_session.events)
+
         label_val = raw_session.label if raw_session.label else ""
 
         return PreparedSession(
             uuid=raw_session.uuid,
-            badWords=bow_vector,
+            badWords=bow_vector,      
             tweet_length=tweet_len,
             audio_db=audio_decibels,
             events=event_ids,
             label=label_val
         )
+    
 
     def _preprocess_text(self, text: str) -> List[str]:
         """
