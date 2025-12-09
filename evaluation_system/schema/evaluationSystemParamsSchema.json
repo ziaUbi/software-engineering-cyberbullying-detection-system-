@@ -1,0 +1,27 @@
+{
+  "title": "EvaluationSystemParams",
+  "type": "object",
+  "required": [
+    "minimum_number_labels",
+    "total_errors",
+    "max_consecutive_errors",
+    "service"
+  ],
+  "properties": {
+    "minimum_number_labels": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "total_errors": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "max_consecutive_errors": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "service": {
+      "type": "boolean"
+    }
+  }
+}

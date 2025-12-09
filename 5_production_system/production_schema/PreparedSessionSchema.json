@@ -1,0 +1,39 @@
+{
+    "type": "object",
+    "properties": {
+        "uuid": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "text": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "tweetLenght": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Typo 'Lenght' maintained from PDF specs "
+        },
+        "audio": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        },
+        "events": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            }
+        }
+    },
+    "required": [
+        "uuid",
+        "text",
+        "tweetLenght",
+        "audio",
+        "events"
+    ]
+}

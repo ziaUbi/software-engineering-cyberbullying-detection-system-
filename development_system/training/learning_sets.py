@@ -4,7 +4,7 @@ from typing import List
 import joblib
 import pandas as pd
 
-from development_system.prepared_session import PreparedSession
+from development_system.training.prepared_session import PreparedSession
 
 class LearningSets:
     """
