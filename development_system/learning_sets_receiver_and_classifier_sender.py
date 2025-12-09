@@ -80,8 +80,8 @@ class LearningSetsReceiverAndClassifierSender:
         # Retrieve ip address and port of the target system
         if not test:
             classifier_file = "data/classifier.sav"
-            self.json_handler.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
-            endpoint = self.json_handler.get_system_address("conf/netconf.json", "Production System")
+            JsonHandlerValidator.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
+            endpoint = JsonHandlerValidator.get_system_address("conf/netconf.json", "Production System")
 
             target_ip = endpoint["ip"]
             target_port = endpoint["port"]
@@ -118,8 +118,8 @@ class LearningSetsReceiverAndClassifierSender:
         :return: The response from the target, if any.
         """
         if not test:
-            self.json_handler.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
-            endpoint = self.json_handler.get_system_address("conf/netconf.json", "Messaging System")
+            JsonHandlerValidator.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
+            endpoint = JsonHandlerValidator.get_system_address("conf/netconf.json", "Messaging System")
 
             target_ip = endpoint["ip"]
             target_port = endpoint["port"]

@@ -24,10 +24,10 @@
     "tolerance": {
       "type": "object",
       "properties": {
-        "overfitting_tolerance": {"type": "number", "minimum": 0, "maximum": 1},
-        "generalization_tolerance": {"type": "number", "minimum": 0, "maximum": 1}
+        "validation_tolerance": {"type": "number", "minimum": 0, "maximum": 1},
+        "test_tolerance": {"type": "number", "minimum": 0, "maximum": 1}
       },
-      "required": ["overfitting_tolerance", "generalization_tolerance"],
+      "required": ["validation_tolerance", "test_tolerance"],
       "additionalProperties": false
     },
     "service_flag": {

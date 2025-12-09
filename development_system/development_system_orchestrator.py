@@ -1,4 +1,5 @@
 import time
+import os
 
 from development_system.configuration_parameters import ConfigurationParameters
 from development_system.json_handler_validator import JsonHandlerValidator
@@ -26,8 +27,9 @@ class DevelopmentSystemOrchestrator:
         """Handle development logic."""
 
         # Read the responses of the user for the Stop&Go interaction
-        JsonHandlerValidator.validate_json("responses/user_responses.json", "schemas/user_responses_schema.json")
-        user_responses = JsonHandlerValidator.read_json_file("responses/user_responses.json")
+        THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+        JsonHandlerValidator.validate_json(os.path.join(THIS_DIR, "responses", "user_responses.json"), os.path.join(THIS_DIR, "schemas", "user_responses_schema.json"))
+        user_responses = JsonHandlerValidator.read_json_file(os.path.join(THIS_DIR, "responses", "user_responses.json"))
 
         print("Service Flag: ", self.service_flag)
 
@@ -55,7 +57,8 @@ class DevelopmentSystemOrchestrator:
                         # convert the received string into a dictionary and the dictionary to a learning set object
                         learning_set = LearningSets.from_dict(JsonHandlerValidator.string_to_dict(message['message']))
                     else:
-                        learning_set = LearningSets.from_json("inputs/learning_sets.json")
+                        THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+                        learning_set = LearningSets.from_json(os.path.join(THIS_DIR, "inputs", "learning_sets.json"))
                     # save learning sets in .sav files
                     LearningSets.save_learning_sets(learning_set)
 

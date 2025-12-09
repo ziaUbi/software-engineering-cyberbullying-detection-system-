@@ -5,8 +5,8 @@ from sklearn.metrics import log_loss
 
 from development_system.configuration_parameters import ConfigurationParameters
 from development_system.json_handler_validator import JsonHandlerValidator
-from learning_sets import LearningSets
-from classifier import Classifier
+from development_system.training.learning_sets import LearningSets
+from development_system.training.classifier import Classifier
 
 class Trainer:
     """Class responsible for training a classifier."""
