@@ -10,6 +10,9 @@
       "type": "string",
       "enum": ["development", "production", "evaluation"]
     },
+    "service": {
+      "type": "boolean"
+    },
     "production_sessions": {
       "type": "integer",
       "minimum": 0
@@ -53,6 +56,7 @@
   "required": [
     "maxNumMissingSamples",
     "current_phase",
+    "service",
     "production_sessions",
     "development_sessions",
     "evaluation_sessions",

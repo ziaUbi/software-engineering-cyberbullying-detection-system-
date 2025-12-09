@@ -136,7 +136,10 @@ class IngestionSystemOrchestrator:
                 #update the session sent counter only it is production/evaluation
                 #because development is changed by the human
                 if self.current_phase != "development":
-                    self._update_session()
+                    #if it is not production testing phase, count sessions to change then phase
+                    #otherwise, if it is production testing, stop counting, no phase change needed
+                    if not self.parameters.configuration["service"]:
+                        self._update_session()
 
             except Exception as e:
                 print(f"Error during ingestion: {e}")

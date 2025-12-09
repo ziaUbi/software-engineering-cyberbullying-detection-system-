@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Raw Session Schema",
+  "description": "Schema validation for the Raw Session structure input to the Preparation System",
+  "type": "object",
+  "required": [
+    "uuid",
+    "tweet",
+    "audio_data",
+    "events",
+    "label"
+  ],
+  "properties": {
+    "uuid": {
+      "type": "string",
+      "description": "Unique identifier for the session",
+      "format": "uuid"
+    },
+    "tweet": {
+      "type": "string",
+      "description": "The text content of the tweet"
+    },
+    "audio_data": {
+      "type": "string",
+      "description": "File path to the associated audio file"
+    },
+    "events": {
+      "type": "array",
+      "description": "List of time-series events",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "event"],
+        "properties": {
+          "timestamp": {
+            "type": "number",
+            "description": "Time in seconds when the event occurred"
+          },
+          "event": {
+            "type": "string",
+            "description": "Name or description of the event (e.g., goal, foul)"
+          }
+        }
+      }
+    },
+    "label": {
+      "type": ["string", "null"],
+      "description": "Classification label (e.g., cyberbullying). Can be null if in production phase."
+    }
+  }
+}

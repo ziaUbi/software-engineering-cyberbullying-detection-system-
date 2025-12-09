@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Preparation System Configuration Schema",
+  "description": "Validation schema for the Preparation System configuration parameters.",
+  "type": "object",
+  "required": [
+    "development",
+    "ip_preparation",
+    "port_preparation",
+    "ip_segregation",
+    "port_segregation",
+    "ip_production",
+    "port_production",
+    "MinDecibelGain",
+    "MaxDecibelGain",
+    "stopWordList",
+    "features"
+  ],
+  "properties": {
+    "development": {
+      "type": "boolean",
+      "description": "Flag to enable development mode."
+    },
+    "ip_preparation": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "IP address for the Preparation System server."
+    },
+    "port_preparation": {
+      "type": "integer",
+      "minimum": 1024,
+      "maximum": 65535,
+      "description": "Port number for the Preparation System server."
+    },
+    "ip_segregation": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "IP address for the Segregation System."
+    },
+    "port_segregation": {
+      "type": "integer",
+      "minimum": 1024,
+      "maximum": 65535,
+      "description": "Port number for the Segregation System."
+    },
+    "ip_production": {
+      "type": "string",
+      "format": "ipv4",
+      "description": "IP address for the Classification/Production System."
+    },
+    "port_production": {
+      "type": "integer",
+      "minimum": 1024,
+      "maximum": 65535,
+      "description": "Port number for the Classification/Production System."
+    },
+    "MinDecibelGain": {
+      "type": "number",
+      "description": "Lower bound for audio decibel clamping."
+    },
+    "MaxDecibelGain": {
+      "type": "number",
+      "description": "Upper bound for audio decibel clamping."
+    },
+    "stopWordList": {
+      "type": "array",
+      "description": "List of words to be removed during text processing.",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "features": {
+      "type": "array",
+      "description": "List of features to extract.",
+      "items": {
+        "type": "string",
+        "enum": ["badWords", "tweetLength", "audioDecibels", "matchEvents"]
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false
+}
