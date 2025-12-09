@@ -4,6 +4,7 @@ import json
 from flask import Flask, request, jsonify
 from queue import Queue, Empty
 from typing import Optional, Dict, Any, Tuple
+import dataclasses
 from dataclasses import asdict
 
 from preparation_system.json_handler import JsonHandler 
