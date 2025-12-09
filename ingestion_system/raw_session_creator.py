@@ -35,25 +35,21 @@ class RawSessionCreator:
 
     def mark_missing_samples(self, raw_session: RawSession, placeholder: Any) -> Tuple[bool, RawSession]:
         """
-        Mark which sources are missing in the RawSession (tweet or audio).
-        Checks if fields are NaN or numbers.
-        
-        Returns:
-            number of missing samples (int)
-            raw_session updated (RawSession)
+        Mark missing sources.
+        - Events: Check if specific keys inside are missing.
         """
         missing_count = 0
-        fields_to_check = ['tweet', 'audio']
+        events = raw_session.events
 
-        for field in fields_to_check:
-            # get the value of the field
-            value = getattr(raw_session, field)
+        if isinstance(events, list):
+            for event_item in events:
+                if event_item.get("timestamp") is None:
+                    missing_count += 1
+                    event_item["timestamp"] = placeholder
 
-            # check if the value is missing (NaN or number)
-            if isinstance(value, (int, float)):
-                missing_count += 1
-                # set the field to the placeholder
-                setattr(raw_session, field, placeholder)
+                if event_item.get("event") is None or isinstance(event_item.get("event"), (int, float)):
+                    missing_count += 1
+                    event_item["event"] = placeholder
 
         validate = self.validate_raw_session(missing_count)
         return validate, raw_session

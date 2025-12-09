@@ -6,3 +6,5 @@ requests
 flask
 flask-restful
 jsonschema
+librosa 
+dataclasses
