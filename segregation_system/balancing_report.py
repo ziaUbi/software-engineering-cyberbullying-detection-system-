@@ -1,4 +1,5 @@
 class BalancingReportModel:
+    
     def generate_balancing_report(self, sessions: list, tolerance: float) -> dict:
         total = len(sessions)
         if total == 0:
