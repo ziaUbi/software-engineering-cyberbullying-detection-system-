@@ -1,0 +1,13 @@
+{
+  "title": "ClassifierEvaluation",
+  "type": "object",
+  "required": [
+    "classifier_evaluation"
+  ],
+  "properties": {
+    "classifier_evaluation": {
+      "type": "string",
+      "enum": ["waiting_for_evaluation", "good", "bad"]
+    }
+  }
+}

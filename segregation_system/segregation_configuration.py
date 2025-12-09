@@ -14,7 +14,6 @@ class SegregationSystemConfiguration:
         except FileNotFoundError:
             print("[Config] netconf.json not found.")
 
-        # Carica parametri locali del Segregation System
         try:
             with open(os.path.join(base_dir, "configuration", "segregation_parameters.json"), "r") as f:
                 SegregationSystemConfiguration.LOCAL_PARAMETERS = json.load(f)

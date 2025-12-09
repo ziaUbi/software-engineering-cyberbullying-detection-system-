@@ -1,14 +1,14 @@
 {
     "Preparation System": {
-        "ip": "192.168.10.b",
+        "ip": "192.168.10.1",
         "port": 5102
     },
     "Development System": {
-        "ip": "192.168.10.d",
+        "ip": "192.168.10.2",
         "port": 5104
     },
     "Messaging System": {
-        "ip": "192.168.10.g",
+        "ip": "192.168.10.3",
         "port": 5110
     }
 }

@@ -1,0 +1,44 @@
+{
+  "title": "GlobalNetConf",
+  "type": "object",
+  "required": [
+    "Preparation System",
+    "Development System",
+    "Messaging System"
+  ],
+  "properties": {
+    "Preparation System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Development System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    },
+    "Messaging System": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}
