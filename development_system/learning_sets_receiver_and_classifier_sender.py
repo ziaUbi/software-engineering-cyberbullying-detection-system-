@@ -11,7 +11,7 @@ from development_system.json_handler_validator import JsonHandlerValidator
 
 class LearningSetsReceiverAndClassifierSender:
     """
-    Eenable inter-module communication using Flask.
+    Enable inter-module communication using Flask.
     This class supports sending and receiving messages in a blocking manner
     using HTTP requests.
     """

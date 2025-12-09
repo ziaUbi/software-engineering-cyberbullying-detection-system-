@@ -1,0 +1,34 @@
+{
+  "Ingestion System": {
+    "ip": "151.83.144.119",
+    "port": 5001
+  },
+  "Preparation System": {
+    "ip": "151.83.144.119",
+    "port": 5002
+  },
+  "Segregation System": {
+    "ip": "188.217.91.69",
+    "port": 5003
+  },
+  "Development System": {
+    "ip": "87.19.204.54",
+    "port": 5004
+  },
+  "Production System": {
+    "ip": "109.116.135.145",
+    "port": 5005
+  },
+  "Evaluation System": {
+    "ip": "93.67.96.103",
+    "port": 5030
+  },
+  "Messaging System": {
+    "ip": "93.67.96.103",
+    "port": 5010
+  },
+  "Service Class": {
+    "ip": "93.67.96.103",
+    "port": 5010
+  }
+}

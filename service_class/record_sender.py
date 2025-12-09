@@ -3,7 +3,6 @@ import pandas as pd
 import requests
 import random
 
-from service_class.UniqueRandomGenerator import UniqueRandomGenerator
 from service_class.service_class_parameters import ServiceClassParameters
 
 class RecordSender:
@@ -14,32 +13,14 @@ class RecordSender:
 
         :param basedir: Base directory of Record Sender.
         """
-
         self.base_dir = basedir
+        # Read the records data from the CSV files
+        self.calendar = pd.read_csv(f"{basedir}/../data/calendar.csv")
+        self.environment = pd.read_csv(f"{basedir}/../data/environment.csv")
+        self.helmet = pd.read_csv(f"{basedir}/../data/helmet.csv")
+        self.labels = pd.read_csv(f"{basedir}/../data/labels.csv")
 
-        # Read the data from the CSV files
-        self.calendar = RecordSender.csv_reader(f"{basedir}/../data/calendar.csv")
-        self.environment = RecordSender.csv_reader(f"{basedir}/../data/environment.csv")
-        self.helmet = RecordSender.csv_reader(f"{basedir}/../data/helmet.csv")
-        self.labels = RecordSender.csv_reader(f"{basedir}/../data/labels.csv")
-
-        min_len = min(len(self.calendar), len(self.environment), len(self.helmet), len(self.labels))
-        # However, all the dataframes should have the same length
-
-        # UniqueRandomGenerator instance
-        self.unique_random_generator = UniqueRandomGenerator(0, min_len - 1)
-
-
-    @staticmethod
-    def csv_reader(csv_path: str):
-        """
-        Read a CSV file into a pandas DataFrame.
-
-        :param csv_path: The path to the CSV file.
-        :return: A pandas DataFrame containing the CSV data.
-        """
-
-        return pd.read_csv(csv_path)
+        self.min_len = min(len(self.calendar), len(self.environment), len(self.helmet), len(self.labels))
 
 
     def prepare_bucket(self, session_count: int, include_labels: bool):
@@ -50,11 +31,11 @@ class RecordSender:
         :param include_labels: Whether to include labels in the bucket.
         :return: A list of records to be sent.
         """
-        self.unique_random_generator.reset()
+        indexes = random.sample(range(self.min_len), session_count)
 
         bucket = []
         for _ in range(session_count):
-            index = self.unique_random_generator.generate()
+            index = indexes.pop()
 
             bucket.append({
                 "source": "calendar",
@@ -83,15 +64,17 @@ class RecordSender:
 
         :param bucket: The list of records to send.
         """
-        url = f"http://{ServiceClassParameters.GLOBAL_PARAMETERS['Ingestion System']['ip']}:{ServiceClassParameters.GLOBAL_PARAMETERS['Ingestion System']['port']}/send"
+        ip = ServiceClassParameters.GLOBAL_PARAMETERS['Ingestion System']['ip']
+        port = ServiceClassParameters.GLOBAL_PARAMETERS['Ingestion System']['port']
+
+        url = f"http://{ip}:{port}/send"
 
         while bucket:
             record = random.choice(bucket)
             try:
 
-                # Preparing the packet to send
                 packet = {
-                    "port": ServiceClassParameters.GLOBAL_PARAMETERS["Service Class"]["port"],
+                    "port": port,
                     "message": json.dumps(record)
                 }
 
