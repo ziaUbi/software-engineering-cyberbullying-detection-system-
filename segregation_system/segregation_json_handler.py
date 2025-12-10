@@ -17,7 +17,6 @@ class SegregationSystemJsonHandler:
         Returns the content of the json file.
 
         """
-
         try:
             with open(filepath, "r") as f:
                 return json.load(f)
@@ -36,8 +35,6 @@ class SegregationSystemJsonHandler:
             Returns:
                 bool: True if the file is written successfully, False otherwise.
         """
-
-
         try:
             with open(filepath, "w") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
