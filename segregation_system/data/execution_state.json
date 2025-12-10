@@ -1,4 +1,5 @@
 {
+    "service_flag": true,
     "enough_collected_sessions": "-",
     "balancing_report": "-",
     "coverage_report": "-"

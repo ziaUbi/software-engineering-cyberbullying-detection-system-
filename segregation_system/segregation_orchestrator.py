@@ -15,9 +15,9 @@ execution_state_file_path = "data/execution_state.json"
 
 class SegregationSystemOrchestrator:
 
-    def __init__(self, testing: bool):
+    def __init__(self):
 
-        self.set_testing(testing)  # Set the testing attribute.
+        self.set_testing(True)
         self.db = SegregationSystemDatabaseController()
         self.message_broker = SessionReceiverAndConfigurationSender()
         self.message_broker.start_server()
@@ -25,7 +25,9 @@ class SegregationSystemOrchestrator:
     def run(self):
 
         SegregationSystemConfiguration.configure_parameters() # Load the current Segregation System's parameters.
-        # Retrieve the previous execution state left by the user.
+
+        self.set_testing(SegregationSystemJsonHandler.read_field_from_json(execution_state_file_path,
+                                                                                   "service_flag")) 
         enough_collected_sessions = SegregationSystemJsonHandler.read_field_from_json(execution_state_file_path,
                                                                                    "enough_collected_sessions")
         balancing_report_status = SegregationSystemJsonHandler.read_field_from_json(execution_state_file_path,
@@ -104,6 +106,7 @@ class SegregationSystemOrchestrator:
             # Get all the prepared sessions in the database.
             all_prepared_sessions = self.db.get_all_prepared_sessions()
 
+            # TODO: SISTEMARE COVERAGE
             print("Generating the input coverage report...")
             report_model = CoverageReportModel(all_prepared_sessions)  # Create the BalancingReportModel Object.
             report_model.generateCoverageReport()  # Generate the Balancing Report.
