@@ -80,7 +80,7 @@ class SegregationSystemOrchestrator:
             print("Generating the balancing report...")
             balancing_report_model = BalancingReportModel.generate_balancing_report(all_prepared_sessions)  # Generate the Balancing Report.
             print("Balancing report generated!")
-            BalancingReportView.show_balancing_report(balancing_report_model)  # Show the balancing report to the user.
+            BalancingReportView.show_balancing_report(balancing_report_model, "plots")  # Show the balancing report to the user.
 
             if self.get_testing():
                 # Simulating the user response...
