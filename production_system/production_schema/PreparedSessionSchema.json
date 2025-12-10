@@ -5,35 +5,54 @@
             "type": "string",
             "format": "uuid"
         },
-        "text": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
+        "label": {
+            "type": ["string", "null"],
+            "enum": ["safe", "cyberbullying"]
         },
-        "tweetLenght": {
+        "tweet_length": {
             "type": "integer",
-            "minimum": 0,
-            "description": "Typo 'Lenght' maintained from PDF specs "
+            "minimum": 0
         },
-        "audio": {
-            "type": "array",
-            "items": {
-                "type": "number"
-            }
-        },
-        "events": {
-            "type": "array",
-            "items": {
-                "type": "integer"
-            }
-        }
+        "word_fuck": { "type": "integer", "minimum": 0 },
+        "word_bulli": { "type": "integer", "minimum": 0 },
+        "word_muslim": { "type": "integer", "minimum": 0 },
+        "word_gay": { "type": "integer", "minimum": 0 },
+        "word_nigger": { "type": "integer", "minimum": 0 },
+        "word_rape": { "type": "integer", "minimum": 0 },
+        "event_score": { "type": "integer", "minimum": 0 },
+        "event_sending-off": { "type": "integer", "minimum": 0 },
+        "event_caution": { "type": "integer", "minimum": 0 },
+        "event_substitution": { "type": "integer", "minimum": 0 },
+        "event_foul": { "type": "integer", "minimum": 0 },
+        "event_unknown": { "type": "integer", "minimum": 0 },
+        "audio_0": { "type": "number" },
+        "audio_1": { "type": "number" },
+        "audio_2": { "type": "number" },
+        "audio_3": { "type": "number" },
+        "audio_4": { "type": "number" },
+        "audio_5": { "type": "number" },
+        "audio_6": { "type": "number" },
+        "audio_7": { "type": "number" },
+        "audio_8": { "type": "number" },
+        "audio_9": { "type": "number" },
+        "audio_10": { "type": "number" },
+        "audio_11": { "type": "number" },
+        "audio_12": { "type": "number" },
+        "audio_13": { "type": "number" },
+        "audio_14": { "type": "number" },
+        "audio_15": { "type": "number" },
+        "audio_16": { "type": "number" },
+        "audio_17": { "type": "number" },
+        "audio_18": { "type": "number" },
+        "audio_19": { "type": "number" }
     },
     "required": [
         "uuid",
-        "text",
-        "tweetLenght",
-        "audio",
-        "events"
+        "label",
+        "tweet_length",
+        "word_fuck", "word_bulli", "word_muslim", "word_gay", "word_nigger", "word_rape",
+        "event_score", "event_sending-off", "event_caution", "event_substitution", "event_foul", "event_unknown",
+        "audio_0", "audio_1", "audio_2", "audio_3", "audio_4", "audio_5", "audio_6", "audio_7", "audio_8", "audio_9",
+        "audio_10", "audio_11", "audio_12", "audio_13", "audio_14", "audio_15", "audio_16", "audio_17", "audio_18", "audio_19"
     ]
 }

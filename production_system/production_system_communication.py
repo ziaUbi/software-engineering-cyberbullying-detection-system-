@@ -81,9 +81,20 @@ class ProductionSystemIO:
             print(f"Error sending label: {exc}")
         return None
 
+    # Questa è l'attesa bloccante originale per i messaggi in arrivo
+    # def get_last_message(self) -> Optional[Dict[str, str]]:
+    #     """Block until a message is available in the queue."""
+    #     return self.msg_queue.get(block=True)
+
     def get_last_message(self) -> Optional[Dict[str, str]]:
         """Block until a message is available in the queue."""
-        return self.msg_queue.get(block=True)
+        try:
+            # Aggiungiamo timeout=1.0. 
+            # In questo modo ogni secondo il blocco si "sveglia".
+            return self.msg_queue.get(block=True, timeout=1.0)
+        except queue.Empty:
+            # Se dopo 1 secondo non è arrivato nulla, restituisce None
+            return None
 
     def send_timestamp(self, timestamp: float, status: str) -> bool:
         """Report production timestamps to the service class."""

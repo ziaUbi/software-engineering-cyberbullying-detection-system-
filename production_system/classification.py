@@ -24,7 +24,7 @@ class Classification:
         if self._classifier is None:
             if not self._model_path.exists():
                 raise FileNotFoundError(f"Classifier artefact not found at {self._model_path}")
-            self._classifier = joblib.load(self._model_path)
+            self._classifier = joblib.load(self._model_path)    # Carica il modello ML salvato
 
     def classify(self, prepared_session: Dict[str, Any], classifier_deployed: bool) -> Optional[Label]:
         """Return a :class:`Label` when a classifier is available."""
@@ -40,11 +40,12 @@ class Classification:
         prediction = self._classifier.predict(features_df)[0]
         prediction_int = int(prediction)
 
-        # Mapping binario: 0 -> safe, 1 -> bullying
+        # Mapping binario: 0 -> not cyberbullying, 1 -> cyber5+
+        # +bullying
         if prediction_int == 0:
-            verdict = "safe"
+            verdict = "not cyberbullying"
         else:
-            verdict = "bullying"
+            verdict = "cyberbullying"
 
         return Label(
             uuid=prepared_session["uuid"],
@@ -52,25 +53,19 @@ class Classification:
         )
 
     def _build_feature_frame(self, prepared_session: Dict[str, Any]) -> pd.DataFrame:
-        """Convert the list-based session payload into a flat DataFrame for the model."""
-        # NOTA: Le specifiche PDF  passano liste (text, audio, events).
-        # Un modello ML classico (sklearn) vuole un array piatto di numeri.
-        # Qui facciamo un'aggregazione semplice (media/conteggio) per rendere i dati compatibili.
-        # Se il modello usa Deep Learning, questa logica andrebbe adattata per passare tensori.
+        """Convert the prepared session payload into a DataFrame."""
         
-        audio_vector = prepared_session.get("audio", [])
-        events_vector = prepared_session.get("events", [])
-        text_list = prepared_session.get("text", [])
-        
-        feature_struct = {
-            # Mappiamo il campo 'tweetLenght' (con typo PDF) a snake_case pulito
-            "tweet_length": prepared_session.get("tweetLenght", 0),
+        # Rimuoviamo i campi di metadati che non servono al classificatore
+        features_only = prepared_session.copy()
+        if "uuid" in features_only:
+            del features_only["uuid"]
+        if "label" in features_only:
+            del features_only["label"]
             
-            # Feature engineering di base sui vettori ricevuti
-            "audio_mean": np.mean(audio_vector) if audio_vector else 0.0,
-            "audio_max": np.max(audio_vector) if audio_vector else 0.0,
-            "events_count": len(events_vector),
-            "events_sum": np.sum(events_vector) if events_vector else 0,
-            "text_segments_count": len(text_list)
-        }
-        return pd.DataFrame([feature_struct])
+        # Il modello (joblib) si aspetta le colonne nello stesso ordine del training.
+        # Creiamo un DataFrame con una sola riga.
+        # NOTA: Se il dizionario ha chiavi extra che il modello non conosce, 
+        # sklearn di solito le ignora o da errore a seconda della versione.
+        # L'ideale è assicurarsi che features_only corrisponda alle feature del training.
+        
+        return pd.DataFrame([features_only])
