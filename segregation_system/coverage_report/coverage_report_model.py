@@ -5,8 +5,8 @@ class CoverageReportModel:
 
         bow_vocabulary = ["fuck", "bulli", "muslim", "gay", "nigger", "rape"]
         
-        
-
+        # Aggrega i dati in modo da creare il report di copertura
+        # crea la classe coi dati corretti e ritornala 
 
 
 
