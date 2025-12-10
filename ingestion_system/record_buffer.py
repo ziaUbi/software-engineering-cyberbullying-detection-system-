@@ -2,13 +2,15 @@ import sqlite3
 import json
 from typing import List, Any
 
+from ingestion_system import DATABASE_FILE_PATH
+
 class RecordBufferController:
     """
     Controller for managing the record buffer using sqlite3 directly.
     Manages storage for: tweet, audio, events, label.
     """
 
-    def __init__(self, DATABASE_FILE_PATH):
+    def __init__(self):
         """
         Initialize the connection and the table.
         """
@@ -43,28 +45,51 @@ class RecordBufferController:
     def store_record(self, record: dict) -> None:
         """
         Stores a record. Handles INSERT (if new UUID) and UPDATE (specific field).
+        Saves CLEAN values (unwrapped) into the database columns.
         """
-        uuid = record["value"]["UUID"]
-        source_type = record["source"] # es. "tweet", "audio"
+        value_data = record["value"]
+        uuid = value_data["uuid"]
+        source_type = record["source"] 
 
-        # 1. INSERT OR IGNORE: create a new row if UUID doesn't exist
+        # 1. INSERT OR IGNORE: crea la riga vuota se non esiste
         insert_query = ("INSERT OR IGNORE INTO records (uuid, tweet, audio, events, label) "
                         "VALUES (?, NULL, NULL, NULL, NULL);")
         self.cursor.execute(insert_query, (uuid,))
 
-        # 2. PREPARE: Convert the record content to JSON string
-        record_content = {k: v for k, v in record["value"].items() if k != "UUID"}
-        json_content = json.dumps(record_content)
+        # 2. EXTRACT & PREPARE: Estraiamo SOLO il dato che ci serve
+        content_to_save = None
 
-        # 3. UPDATE: set the specific source field
+        if source_type == "tweet":
+            content_to_save = value_data.get("tweet")
+        
+        elif source_type == "audio":
+            # Gestiamo entrambi i casi (file_path o audio) per sicurezza
+            content_to_save = value_data.get("file_path") or value_data.get("audio")
+        
+        elif source_type == "events":
+            content_to_save = value_data.get("events")
+        
+        elif source_type == "label":
+            content_to_save = value_data.get("label")
+
+        # Se non abbiamo trovato il dato, usciamo o logghiamo errore
+        if content_to_save is None:
+            print(f"Warning: No valid data found for source '{source_type}' in record {uuid}")
+            return
+
+        # Convertiamo il SINGOLO VALORE in stringa JSON
+        # Esempio: "testo" diventa "\"testo\"", [1,2] diventa "[1, 2]"
+        json_content = json.dumps(content_to_save)
+
+        # 3. UPDATE: aggiorniamo la colonna specifica
         if source_type in ["tweet", "audio", "events", "label"]:
             update_query = f"UPDATE records SET {source_type} = ? WHERE uuid = ?;"
             self.cursor.execute(update_query, (json_content, uuid))
             
-            # Commit the changes
             self.conn.commit()
+            # print(f"Stored {source_type} for {uuid}") # Debug opzionale
         else:
-            print(f"Warning: Unknown source type '{source_type}' for UUID {uuid}")
+            print(f"Warning: Unknown source type '{source_type}' for uuid {uuid}")
 
     def get_records(self, uuid: str) -> List[Any]:
         """

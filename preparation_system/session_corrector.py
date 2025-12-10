@@ -1,5 +1,5 @@
 from typing import Any, List, Union, Optional
-from .preparation_configuration import PreparationConfiguration
+from preparation_system.preparation_configuration import PreparationSystemParameters
 
 class SessionCorrector:
     """
@@ -8,11 +8,11 @@ class SessionCorrector:
     tasks in the BPMN.
     """
 
-    def __init__(self, config: PreparationConfiguration):
+    def __init__(self, config: PreparationSystemParameters):
         """
         Initialize the SessionCorrector with the system configuration.
 
-        :param config: Instance of PreparationConfiguration containing limits (Min/Max Decibel).
+        :param config: Instance of PreparationSystemParameters containing limits (Min/Max Decibel).
         """
         self.config = config
 

@@ -13,9 +13,9 @@ def _get_data_file_absolute_path(relative_path: str) -> str:
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), relative_path)
 
 
-PREP_MAN_CONFIG_FILE_PATH = _get_data_file_absolute_path("Preparation_Configuration/"
-                                                        "PreparationSystemConfiguration.json")
-PREP_MAN_CONFIG_SCHEMA_FILE_PATH = _get_data_file_absolute_path(
-    "Preparation_Configuration/PreparationSystemConfigurationSchema.json")
+PREP_CONFIG_FILE_PATH = _get_data_file_absolute_path("Preparation_configuration_schema/"
+                                                        "preparationSystemConfiguration.json")
+PREP_CONFIG_SCHEMA_FILE_PATH = _get_data_file_absolute_path(
+    "Preparation_configuration_schema/preparationSystemConfigurationSchema.json")
 
 RAW_SESSION_SCHEMA_PATH = _get_data_file_absolute_path("session_schemas/rawSessionSchema.json")

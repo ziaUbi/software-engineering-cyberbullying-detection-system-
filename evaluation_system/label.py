@@ -8,44 +8,44 @@ class Label:
     """
     
     # Usa il nome della tua classe Enum come tipo
-    def __init__(self, uuid: str, cyberbullying: str, expert: bool):
+    def __init__(self, uuid: str, label: str, expert: bool):
         """
         Initializes a Label object.
         :param uuid: Unique identifier for the label.
-        :param cyberbullying: String indicating the status.
+        :param label: String indicating the status.
         :param expert: Boolean indicating if the label was assigned by an expert.
         """
-        self.uuid = uuid
-        self.cyberbullying = cyberbullying
-        self.expert = expert
+        self._uuid = uuid
+        self._label = label  
+        self._expert = expert
         
     @property
     def uuid(self) -> str:
-        return self.uuid
+        return self._uuid
     
     @uuid.setter
     def uuid(self, value: str):
-        self.uuid = value
+        self._uuid = value
         
     @property
-    def cyberbullying(self) -> str:
-        return self.cyberbullying
+    def label(self) -> str:
+        return self._label
     
-    @cyberbullying.setter
-    def cyberbullying(self, value: str):
-        self.cyberbullying = value
+    @label.setter
+    def label(self, value: str):
+        self._label = value
         
     @property
     def expert(self) -> bool:
-        return self.expert
+        return self._expert
     
     @expert.setter
     def expert(self, value: bool):
-        self.expert = value
+        self._expert = value
     
     def to_dict(self) -> dict:
         return {
-            "uuid": self.uuid,
-            "cyberbullying": self.cyberbullying, 
-            "expert": self.expert
+            "uuid": self._uuid,
+            "label": self._label, 
+            "expert": self._expert
         }

@@ -24,7 +24,7 @@ class Classification:
         if self._classifier is None:
             if not self._model_path.exists():
                 raise FileNotFoundError(f"Classifier artefact not found at {self._model_path}")
-            self._classifier = joblib.load(self._model_path)
+            self._classifier = joblib.load(self._model_path)    # Carica il modello ML salvato
 
     def classify(self, prepared_session: Dict[str, Any], classifier_deployed: bool) -> Optional[Label]:
         """Return a :class:`Label` when a classifier is available."""
@@ -40,11 +40,11 @@ class Classification:
         prediction = self._classifier.predict(features_df)[0]
         prediction_int = int(prediction)
 
-        # Mapping binario: 0 -> safe, 1 -> bullying
+        # Mapping binario: 0 -> not cyberbullying, 1 -> cyberbullying
         if prediction_int == 0:
-            verdict = "safe"
+            verdict = "not cyberbullying"
         else:
-            verdict = "bullying"
+            verdict = "cyberbullying"
 
         return Label(
             uuid=prepared_session["uuid"],
@@ -52,25 +52,53 @@ class Classification:
         )
 
     def _build_feature_frame(self, prepared_session: Dict[str, Any]) -> pd.DataFrame:
-        """Convert the list-based session payload into a flat DataFrame for the model."""
-        # NOTA: Le specifiche PDF  passano liste (text, audio, events).
-        # Un modello ML classico (sklearn) vuole un array piatto di numeri.
-        # Qui facciamo un'aggregazione semplice (media/conteggio) per rendere i dati compatibili.
-        # Se il modello usa Deep Learning, questa logica andrebbe adattata per passare tensori.
-        
-        audio_vector = prepared_session.get("audio", [])
-        events_vector = prepared_session.get("events", [])
-        text_list = prepared_session.get("text", [])
-        
+        """
+        Convert the prepared session dict into a DataFrame.
+        Input: Dict (dalla PreparedSession)
+        Output: DataFrame (pronto per il modello scikit-learn)
+        """
         feature_struct = {
-            # Mappiamo il campo 'tweetLenght' (con typo PDF) a snake_case pulito
-            "tweet_length": prepared_session.get("tweetLenght", 0),
+            # 1. Feature testuale
+            "tweet_length": prepared_session["tweet_length"],
             
-            # Feature engineering di base sui vettori ricevuti
-            "audio_mean": np.mean(audio_vector) if audio_vector else 0.0,
-            "audio_max": np.max(audio_vector) if audio_vector else 0.0,
-            "events_count": len(events_vector),
-            "events_sum": np.sum(events_vector) if events_vector else 0,
-            "text_segments_count": len(text_list)
+            # 2. Bag of Words (conteggi parole specifiche)
+            "word_fuck": prepared_session["word_fuck"],
+            "word_bulli": prepared_session["word_bulli"],
+            "word_muslim": prepared_session["word_muslim"],
+            "word_gay": prepared_session["word_gay"],
+            "word_nigger": prepared_session["word_nigger"],
+            "word_rape": prepared_session["word_rape"],
+            
+            # 3. Eventi di gioco (conteggi)
+            "event_score": prepared_session["event_score"],
+            "event_sending-off": prepared_session["event_sending-off"],
+            "event_caution": prepared_session["event_caution"],
+            "event_substitution": prepared_session["event_substitution"],
+            "event_foul": prepared_session["event_foul"],
+            "event_unknown": prepared_session["event_unknown"],
+            
+            # 4. Feature Audio (flattened vector 0-19)
+            "audio_0": prepared_session["audio_0"],
+            "audio_1": prepared_session["audio_1"],
+            "audio_2": prepared_session["audio_2"],
+            "audio_3": prepared_session["audio_3"],
+            "audio_4": prepared_session["audio_4"],
+            "audio_5": prepared_session["audio_5"],
+            "audio_6": prepared_session["audio_6"],
+            "audio_7": prepared_session["audio_7"],
+            "audio_8": prepared_session["audio_8"],
+            "audio_9": prepared_session["audio_9"],
+            "audio_10": prepared_session["audio_10"],
+            "audio_11": prepared_session["audio_11"],
+            "audio_12": prepared_session["audio_12"],
+            "audio_13": prepared_session["audio_13"],
+            "audio_14": prepared_session["audio_14"],
+            "audio_15": prepared_session["audio_15"],
+            "audio_16": prepared_session["audio_16"],
+            "audio_17": prepared_session["audio_17"],
+            "audio_18": prepared_session["audio_18"],
+            "audio_19": prepared_session["audio_19"],
         }
+        
+        # Creazione del DataFrame con una sola riga (index=[0])
         return pd.DataFrame([feature_struct])

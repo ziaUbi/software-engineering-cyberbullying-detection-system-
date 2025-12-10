@@ -11,6 +11,7 @@ from ingestion_system.record_buffer import RecordBufferController
 from ingestion_system.raw_session_creator import RawSessionCreator
 from ingestion_system.record_and_session_channel import RecordAndSessionChannel
 from ingestion_system.record_sufficiency_checker import RecordSufficiencyChecker
+from ingestion_system.json_handler import JsonHandler
 
 class IngestionSystemOrchestrator:
     """
@@ -28,14 +29,15 @@ class IngestionSystemOrchestrator:
         # parameters class configuration
         self.parameters = Parameters()
 
-        # record sufficiency checker configuration
-        self.sufficiency_checker = RecordSufficiencyChecker()
 
         # buffer class configuration
         self.buffer_controller = RecordBufferController()
+        
+        # record sufficiency checker configuration
+        self.sufficiency_checker = RecordSufficiencyChecker(self.buffer_controller)
 
         # raw session configuration
-        self.session_creator = RawSessionCreator()
+        self.session_creator = RawSessionCreator(self.parameters)
 
         # IO configuration
         self.json_io = RecordAndSessionChannel(host= self.parameters.configuration["ip_ingestion"]
@@ -76,7 +78,7 @@ class IngestionSystemOrchestrator:
         while True:  # receive records iteratively
             try:
                 # receives new record
-                incoming_result = self.json_io.get_record(timeout=2.0)
+                incoming_result = self.json_io.get_record()
 
                 if incoming_result is None:
                     continue  # no record received, continue the loop
@@ -88,16 +90,38 @@ class IngestionSystemOrchestrator:
                 
                 processed_count += 1
                 print(f"Processed records count: {processed_count}")
+
+                # 1. Controlliamo se è un pacchetto di tipo "audio"
+                if new_record.get("source") == "audio":
+                    
+                    # 2. Estraiamo il dizionario interno "value"
+                    value_data = new_record.get("value", {})
+                    base64_audio = value_data.get("audio")
+
+                    if base64_audio:
+                        # A. TRASFORMAZIONE: Base64 -> File
+                        audio_path = JsonHandler.save_base64_audio_to_file(base64_audio)
+                        
+                        # B. AGGIORNAMENTO RECORD
+                        # Attenzione: Dobbiamo aggiornare dentro "value", non alla radice!
+                        # Così store_record salverà il path nel DB.
+                        new_record["value"]["file_path"] = audio_path 
+                        
+                        # Rimuoviamo il campo pesante
+                        if "audio" in new_record["value"]:
+                            del new_record["value"]["audio"]
+
+
                 # stores record
                 self.buffer_controller.store_record(new_record)
 
-                uuid = new_record["value"]["UUID"]
+                uuid = new_record["value"]["uuid"]
 
                 # checks if records are sufficient to create a raw session
                 if not self.sufficiency_checker.are_records_sufficient(uuid, self.current_phase):
                     continue
                 
-                print(f"Creating RawSession for UUID: {uuid}")
+                print(f"Creating RawSession")
                 # retrieves stored records
                 stored_records = self.buffer_controller.get_records(uuid)
 
@@ -107,10 +131,11 @@ class IngestionSystemOrchestrator:
                 print(f"RawSessions created count: {sessions_created}")
 
                 # removes records
-                self.buffer_controller.remove_records(new_record["value"]["UUID"])
+                self.buffer_controller.remove_records(new_record["value"]["uuid"])
 
                 # marks missing samples with "None" and checks if the session is valid
                 session_valid, marked_raw_session = self.session_creator.mark_missing_samples(raw_session, None)
+    
                 
                 if not session_valid:
                     continue  # do not send anything
@@ -121,18 +146,21 @@ class IngestionSystemOrchestrator:
                         "uuid": marked_raw_session.uuid,
                         "label": marked_raw_session.label
                     }
-                    json_label = json.dumps(label) #json
-                    print("Send Label to Evaluation System: ", json_label)
+                    print(label)
+                    print("Send Label to Evaluation System")
 
                     self.json_io.send_label(target_ip=self.parameters.configuration["ip_evaluation"],
                                               target_port=self.parameters.configuration["port_evaluation"], label_data=label)
 
                 # sends raw session to preparation system
                 session_dict = asdict(marked_raw_session)
-                self.json_io.send_raw_session(target_ip=self.parameters.configuration["ip_preparation"],
-                                          target_port=self.parameters.configuration["port_preparation"], raw_session_data=session_dict)
+                print(session_dict)
+                if self.json_io.send_raw_session(target_ip=self.parameters.configuration["ip_preparation"],
+                                          target_port=self.parameters.configuration["port_preparation"], session_data=session_dict):
 
-                print(f"Raw Session sent for UUID: {uuid}")
+                    print(f"Raw Session sent ")
+
+
                 #update the session sent counter only it is production/evaluation
                 #because development is changed by the human
                 if self.current_phase != "development":
@@ -142,6 +170,7 @@ class IngestionSystemOrchestrator:
                         self._update_session()
 
             except Exception as e:
+                raise e
                 print(f"Error during ingestion: {e}")
                 time.sleep(1)  # brief pause before retrying
 

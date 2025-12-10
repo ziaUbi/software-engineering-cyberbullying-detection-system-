@@ -5,18 +5,8 @@ from typing import Any
 import jsonschema
 
 class SegregationSystemJsonHandler:
-    """
-        A class to read and save file json
-    """
-
     @staticmethod
     def read_json_file(filepath):
-        """
-        Read a json file.
-
-        Returns the content of the json file.
-
-        """
         try:
             with open(filepath, "r") as f:
                 return json.load(f)
@@ -27,14 +17,6 @@ class SegregationSystemJsonHandler:
 
     @staticmethod
     def write_json_file(data, filepath):
-        """
-            Args:
-                data: data to write into json file
-                filepath: path where json file will be saved.
-
-            Returns:
-                bool: True if the file is written successfully, False otherwise.
-        """
         try:
             with open(filepath, "w") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
@@ -45,17 +27,6 @@ class SegregationSystemJsonHandler:
 
     @staticmethod
     def write_field_to_json(file_path: str, field_name: str, value):
-        """
-        Updates the value of a specific field in a JSON file using `write_json_file`.
-
-        Args:
-            file_path (str): Path to the JSON file.
-            field_name (str): The field name to update.
-            value: The new value to set for the field.
-
-        Returns:
-            bool: True if the update was successful, False otherwise.
-        """
         try:
             # Load the existing data
             data = SegregationSystemJsonHandler.read_json_file(file_path)
@@ -74,16 +45,6 @@ class SegregationSystemJsonHandler:
 
     @staticmethod
     def read_field_from_json(file_path: str, field_name: str):
-        """
-        Reads the value of a specific field from a JSON file.
-
-        Args:
-            file_path (str): Path to the JSON file.
-            field_name (str): The field name to retrieve the value for.
-
-        Returns:
-            The value of the specified field or None if the field does not exist.
-        """
         return SegregationSystemJsonHandler.read_json_file(file_path).get(field_name, None)
 
     @staticmethod
@@ -126,10 +87,7 @@ class SegregationSystemJsonHandler:
     def validate_json(json_data: dict, schema_path: str) -> bool:
         """
             Validate a json object against a json schema in a file.
-            :param json_data: json object
-            :param schema_path: path to the json schema relative to the data folder
-            :return: True if json object is valid, False otherwise
-            """
+        """
         with open(schema_path, "r", encoding="UTF-8") as file:
             json_schema = json.load(file)
         try:
@@ -143,9 +101,6 @@ class SegregationSystemJsonHandler:
     def validate_json_from_path(json_path: str, schema_path: str) -> bool:
         """
         Validate a json file against a json schema in a file.
-        :param json_path: file containing the json object
-        :param schema_path: file containing the json schema
-        :return: True if json object is valid, False otherwise
         """
         with open(json_path, "r", encoding="UTF-8") as file:
             json_data = json.load(file)
@@ -155,12 +110,6 @@ class SegregationSystemJsonHandler:
     def string_to_dict(string: str) -> dict:
         """
         Converts a JSON-formatted string back to a dictionary.
-
-        Args:
-            string (str): The JSON string to convert.
-
-        Returns:
-            dict: The dictionary representation of the string.
         """
         try:
             return json.loads(string)
@@ -171,12 +120,6 @@ class SegregationSystemJsonHandler:
     def dict_to_string(dictionary: dict) -> str:
         """
         Converts a dictionary to a JSON-formatted string.
-
-        Args:
-            dictionary (dict): The dictionary to convert.
-
-        Returns:
-            str: A JSON-formatted string representation of the dictionary.
         """
         try:
             return json.dumps(dictionary, indent=4)

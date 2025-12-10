@@ -2,8 +2,8 @@
 from typing import Set
 
 from typing import List, Optional, Any
-from .ingestion_configuration import Parameters  
-from .record_buffer import RecordBufferController 
+from ingestion_system.ingestion_configuration import Parameters  
+from ingestion_system.record_buffer import RecordBufferController 
 
 class RecordSufficiencyChecker:
     """

@@ -7,10 +7,7 @@ from segregation_configuration import SegregationSystemConfiguration
 class BalancingReportModel:
     def generate_balancing_report(self, sessions: list) -> dict:
         total = len(sessions)
-        if total == 0:
-            return {"is_balanced": False, "msg": "No sessions"}
 
-        # Conta le classi (es. "Cyberbullying" vs "Safe")
         counts = {}
         for s in sessions:
             counts[s.label] = counts.get(s.label, 0) + 1

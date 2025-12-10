@@ -35,7 +35,7 @@ class LabelReceiverAndConfigurationSender:
         self.label_queue = queue.Queue()
 
         # Path to the JSON schema 
-        self.label_schema_path = f"{basedir}/schemas/label_schema.json"
+        self.label_schema_path = f"{basedir}/schema/label_schema.json"
 
         # Register the Flask route for receiving labels
         @self.app.route('/send', methods=['POST'])
@@ -50,12 +50,11 @@ class LabelReceiverAndConfigurationSender:
 
         try:
             packet = request.get_json()
-            if not packet or "message" not in packet:
-                    return jsonify({"status": "error", "message": "Invalid packet format"}), 400
+            if not packet or "payload" not in packet:
+                    return jsonify({"status": "error", "payload": "Invalid packet format"}), 400
 
-            # The message is a JSON string inside the 'message' field
-            json_label = json.loads(packet["message"])
-
+            # The message is a JSON string inside the 'payload' field
+            json_label = packet.get("payload")
             #Schema Validation
             if self._validate_json_label(json_label):
                 
@@ -73,16 +72,17 @@ class LabelReceiverAndConfigurationSender:
                     print(f"Warning: Unknown sender IP {sender_ip}")
                     return jsonify({"status": "error", "message": "Unauthorized Sender IP"}), 403
 
+                
                 #Create Label Object
                 label = Label(
                     uuid=json_label['uuid'], 
-                    cyberbullying=str(json_label['cyberbullying']), 
+                    label=str(json_label['label']), 
                     expert=expert
                 )
                 
                 #Insert into Queue
                 self.label_queue.put(label)
-
+                
                 return jsonify({"status": "received"}), 200
             else:
                 return jsonify({"status": "error", "message": "Invalid JSON label schema"}), 400

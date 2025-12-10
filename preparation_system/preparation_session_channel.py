@@ -53,6 +53,7 @@ class PreparationSessionChannel:
             payload = data.get('payload') # This should be the RawSession dict
 
             if not payload:
+                print("Received message without payload.")
                 return jsonify({"error": "Invalid format, 'payload' missing"}), 400
 
             # We only care about raw_sessions in this input channel
@@ -81,16 +82,36 @@ class PreparationSessionChannel:
     def get_raw_session(self, timeout: Optional[float] = None) -> Optional[Dict[str, Any]]:
         """
         Retrieves the next available RawSession from the queue.
-        Corresponds to the 'get_raw_session()' method in the UML.
-
-        :param timeout: Time in seconds to wait for a message. None blocks indefinitely.
-        :return: A dictionary representing the RawSession, or None if queue is empty/timeout.
         """
         try:
             queue_item = self._input_queue.get(timeout=timeout, block=True)
             raw_session_data = queue_item.get('data')
 
-            # Optional: Here you could interact with JsonHandler to validate the schema
+            # --- CORREZIONE: Parsing pre-validazione ---
+            if raw_session_data:
+                # 1. Correzione EVENTI: da stringa '["a", "b"]' a lista ["a", "b"]
+                if "events" in raw_session_data and isinstance(raw_session_data["events"], str):
+                    try:
+                        raw_session_data["events"] = json.loads(raw_session_data["events"])
+                    except Exception as e:
+                        print(f"Warning: Failed to parse events string: {e}")
+                        # Se fallisce, lasciamolo com'è (il validatore poi darà errore, giustamente)
+
+                # 2. Correzione TWEET (opzionale, se arriva come stringa JSON)
+                if "tweet" in raw_session_data and isinstance(raw_session_data["tweet"], str):
+                    # A volte il tweet è salvato come '"testo"', rimuoviamo doppi apici extra se necessario
+                    # Ma attenzione: se è testo semplice non va toccato. 
+                    # json.loads su "ciao" (senza quote) fallisce, su "\"ciao\"" funziona.
+                    try:
+                        # Tentativo euristico: se inizia con { o [ o ", proviamo a parsarlo
+                        val = raw_session_data["tweet"]
+                        if val.startswith(('"', '{', '[')):
+                             raw_session_data["tweet"] = json.loads(val)
+                    except:
+                        pass # Era testo normale
+            # -------------------------------------------
+
+            # Ora raw_session_data['events'] è una LISTA vera, e il validatore sarà felice.
             handler = JsonHandler()
             if not handler.validate_json(raw_session_data, RAW_SESSION_SCHEMA_PATH):
                 print("Invalid RawSession schema received.")

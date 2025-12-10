@@ -1,5 +1,5 @@
 {
-    "minimum_number_labels" : 10,
+    "min_number_labels" : 10,
     "total_errors" : 3,
     "max_consecutive_errors" : 2,
     "service" : true

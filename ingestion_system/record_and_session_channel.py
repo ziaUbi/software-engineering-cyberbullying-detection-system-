@@ -21,7 +21,7 @@ class RecordAndSessionChannel:
     """
     A channel for sending/receiving records, sessions, and labels using Flask.
     """
-    def __init__(self, host: str = '0.0.0.0', port: int = 5000):
+    def __init__(self, host: str = '0.0.0.0', port: int = 5001):
         """
         Initialize the attributes defined in the UML.
         """
@@ -139,7 +139,7 @@ class RecordAndSessionChannel:
         }
         try:
             # Usa un timeout breve per non bloccare l'esecuzione
-            response = requests.post(url, json=payload, timeout=2)
+            response = requests.post(url, json=payload, timeout=10)
             if response.status_code == 200:
                 return True
         except requests.RequestException as e:

@@ -15,7 +15,7 @@
       "type": "object",
       "description": "Record data payload.",
       "properties": {
-        "UUID": {
+        "uuid": {
           "type": "string",
           "description": "Unique session identifier."
         },
@@ -50,7 +50,7 @@
         }
       },
 
-      "required": ["UUID"]
+      "required": ["uuid"]
     }
   },
 

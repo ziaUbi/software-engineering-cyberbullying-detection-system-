@@ -44,6 +44,7 @@ class ProductionOrchestrator:
             if self._service:
                 self._prod_sys_io.send_timestamp(time.time(), "start")
 
+            # Address message based on sender IP
             sender_ip = message["ip"]
             if sender_ip == self._configuration.global_netconf["Development System"]["ip"]:
                 self._handle_deployment(message["message"])
@@ -92,17 +93,22 @@ class ProductionOrchestrator:
             return
 
         print("Moderation label generated")
+        # 1. Invio OBBLIGATORIO al Client Side
+        self._send_label_to_target("Service Class", label, "client")
+
+        # 2. Invio OPZIONALE all'Evaluation System
         if self._evaluation_phase:
             self._send_label_to_target("Evaluation System", label, "send")
-        else:
-            self._send_label_to_target("Service Class", label, "client")
             
+        # -----------------------------------
+
         self._session_counter += 1
 
         if self._service:
             self._prod_sys_io.send_timestamp(time.time(), "end")
 
         self._rotate_evaluation_phase()
+        
 
     def _send_label_to_target(self, target_key: str, label, rule: str) -> None:
         try:
@@ -119,7 +125,7 @@ class ProductionOrchestrator:
 
         if not self._evaluation_phase and self._session_counter == self._configuration.parameters["max_session_production"]:
             self._session_counter = 0
-            self._evaluation_phase = False
+            self._evaluation_phase = True
 
 
 if __name__ == "__main__":
