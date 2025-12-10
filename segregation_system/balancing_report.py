@@ -1,37 +1,10 @@
-class BalancingReportModel:
-    
-    def generate_balancing_report(self, sessions: list, tolerance: float) -> dict:
-        total = len(sessions)
-        if total == 0:
-            return {"is_balanced": False, "msg": "No sessions"}
+from dataclasses import dataclass, field
+from typing import Dict, List, Any
 
-        # Conta le classi (es. "Cyberbullying" vs "Safe")
-        counts = {}
-        for s in sessions:
-            label = s.label
-            counts[label] = counts.get(label, 0) + 1
-
-        is_balanced = True
-        report_details = {}
-        
-        # Logica: in un sistema binario ideale 50/50. 
-        # Tolleranza applicata rispetto alla distribuzione equa.
-        ideal_ratio = 1.0 / len(counts) if len(counts) > 0 else 0
-        
-        for label, count in counts.items():
-            ratio = count / total
-            diff = abs(ratio - ideal_ratio)
-            
-            if diff > tolerance:
-                is_balanced = False
-            
-            report_details[label] = {
-                "count": count,
-                "percentage": round(ratio * 100, 2)
-            }
-
-        return {
-            "total_sessions": total,
-            "details": report_details,
-            "is_balanced": is_balanced
-        }
+@dataclass
+class BalancingReportData:
+    total_sessions: int
+    class_distribution: Dict[str, int]  # Es: {"Cyberbullying": 30, "Safe": 70}
+    class_percentages: Dict[str, float] # Es: {"Cyberbullying": 0.3, "Safe": 0.7}
+    is_balanced: bool
+    tolerance_used: float
