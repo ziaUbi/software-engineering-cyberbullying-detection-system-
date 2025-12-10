@@ -55,12 +55,12 @@ class DevelopmentSystemOrchestrator:
                         print("start timestamp sent")
                         print("Response from Module Service System:", response)
                         # convert the received string into a dictionary and the dictionary to a learning set object
-                        learning_set = LearningSets.from_dict(JsonHandlerValidator.string_to_dict(message['message']))
+                        learning_sets = LearningSets.from_dict(JsonHandlerValidator.string_to_dict(message['message']))
                     else:
                         THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-                        learning_set = LearningSets.from_json(os.path.join(THIS_DIR, "inputs", "learning_sets.json"))
+                        learning_sets = LearningSets.from_json(os.path.join(THIS_DIR, "inputs", "learning_sets.json"))
                     # save learning sets in .sav files
-                    LearningSets.save_learning_sets(learning_set)
+                    LearningSets.save_learning_sets(learning_sets)
 
                 set_average_hyperparams = True
                 self.training_orchestrator.train_classifier(set_average_hyperparams)

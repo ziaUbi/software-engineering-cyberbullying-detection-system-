@@ -1,12 +1,22 @@
 from typing import List, Tuple
 
 class PreparedSession:
+    # ... (La struttura della dataclass rimane identica) ...
+    uuid: str
+    label: str
+    features: Dict[str, Union[int, float]] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        data = {"uuid": self.uuid, "label": self.label}
+        data.update(self.features)
+        return data
+class PreparedSession:
     """
     The `PreparedSession` class represents a prepared session for a data segregation system.
 
     """
 
-    def __init__(self, uuid: str, features: List[Tuple[float, float, float, float, str, str]], label: str):
+    def __init__(self, uuid: str, features, label: str):
         """
         Initializes a new instance of the `PreparedSession` class.
 
