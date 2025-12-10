@@ -131,10 +131,11 @@ class IngestionSystemOrchestrator:
                 print(f"RawSessions created count: {sessions_created}")
 
                 # removes records
-                self.buffer_controller.remove_records(new_record["value"]["UUID"])
+                self.buffer_controller.remove_records(new_record["value"]["uuid"])
 
                 # marks missing samples with "None" and checks if the session is valid
                 session_valid, marked_raw_session = self.session_creator.mark_missing_samples(raw_session, None)
+    
                 
                 if not session_valid:
                     continue  # do not send anything
@@ -145,7 +146,7 @@ class IngestionSystemOrchestrator:
                         "uuid": marked_raw_session.uuid,
                         "label": marked_raw_session.label
                     }
-                    json_label = json.dumps(label) #json
+                    print(label)
                     print("Send Label to Evaluation System")
 
                     self.json_io.send_label(target_ip=self.parameters.configuration["ip_evaluation"],
@@ -153,10 +154,13 @@ class IngestionSystemOrchestrator:
 
                 # sends raw session to preparation system
                 session_dict = asdict(marked_raw_session)
-                self.json_io.send_raw_session(target_ip=self.parameters.configuration["ip_preparation"],
-                                          target_port=self.parameters.configuration["port_preparation"], raw_session_data=session_dict)
+                print(session_dict)
+                if self.json_io.send_raw_session(target_ip=self.parameters.configuration["ip_preparation"],
+                                          target_port=self.parameters.configuration["port_preparation"], session_data=session_dict):
 
-                print(f"Raw Session sent ")
+                    print(f"Raw Session sent ")
+
+
                 #update the session sent counter only it is production/evaluation
                 #because development is changed by the human
                 if self.current_phase != "development":

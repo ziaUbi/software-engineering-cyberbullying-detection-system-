@@ -60,4 +60,4 @@ class RawSessionCreator:
         BPMN gateway: 'RAW SESSION VALID?'.
         Rule: the number of missing sources must be <= maxNumMissingSamples.
         """
-        return missing_count <= self.config.maxNumMissingSamples
+        return missing_count <= self.config.configuration["maxNumMissingSamples"]
