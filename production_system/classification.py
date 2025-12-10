@@ -53,19 +53,53 @@ class Classification:
         )
 
     def _build_feature_frame(self, prepared_session: Dict[str, Any]) -> pd.DataFrame:
-        """Convert the prepared session payload into a DataFrame."""
-        
-        # Rimuoviamo i campi di metadati che non servono al classificatore
-        features_only = prepared_session.copy()
-        if "uuid" in features_only:
-            del features_only["uuid"]
-        if "label" in features_only:
-            del features_only["label"]
+        """
+        Convert the prepared session dict into a DataFrame.
+        Input: Dict (dalla PreparedSession)
+        Output: DataFrame (pronto per il modello scikit-learn)
+        """
+        feature_struct = {
+            # 1. Feature testuale
+            "tweet_length": prepared_session["tweet_length"],
             
-        # Il modello (joblib) si aspetta le colonne nello stesso ordine del training.
-        # Creiamo un DataFrame con una sola riga.
-        # NOTA: Se il dizionario ha chiavi extra che il modello non conosce, 
-        # sklearn di solito le ignora o da errore a seconda della versione.
-        # L'ideale è assicurarsi che features_only corrisponda alle feature del training.
+            # 2. Bag of Words (conteggi parole specifiche)
+            "word_fuck": prepared_session["word_fuck"],
+            "word_bulli": prepared_session["word_bulli"],
+            "word_muslim": prepared_session["word_muslim"],
+            "word_gay": prepared_session["word_gay"],
+            "word_nigger": prepared_session["word_nigger"],
+            "word_rape": prepared_session["word_rape"],
+            
+            # 3. Eventi di gioco (conteggi)
+            "event_score": prepared_session["event_score"],
+            "event_sending-off": prepared_session["event_sending-off"],
+            "event_caution": prepared_session["event_caution"],
+            "event_substitution": prepared_session["event_substitution"],
+            "event_foul": prepared_session["event_foul"],
+            "event_unknown": prepared_session["event_unknown"],
+            
+            # 4. Feature Audio (flattened vector 0-19)
+            "audio_0": prepared_session["audio_0"],
+            "audio_1": prepared_session["audio_1"],
+            "audio_2": prepared_session["audio_2"],
+            "audio_3": prepared_session["audio_3"],
+            "audio_4": prepared_session["audio_4"],
+            "audio_5": prepared_session["audio_5"],
+            "audio_6": prepared_session["audio_6"],
+            "audio_7": prepared_session["audio_7"],
+            "audio_8": prepared_session["audio_8"],
+            "audio_9": prepared_session["audio_9"],
+            "audio_10": prepared_session["audio_10"],
+            "audio_11": prepared_session["audio_11"],
+            "audio_12": prepared_session["audio_12"],
+            "audio_13": prepared_session["audio_13"],
+            "audio_14": prepared_session["audio_14"],
+            "audio_15": prepared_session["audio_15"],
+            "audio_16": prepared_session["audio_16"],
+            "audio_17": prepared_session["audio_17"],
+            "audio_18": prepared_session["audio_18"],
+            "audio_19": prepared_session["audio_19"],
+        }
         
-        return pd.DataFrame([features_only])
+        # Creazione del DataFrame con una sola riga (index=[0])
+        return pd.DataFrame([feature_struct])

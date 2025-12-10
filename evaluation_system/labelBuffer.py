@@ -2,6 +2,7 @@
 Author: Rossana Antonella Sacco
 """
 
+import os
 import sqlite3
 from typing import List, Tuple
 from evaluation_system.label import Label
@@ -19,11 +20,16 @@ class LabelBuffer:
         :param db_name: The name of the SQLite database file.
         """
         self.db_name = db_name
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        self.db_path = os.path.join(current_dir, db_name)
+    
         self.create_table()
+        
 
     def _connect(self):
         """Establish a connection to the database."""
-        return sqlite3.connect(self.db_name)
+        return sqlite3.connect(self.db_path)
 
     def create_table(self) -> None:
         """
