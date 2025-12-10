@@ -1,4 +1,5 @@
 import time
+import os
 
 from service_class.service_class_parameters import ServiceClassParameters
 from service_class.service_receiver import ServiceReceiver
@@ -11,18 +12,18 @@ class ServiceClassOrchestrator:
     """
 
 
-    def __init__(self, basedir: str = "."):
+    def __init__(self):
         """
         Initialize the Service Class Orchestrator.
 
         :param basedir: The base directory for the Service Class Orchestrator.
         """
 
-        self.basedir = basedir
-        ServiceClassParameters.loadParameters(self.basedir) # Load the parameters of the Service Class
-        self.logger = Logger(self.basedir, ServiceClassParameters.LOCAL_PARAMETERS["phase"])
-        self.serviceReceiver = ServiceReceiver(basedir=self.basedir, logger=self.logger)
-        self.recordSender = RecordSender(basedir=self.basedir)
+        basedir = os.path.dirname(os.path.abspath(__file__))
+        ServiceClassParameters.loadParameters(basedir) # Load the parameters of the Service Class
+        self.logger = Logger(basedir, ServiceClassParameters.LOCAL_PARAMETERS["phase"])
+        self.serviceReceiver = ServiceReceiver(basedir=basedir, logger=self.logger)
+        self.recordSender = RecordSender(basedir=basedir)
 
 
     def start(self):
@@ -155,9 +156,5 @@ class ServiceClassOrchestrator:
 if __name__ == "__main__":
 
     service_class_orchestrator = ServiceClassOrchestrator()
-
-    # Start the Service Class Orchestrator
     service_class_orchestrator.start()
-
-    # Wait user input to stop the program
     input("Press Enter to stop the program...")
