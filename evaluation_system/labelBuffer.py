@@ -36,7 +36,7 @@ class LabelBuffer:
         Create the labels table in the database.
         The table has the following columns:
         - uuid (TEXT): Unique identifier for the label.
-        - cyberbullying (TEXT): String indicating the status.
+        - label (TEXT): String indicating the status.
         - expert (INTEGER): Integer indicating if the label was assigned by an expert (0 or 1).
         The primary key is a composite key of (uuid, expert) to allow both classifier and expert labels
         for the same UUID.
@@ -44,7 +44,7 @@ class LabelBuffer:
         query = """
         CREATE TABLE IF NOT EXISTS labels (
             uuid TEXT NOT NULL,
-            cyberbullying TEXT NOT NULL,
+            label TEXT NOT NULL,
             expert INTEGER NOT NULL,
             PRIMARY KEY (uuid, expert)
         )
@@ -88,28 +88,28 @@ class LabelBuffer:
         :param label: The Label instance to save.
         """
         query = """
-        INSERT OR REPLACE INTO labels (uuid, cyberbullying, expert)
+        INSERT OR REPLACE INTO labels (uuid, label, expert)
         VALUES (?, ?, ?)
         """
-        self.execute_query(query, (label.uuid, label.cyberbullying, label.expert))
+        self.execute_query(query, (label.uuid, label.label, label.expert))
 
     def get_classifier_labels(self, limit: int = 100) -> List[Label]:
         """
         Get the first 'limit' classifier labels from the database (expert=0).
         Ordered by UUID to ensure alignment with expert labels.
         """
-        query = "SELECT uuid, cyberbullying, expert FROM labels WHERE expert = 0 ORDER BY uuid LIMIT ?"
+        query = "SELECT uuid, label, expert FROM labels WHERE expert = 0 ORDER BY uuid LIMIT ?"
         rows = self.fetch_query(query, (limit,))
         # we use bool(row[2]) to convert integer back to boolean, as expert is stored as INTEGER in the DB
-        return [Label(uuid=row[0], cyberbullying=row[1], expert=bool(row[2])) for row in rows]
+        return [Label(uuid=row[0], label=row[1], expert=bool(row[2])) for row in rows]
 
     def get_expert_labels(self, limit: int = 100) -> List[Label]:
         """
         Get the first 'limit' expert labels from the database (expert=1).
         """
-        query = "SELECT uuid, cyberbullying, expert FROM labels WHERE expert = 1 ORDER BY uuid LIMIT ?"
+        query = "SELECT uuid, label, expert FROM labels WHERE expert = 1 ORDER BY uuid LIMIT ?"
         rows = self.fetch_query(query, (limit,))
-        return [Label(uuid=row[0], cyberbullying=row[1], expert=bool(row[2])) for row in rows]
+        return [Label(uuid=row[0], label=row[1], expert=bool(row[2])) for row in rows]
 
     def delete_labels(self, limit: int) -> None:
         """

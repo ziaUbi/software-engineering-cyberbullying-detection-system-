@@ -40,8 +40,7 @@ class Classification:
         prediction = self._classifier.predict(features_df)[0]
         prediction_int = int(prediction)
 
-        # Mapping binario: 0 -> not cyberbullying, 1 -> cyber5+
-        # +bullying
+        # Mapping binario: 0 -> not cyberbullying, 1 -> cyberbullying
         if prediction_int == 0:
             verdict = "not cyberbullying"
         else:

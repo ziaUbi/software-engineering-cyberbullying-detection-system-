@@ -44,6 +44,7 @@ class ProductionOrchestrator:
             if self._service:
                 self._prod_sys_io.send_timestamp(time.time(), "start")
 
+            # Address message based on sender IP
             sender_ip = message["ip"]
             if sender_ip == self._configuration.global_netconf["Development System"]["ip"]:
                 self._handle_deployment(message["message"])
@@ -124,7 +125,7 @@ class ProductionOrchestrator:
 
         if not self._evaluation_phase and self._session_counter == self._configuration.parameters["max_session_production"]:
             self._session_counter = 0
-            self._evaluation_phase = False
+            self._evaluation_phase = True
 
 
 if __name__ == "__main__":

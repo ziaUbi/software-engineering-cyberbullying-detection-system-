@@ -99,15 +99,15 @@ class EvaluationReportModel:
     def compute_actual_total_errors(self, classifier_labels: List[Label], expert_labels: List[Label]) -> int:
         """
         Compute the actual total errors in the evaluation report.
-        Compares 'cyberbullying' strings.
+        Compares 'label' strings.
         """
         actual_total_errors = 0
         limit = min(len(classifier_labels), len(expert_labels))
         
         for i in range(limit):
-            # Compare 'cyberbullying' strings after stripping and lowering case
-            val_c = str(classifier_labels[i].cyberbullying).strip().lower()
-            val_e = str(expert_labels[i].cyberbullying).strip().lower()
+            # Compare 'label' strings after stripping and lowering case
+            val_c = str(classifier_labels[i].label).strip().lower()
+            val_e = str(expert_labels[i].label).strip().lower()
             
             if val_c != val_e:
                 actual_total_errors += 1
@@ -123,8 +123,8 @@ class EvaluationReportModel:
         limit = min(len(classifier_labels), len(expert_labels))
         
         for i in range(limit):
-            val_c = str(classifier_labels[i].cyberbullying).strip().lower()
-            val_e = str(expert_labels[i].cyberbullying).strip().lower()
+            val_c = str(classifier_labels[i].label).strip().lower()
+            val_e = str(expert_labels[i].label).strip().lower()
             
             if val_c != val_e:
                 consecutive_errors += 1
