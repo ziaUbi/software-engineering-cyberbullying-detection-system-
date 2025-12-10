@@ -17,7 +17,7 @@ class EvaluationReportView:
         :param report: The EvaluationReport object containing data to display.
         """
         
-        # 1. Extract Metrics
+        #Extract Metrics
         actual_total = report.get_actual_total_errors()
         allowed_total = report.get_total_errors()
         
@@ -26,7 +26,7 @@ class EvaluationReportView:
         
         num_labels = len(report.get_classifier_labels())
 
-        # 2. Header
+        #Header
         print("\n" + "="*60)
         print(f"{'CYBERBULLYING EVALUATION REPORT':^60}")
         print("="*60)
