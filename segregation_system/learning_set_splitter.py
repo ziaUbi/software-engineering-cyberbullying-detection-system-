@@ -6,35 +6,14 @@ from segregation_system.prepared_session import PreparedSession
 from segregation_system.segregation_configuration import SegregationSystemConfiguration
 
 class LearningSetSplitter:
-    """
-    Handles the splitting of prepared sessions into training, validation, and test sets.
-    """
 
     def __init__(self):
-        """
-        Initializes the LearningSetSplitter object.
-        """
         self._training_percentage = SegregationSystemConfiguration.LOCAL_PARAMETERS['training_set_percentage']
         self._validation_percentage = SegregationSystemConfiguration.LOCAL_PARAMETERS['validation_set_percentage']
         self._test_percentage = SegregationSystemConfiguration.LOCAL_PARAMETERS['test_set_percentage']
-        pass
 
 
     def generateLearningSets(self, prepared_sessions: List[PreparedSession] , ) -> LearningSet:
-        """
-        Divides the given prepared sessions into training, validation, and test sets
-        based on the percentages specified in the configuration file.
-
-        Args:
-            prepared_sessions (List[PreparedSession]): The list of prepared sessions to split.
-            config (SegregationSystemConfiguration): The segregation system configuration.
-
-        Returns:
-            LearningSet: An object containing the training, validation, and test sets.
-
-        Raises:
-            ValueError: If the sum of the percentages in the configuration is not 100%.
-        """
         if self._training_percentage + self._validation_percentage + self._test_percentage != 1:
             raise ValueError("The percentages for training, validation, and test sets must sum to 100%.")
 

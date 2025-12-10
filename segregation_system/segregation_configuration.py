@@ -26,14 +26,3 @@ class SegregationSystemConfiguration:
                     SegregationSystemConfiguration.LOCAL_PARAMETERS = json.load(f)
         except FileNotFoundError:
             print("[Config] segregation_parameters.json not found. Using defaults.")
-            # Default fallback
-            SegregationSystemConfiguration.LOCAL_PARAMETERS = {
-                "service": False,
-                "min_sessions_for_processing": 2000,
-                "balancing_report_threshold": 0.05,
-                "minimum_coverage_report_threshold": 100,
-                "number_of_record_of_session": 4,
-                "training_set_percentage": 0.70,
-                "validation_set_percentage": 0.20,
-                "test_set_percentage": 0.10
-            }
