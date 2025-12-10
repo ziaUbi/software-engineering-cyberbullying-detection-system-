@@ -4,8 +4,9 @@ from random import randrange
 
 from segregation_system.session_receiver_and_configuration_sender import SessionReceiverAndConfigurationSender
 from segregation_system.segregation_json_handler import SegregationSystemJsonHandler
-from segregation_system.balancing_report_model import BalancingReportModel
-from segregation_system.coverage_report_model import CoverageReportModel
+from segregation_system.balancing_report.balancing_report_model import BalancingReportModel
+from segregation_system.balancing_report.balancing_report_view import BalancingReportView
+from segregation_system.coverage_report.coverage_report_model import CoverageReportModel
 from segregation_system.learning_set_splitter import LearningSetSplitter
 from segregation_system.segregation_database import SegregationSystemDatabaseController
 from segregation_system.segregation_configuration import SegregationSystemConfiguration
@@ -77,9 +78,9 @@ class SegregationSystemOrchestrator:
             all_prepared_sessions = self.db.get_all_prepared_sessions()
 
             print("Generating the balancing report...")
-            report_model = BalancingReportModel(all_prepared_sessions)  # Create the BalancingReportModel Object.
-            report_model.generateBalancingReport()  # Generate the Balancing Report.
+            balancing_report_model = BalancingReportModel.generate_balancing_report(all_prepared_sessions)  # Generate the Balancing Report.
             print("Balancing report generated!")
+            BalancingReportView.show_balancing_report(balancing_report_model)  # Show the balancing report to the user.
 
             if self.get_testing():
                 # Simulating the user response...

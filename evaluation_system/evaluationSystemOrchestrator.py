@@ -187,5 +187,11 @@ class EvaluationSystemOrchestrator:
             print(f"Error removing file: {e}")
 
 if __name__ == "__main__":
-    orchestrator = EvaluationSystemOrchestrator()
+    
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    print(f"Working directory set to: {current_dir}")
+
+    orchestrator = EvaluationSystemOrchestrator(basedir=current_dir)
     orchestrator.evaluate()
+    
