@@ -139,7 +139,7 @@ class RecordAndSessionChannel:
         }
         try:
             # Usa un timeout breve per non bloccare l'esecuzione
-            response = requests.post(url, json=payload, timeout=2)
+            response = requests.post(url, json=payload, timeout=10)
             if response.status_code == 200:
                 return True
         except requests.RequestException as e:

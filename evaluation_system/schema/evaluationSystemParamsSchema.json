@@ -2,13 +2,13 @@
   "title": "EvaluationSystemParams",
   "type": "object",
   "required": [
-    "minimum_number_labels",
+    "min_number_labels",
     "total_errors",
     "max_consecutive_errors",
     "service"
   ],
   "properties": {
-    "minimum_number_labels": {
+    "min_number_labels": {
       "type": "integer",
       "minimum": 1
     },

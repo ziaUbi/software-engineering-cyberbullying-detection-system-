@@ -51,7 +51,7 @@ class PreparationSystemOrchestrator:
             try:
                 # --- 1. RECEIVE RAW SESSION ---
                 # Bloccante con timeout per permettere graceful shutdown se necessario
-                raw_session= self.json_io.get_raw_session(timeout=2.0)
+                raw_session= self.json_io.get_raw_session()
 
                 if raw_session is None:
                     continue  # Nessun messaggio, riprovo

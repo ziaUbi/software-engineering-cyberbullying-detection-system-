@@ -15,37 +15,37 @@ class Label:
         :param label: String indicating the status.
         :param expert: Boolean indicating if the label was assigned by an expert.
         """
-        self.uuid = uuid
-        self.label = label  
-        self.expert = expert
+        self._uuid = uuid
+        self._label = label  
+        self._expert = expert
         
     @property
     def uuid(self) -> str:
-        return self.uuid
+        return self._uuid
     
     @uuid.setter
     def uuid(self, value: str):
-        self.uuid = value
+        self._uuid = value
         
     @property
     def label(self) -> str:
-        return self.label
+        return self._label
     
     @label.setter
     def label(self, value: str):
-        self.label = value
+        self._label = value
         
     @property
     def expert(self) -> bool:
-        return self.expert
+        return self._expert
     
     @expert.setter
     def expert(self, value: bool):
-        self.expert = value
+        self._expert = value
     
     def to_dict(self) -> dict:
         return {
-            "uuid": self.uuid,
-            "label": self.label, 
-            "expert": self.expert
+            "uuid": self._uuid,
+            "label": self._label, 
+            "expert": self._expert
         }

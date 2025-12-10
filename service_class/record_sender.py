@@ -36,7 +36,6 @@ class RecordSender:
         :return: A list of records to be sent.
         """
         indexes = random.sample(range(self.min_len), session_count)
-
         bucket = []
         for _ in range(session_count):
             index = indexes.pop()

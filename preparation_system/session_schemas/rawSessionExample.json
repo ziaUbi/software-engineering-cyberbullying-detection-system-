@@ -2,10 +2,10 @@
 {    
     "uuid": "123e4567-e89b-12d3-a456-426614174000",
     "tweet": "What an awful referee! You should quit football.",
-    "audio_data": "audio/123e4567.wav",
+    "audio": "audio/123e4567.wav",
     "events": [
-        {"timestamp": 0.0, "event": "goal"},
-        {"timestamp": 3.1, "event": "crowd_cheer"}
+        {"event": "goal"},
+        {"event": "crowd_cheer"}
     ],
     "label": "cyberbullying"
 }
