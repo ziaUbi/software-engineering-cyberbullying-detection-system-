@@ -1,0 +1,30 @@
+{
+  "uuid": "550e8400-e29b-41d4-a716-446655440000",
+  "label": "cyberbullying",
+  "tweet_length": 3,
+  
+  "word_fuck": 2,
+  "word_bulli": 1,
+  "word_muslim": 0,
+  "word_gay": 0,
+  "word_nigger": 0,
+  "word_rape": 0,
+  
+  "event_score": 0,
+  "event_sending-off": 0,
+  "event_caution": 1,
+  "event_substitution": 0,
+  "event_foul": 3,
+  "event_unknown": 0,
+  
+  "audio_0": -12.5,
+  "audio_1": -10.2,
+  "audio_2": -4.5,
+  "audio_3": -1.2,
+  "audio_4": -22.0,
+  "audio_5": 0.0,
+  "audio_6": 0.0,
+  "audio_7": 0.0,
+  "audio_8": 0.0,
+  "audio_9": 0.0
+}
