@@ -8,7 +8,7 @@ class PreparedSession:
     The `PreparedSession` class represents a prepared session for a data segregation system.
     """
     uuid: str
-    text: List[str]
+    badWords: List[int] # Bag of Words vector (0/1)
     tweet_length: int
     audio_db: List[float]
     events: List[int]

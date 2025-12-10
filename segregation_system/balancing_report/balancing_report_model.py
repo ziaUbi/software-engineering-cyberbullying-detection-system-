@@ -5,7 +5,6 @@ from segregation_system.balancing_report.balancing_report import BalancingReport
 from segregation_configuration import SegregationSystemConfiguration
 
 class BalancingReportModel:
-    
     def generate_balancing_report(self, sessions: list) -> dict:
         total = len(sessions)
         if total == 0:
@@ -34,7 +33,7 @@ class BalancingReportModel:
                 "percentage": round((count / total) * 100, 2)
             }
 
-        balancing_report = BalancingReportData(
+        return BalancingReportData(
             total_sessions=total,
             class_distribution={label: details["count"] for label, details in report_details.items()},
             class_percentages={label: details["percentage"] for label, details in report_details.items()},

@@ -1,0 +1,12 @@
+    
+{    
+    "uuid": "123e4567-e89b-12d3-a456-426614174000",
+    "badWords": [0, 0, 0, 1, 0, 0],
+    "tweet_length": 15,
+    "audio_db": [10, 20, 30],
+    "events": [
+        {"timestamp": 0.0, "event": "goal"},
+        {"timestamp": 3.1, "event": "crowd_cheer"}
+    ],
+    "label": "cyberbullying"
+}
