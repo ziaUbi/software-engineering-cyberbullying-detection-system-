@@ -5,10 +5,6 @@
             "type": "string",
             "format": "uuid"
         },
-        "label": {
-            "type": ["string", "null"],
-            "enum": ["safe", "cyberbullying"]
-        },
         "tweet_length": {
             "type": "integer",
             "minimum": 0
@@ -48,7 +44,6 @@
     },
     "required": [
         "uuid",
-        "label",
         "tweet_length",
         "word_fuck", "word_bulli", "word_muslim", "word_gay", "word_nigger", "word_rape",
         "event_score", "event_sending-off", "event_caution", "event_substitution", "event_foul", "event_unknown",
