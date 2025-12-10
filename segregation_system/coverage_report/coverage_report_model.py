@@ -1,18 +1,18 @@
+from coverage_report.coverage_report import CoverageReportData
+
 class CoverageReportModel:
-    def generate_coverage_report(self, sessions: list, min_len: int, max_len: int) -> dict:
-        issues = []
-        
-        # Verifica copertura (esempio: lunghezza tweet nel range corretto)
-        for s in sessions:
-            if not (min_len <= s.tweet_length <= max_len):
-                issues.append(f"Session {s.uuid}: Length {s.tweet_length} out of range [{min_len}-{max_len}]")
-            
-            # Qui si potrebbero aggiungere controlli sull'audio_db se richiesto dal PDF
-        
-        coverage_satisfied = (len(issues) == 0)
-        
-        return {
-            "coverage_satisfied": coverage_satisfied,
-            "issues_count": len(issues),
-            "sample_issues": issues[:5]
-        }
+    def generate_coverage_report(self, sessions: list) -> dict:
+
+        bow_vocabulary = ["fuck", "bulli", "muslim", "gay", "nigger", "rape"]
+        coverage_satisfied = True
+
+        report = CoverageReportData(
+            total_sessions=len(sessions),
+            tweet_length_list=[len(s.tweet) for s in sessions],
+            audio_db_list=[s.audio_db_level for s in sessions],
+            badWords=[sum(1 for word in bow_vocabulary if word in s.tweet.lower()) for s in sessions],
+            events_list=[len(s.events) for s in sessions],
+            coverage_satisfied=coverage_satisfied
+        )
+
+        return report
