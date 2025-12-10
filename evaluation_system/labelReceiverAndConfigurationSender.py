@@ -72,6 +72,7 @@ class LabelReceiverAndConfigurationSender:
                     print(f"Warning: Unknown sender IP {sender_ip}")
                     return jsonify({"status": "error", "message": "Unauthorized Sender IP"}), 403
 
+                
                 #Create Label Object
                 label = Label(
                     uuid=json_label['uuid'], 
@@ -81,7 +82,7 @@ class LabelReceiverAndConfigurationSender:
                 
                 #Insert into Queue
                 self.label_queue.put(label)
-
+                
                 return jsonify({"status": "received"}), 200
             else:
                 return jsonify({"status": "error", "message": "Invalid JSON label schema"}), 400
@@ -108,7 +109,7 @@ class LabelReceiverAndConfigurationSender:
             with open(self.label_schema_path, "r") as schema_file:
                 label_schema = json.load(schema_file)
             
-            jsonschema.validate(json.dumps(json_label), label_schema)
+            jsonschema.validate(json_label, label_schema)
             return True
         except FileNotFoundError:
             print(f"CRITICAL: Schema file not found at {self.label_schema_path}")
