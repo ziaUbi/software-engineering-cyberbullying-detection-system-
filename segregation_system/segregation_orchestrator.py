@@ -1,59 +1,14 @@
 import os
 import time
-from segregation_parameters import SegregationSystemConfiguration
-from database.database_manager import PreparedSessionDatabaseController
-from logic.balancing_report import BalancingReportModel
-from logic.coverage_report import CoverageReportModel
-from logic.learning_set_splitter import LearningSetSplitter
-from communication.segregation_communication import SegregationCommunication
-from models.prepared_session import PreparedSession
-
-class SegregationSystemOrchestrator:
-    def __init__(self, base_dir="."):
-        # 1. Carica parametri
-        SegregationSystemConfiguration.load_parameters(base_dir)
-        
-        # 2. Inizializza componenti
-        self.db = PreparedSessionDatabaseController(f"{base_dir}/database/segregation.db")
-        self.comm = SegregationCommunication()
-        
-        self.running = True
-
-    def start(self):
-        print("--- Segregation System Orchestrator Started ---")
-        self.comm.start_listening()
-
-        while self.running:
-            # A. Controllo nuovi messaggi (Sessioni)
-            session_data = self.comm.get_session()
-            if session_data:
-                # Converti dict in oggetto e salva su DB
-                session = PreparedSession.from_dict(session_data)
-                self.db.store_prepared_session(session)
-
-            self._process_data()
-            
-            time.sleep(1)
-
-
-if __name__ == "__main__":
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    orchestrator = SegregationSystemOrchestrator(base_dir)
-    try:
-        orchestrator.start()
-    except KeyboardInterrupt:
-        print("Stopping Segregation System...")
-
-
 from random import randrange
 
+from segregation_system.session_receiver_and_configuration_sender import SessionReceiverAndConfigurationSender
 from segregation_system.segregation_json_handler import SegregationSystemJsonHandler
 from segregation_system.balancing_report_model import BalancingReportModel
 from segregation_system.coverage_report_model import CoverageReportModel
 from segregation_system.learning_set_splitter import LearningSetSplitter
 from segregation_system.segregation_database import SegregationSystemDatabaseController
 from segregation_system.segregation_configuration import SegregationSystemConfiguration
-from segregation_system.session_receiver_and_configuration_sender import SessionReceiverAndConfigurationSender
 
 execution_state_file_path = "data/execution_state.json"
 
@@ -215,3 +170,13 @@ if __name__ == "__main__":
             orchestrator.run()
     else:
         orchestrator.run()
+
+
+
+if __name__ == "__main__":
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    orchestrator = SegregationSystemOrchestrator(base_dir)
+    try:
+        orchestrator.start()
+    except KeyboardInterrupt:
+        print("Stopping Segregation System...")
