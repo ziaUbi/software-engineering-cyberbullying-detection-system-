@@ -2,13 +2,15 @@ import sqlite3
 import json
 from typing import List, Any
 
+from ingestion_system import DATABASE_FILE_PATH
+
 class RecordBufferController:
     """
     Controller for managing the record buffer using sqlite3 directly.
     Manages storage for: tweet, audio, events, label.
     """
 
-    def __init__(self, DATABASE_FILE_PATH):
+    def __init__(self):
         """
         Initialize the connection and the table.
         """
@@ -44,7 +46,7 @@ class RecordBufferController:
         """
         Stores a record. Handles INSERT (if new UUID) and UPDATE (specific field).
         """
-        uuid = record["value"]["UUID"]
+        uuid = record["value"]["uuid"]
         source_type = record["source"] # es. "tweet", "audio"
 
         # 1. INSERT OR IGNORE: create a new row if UUID doesn't exist
@@ -64,7 +66,7 @@ class RecordBufferController:
             # Commit the changes
             self.conn.commit()
         else:
-            print(f"Warning: Unknown source type '{source_type}' for UUID {uuid}")
+            print(f"Warning: Unknown source type '{source_type}' for uuid {uuid}")
 
     def get_records(self, uuid: str) -> List[Any]:
         """

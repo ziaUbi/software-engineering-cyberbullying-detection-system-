@@ -21,7 +21,7 @@ class RecordAndSessionChannel:
     """
     A channel for sending/receiving records, sessions, and labels using Flask.
     """
-    def __init__(self, host: str = '0.0.0.0', port: int = 5000):
+    def __init__(self, host: str = '0.0.0.0', port: int = 5001):
         """
         Initialize the attributes defined in the UML.
         """

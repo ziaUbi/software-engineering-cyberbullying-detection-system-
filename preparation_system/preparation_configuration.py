@@ -8,7 +8,7 @@ import sys
 import logging
 
 from preparation_system.json_handler import JsonHandler
-from preparation_system import PREP_CONFIG_FILE_PATH, PREP_MAN_CONFIG_SCHEMA_FILE_PATH
+from preparation_system import PREP_CONFIG_FILE_PATH, PREP_CONFIG_SCHEMA_FILE_PATH
 
 class PreparationSystemParameters:
     """
@@ -30,7 +30,7 @@ class PreparationSystemParameters:
             sys.exit(1) # Exit with error code
 
         # Validate configuration file schema
-        is_valid = handler.validate_json(self.configuration, PREP_MAN_CONFIG_SCHEMA_FILE_PATH)
+        is_valid = handler.validate_json(self.configuration, PREP_CONFIG_SCHEMA_FILE_PATH)
         
         if not is_valid:
             logging.critical("Configuration file does not match the schema.")

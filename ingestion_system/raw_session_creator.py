@@ -1,8 +1,8 @@
 # raw_session_creator.py
 
 from typing import Tuple, Any
-from .ingestion_configuration import IngestionConfiguration
-from .raw_session import RawSession
+from ingestion_system.ingestion_configuration import Parameters
+from ingestion_system.raw_session import RawSession
 
 
 class RawSessionCreator:
@@ -13,7 +13,7 @@ class RawSessionCreator:
     - validating the resulting RawSession.
     """
 
-    def __init__(self, config: IngestionConfiguration):
+    def __init__(self, config: Parameters):
         self.config = config
 
     def create_raw_session(self, records) -> RawSession:
