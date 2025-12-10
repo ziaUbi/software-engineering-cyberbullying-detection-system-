@@ -50,7 +50,7 @@ class ServiceReceiver:
         self.label_schema_path = f"{basedir}/schemas/label_schema.json"
 
         # Path of the timestamp log
-        self.timestamp_log_path = f"{basedir}/log/timestamp_log.txt"
+        self.timestamp_log_path = f"{basedir}/logs/timestamp_log.txt"
 
         # Developed Classifiers counter, used only when the phase is "development"
         self.developed_classifiers = 1
