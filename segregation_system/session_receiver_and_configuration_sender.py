@@ -30,6 +30,9 @@ class SessionReceiverAndConfigurationSender:
         # Define a route to receive messages
         @self.app.route('/send', methods=['POST'])
         def receive_message():
+            if not request.is_json:
+                 return jsonify({"error": "Content-Type must be application/json"}), 415
+            
             data = request.json
             sender_ip = request.remote_addr
             sender_port = data.get('port')
@@ -87,25 +90,6 @@ class SessionReceiverAndConfigurationSender:
         }
 
         self.send_message(network_info.get('ip') , network_info.get('port') , json.dumps(configuration) , "MessagingSystem")
-
-    # Testing method
-    def send_timestamp(self, status: str = ""):
-        """
-        Send the timestamp to the Service Class.
-
-        :param status: The status of the timestamp
-        :return: True if the timestamp was sent successfully, False otherwise.
-        """
-        network_info = SegregationSystemConfiguration.GLOBAL_PARAMETERS["Service Class"]
-
-        timestamp_message = {
-            "timestamp": time.time(),
-            "system": "Segregation System",
-            "status": status
-        }
-
-        self.send_message(network_info.get('ip') , network_info.get('port') , json.dumps(timestamp_message) , "Timestamp")
-
 
 if __name__ == "__main__":
 
