@@ -7,12 +7,12 @@ class ServiceClassParameters:
     """
 
     # Local parameters
-    LOCAL_PARAMETERS_PATH = "parameters/service_class_parameters.json"
+    LOCAL_PARAMETERS_PATH = "configuration/service_class_parameters.json"
     LOCAL_PARAMETERS_SCHEMA_PATH = "schemas/service_class_parameters_schema.json"
     LOCAL_PARAMETERS = {}
 
     # Global parameters
-    GLOBAL_PARAMETERS_PATH = "parameters/netconf.json"
+    GLOBAL_PARAMETERS_PATH = "configuration/netconf.json"
     GLOBAL_PARAMETERS_SCHEMA_PATH = "schemas/netconf_schema.json"
     GLOBAL_PARAMETERS = {}
 

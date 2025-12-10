@@ -2,6 +2,9 @@ import json
 import pandas as pd
 import requests
 import random
+from pydub import AudioSegment
+from io import BytesIO
+import base64
 
 from service_class.service_class_parameters import ServiceClassParameters
 
@@ -13,15 +16,16 @@ class RecordSender:
 
         :param basedir: Base directory of Record Sender.
         """
-        self.base_dir = basedir
         # Read the records data from the CSV files
-        self.calendar = pd.read_csv(f"{basedir}/../data/calendar.csv")
-        self.environment = pd.read_csv(f"{basedir}/../data/environment.csv")
-        self.helmet = pd.read_csv(f"{basedir}/../data/helmet.csv")
-        self.labels = pd.read_csv(f"{basedir}/../data/labels.csv")
+        print(basedir)
+        self.tweets = pd.read_csv(f"{basedir}/data/tweets.csv")
+        self.events = pd.read_csv(f"{basedir}/data/events.csv")
+        self.audio = AudioSegment.from_mp3(f"{basedir}/data/audio.mp3")
+        self.audio_duration_ms = len(self.audio)
+        self.clip_duration_ms = 20 * 1000 # 20 seconds in milliseconds
+        self.labels = pd.read_csv(f"{basedir}/data/labels.csv")
 
-        self.min_len = min(len(self.calendar), len(self.environment), len(self.helmet), len(self.labels))
-
+        self.min_len = min(len(self.tweets), len(self.events), len(self.labels))
 
     def prepare_bucket(self, session_count: int, include_labels: bool):
         """
@@ -38,21 +42,33 @@ class RecordSender:
             index = indexes.pop()
 
             bucket.append({
-                "source": "calendar",
-                "value": self.calendar.iloc[index].to_dict()
+                "source": "tweet",
+                "value": self.tweets.iloc[index].to_dict()
             })
             bucket.append({
-                "source": "environment",
-                "value": self.environment.iloc[index].to_dict()
+                "source": "events",
+                "value": self.events.iloc[index].to_dict()
             })
+
+            max_start = max(0, self.audio_duration_ms - self.clip_duration_ms)
+            start_ms = random.randint(0, max_start)
+            end_ms = start_ms + self.clip_duration_ms
+            # extract the audio slice
+            audio_slice = self.audio[start_ms:end_ms]
+            # Convert to bytes (WAV for simplicity)
+            buffer = BytesIO()
+            audio_slice.export(buffer, format="wav")
+            audio_bytes = buffer.getvalue()
+            audio_b64 = base64.b64encode(audio_bytes).decode("ascii")
+
             bucket.append({
-                "source": "helmet",
-                "value": self.helmet.iloc[index].to_dict()
+                "source": "audio",
+                "value": {"audio": audio_b64, "uuid": self.tweets.iloc[index].to_dict()["uuid"]}
             })
 
             if include_labels:
                 bucket.append({
-                    "source": "labels",
+                    "source": "label",
                     "value": self.labels.iloc[index].to_dict()
                 })
 
@@ -75,7 +91,7 @@ class RecordSender:
 
                 packet = {
                     "port": port,
-                    "message": json.dumps(record)
+                    "payload": json.dumps(record)
                 }
 
                 response = requests.post(url, json=packet)

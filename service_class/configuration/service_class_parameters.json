@@ -1,5 +1,5 @@
 {
-    "phase" : "development",
+    "phase" : "all_phases",
     "classifiers_to_develop" : 10,
     "development_sessions" : 100,
     "production_sessions" : 1000,
