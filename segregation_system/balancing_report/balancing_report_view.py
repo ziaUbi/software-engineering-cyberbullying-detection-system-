@@ -1,7 +1,9 @@
+import os
 import matplotlib.pyplot as plt
+from segregation_system.balancing_report.balancing_report import BalancingReportData
 
 class BalancingReportView:
-    def show_balancing_report(balancing_report_model):
+    def show_balancing_report(balancing_report_model: BalancingReportData, workspace_dir):
         print("Balancing Report:")
         print(f"Total Sessions: {balancing_report_model.total_sessions}")
         print("Class Distribution:")
@@ -21,3 +23,5 @@ class BalancingReportView:
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.show()
+        plt_path = os.path.join(workspace_dir, 'balancing_report.png')
+        plt.savefig(plt_path)

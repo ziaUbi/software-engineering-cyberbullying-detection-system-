@@ -1,4 +1,4 @@
-"""Configuration loader for the cyberbullying detection production system."""
+"""Configuration loader for the production system."""
 from __future__ import annotations
 
 from pathlib import Path

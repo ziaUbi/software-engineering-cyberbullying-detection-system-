@@ -77,8 +77,8 @@ class EvaluationReportView:
 
         for i in range(limit):
             
-            val_c = str(c_labels[i].cyberbullying).strip()
-            val_e = str(e_labels[i].cyberbullying).strip()
+            val_c = str(c_labels[i].label).strip()
+            val_e = str(e_labels[i].label).strip()
             
             if val_c.lower() != val_e.lower():
                 uuid_short = c_labels[i].uuid[:8] 

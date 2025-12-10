@@ -35,7 +35,7 @@ class LabelReceiverAndConfigurationSender:
         self.label_queue = queue.Queue()
 
         # Path to the JSON schema 
-        self.label_schema_path = f"{basedir}/schemas/label_schema.json"
+        self.label_schema_path = f"{basedir}/schema/label_schema.json"
 
         # Register the Flask route for receiving labels
         @self.app.route('/send', methods=['POST'])
@@ -50,12 +50,11 @@ class LabelReceiverAndConfigurationSender:
 
         try:
             packet = request.get_json()
-            if not packet or "message" not in packet:
-                    return jsonify({"status": "error", "message": "Invalid packet format"}), 400
+            if not packet or "payload" not in packet:
+                    return jsonify({"status": "error", "payload": "Invalid packet format"}), 400
 
-            # The message is a JSON string inside the 'message' field
-            json_label = json.loads(packet["message"])
-
+            # The message is a JSON string inside the 'payload' field
+            json_label = packet.get("payload")
             #Schema Validation
             if self._validate_json_label(json_label):
                 
@@ -76,7 +75,7 @@ class LabelReceiverAndConfigurationSender:
                 #Create Label Object
                 label = Label(
                     uuid=json_label['uuid'], 
-                    cyberbullying=str(json_label['cyberbullying']), 
+                    label=str(json_label['label']), 
                     expert=expert
                 )
                 
@@ -109,7 +108,7 @@ class LabelReceiverAndConfigurationSender:
             with open(self.label_schema_path, "r") as schema_file:
                 label_schema = json.load(schema_file)
             
-            jsonschema.validate(json_label, label_schema)
+            jsonschema.validate(json.dumps(json_label), label_schema)
             return True
         except FileNotFoundError:
             print(f"CRITICAL: Schema file not found at {self.label_schema_path}")

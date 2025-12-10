@@ -16,11 +16,11 @@
     "port": 5004
   },
   "Production System": {
-    "ip": "109.116.135.145",
-    "port": 5005
+    "ip": "172.20.10.11",
+    "port": 5105
   },
   "Evaluation System": {
-    "ip": "93.67.96.103",
+    "ip": "172.20.10.2",
     "port": 5030
   },
   "Messaging System": {
