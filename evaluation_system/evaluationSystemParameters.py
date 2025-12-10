@@ -13,12 +13,12 @@ class EvaluationSystemParameters:
 
     # Local parameters paths
     LOCAL_PARAMETERS_PATH = "params/evaluationSystemParam.json"
-    LOCAL_PARAMETERS_SCHEMA_PATH = "schemas/evaluationSystemParamsSchema.json"
+    LOCAL_PARAMETERS_SCHEMA_PATH = "schema/evaluationSystemParamsSchema.json"
     LOCAL_PARAMETERS = {}
 
     # Global parameters paths
-    GLOBAL_PARAMETERS_PATH = "parameters/global_netconf.json"
-    GLOBAL_PARAMETERS_SCHEMA_PATH = "schemas/global_netconf_schema.json"
+    GLOBAL_PARAMETERS_PATH = "params/netConf.json"
+    GLOBAL_PARAMETERS_SCHEMA_PATH = "schema/netConfSchema.json"
     GLOBAL_PARAMETERS = {}
 
     # Static class attributes for easy access in Orchestrator
