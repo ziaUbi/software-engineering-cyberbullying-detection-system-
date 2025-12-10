@@ -4,7 +4,11 @@ class CoverageReportModel:
     def generate_coverage_report(self, sessions: list) -> dict:
 
         bow_vocabulary = ["fuck", "bulli", "muslim", "gay", "nigger", "rape"]
-        coverage_satisfied = True
+        
+        
+
+
+
 
         report = CoverageReportData(
             total_sessions=len(sessions),

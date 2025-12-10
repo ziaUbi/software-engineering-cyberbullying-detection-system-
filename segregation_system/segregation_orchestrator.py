@@ -82,7 +82,6 @@ class SegregationSystemOrchestrator:
 
             if self.get_testing():
                 # Simulating the user response...
-                # Randomly assign an outcome, with 20,00% probability of it being True.
                 if balancing_report_model.is_balanced and balancing_report_model.is_minimum:
                     SegregationSystemJsonHandler.write_field_to_json(execution_state_file_path, "balancing_report", "OK")
                 else:
