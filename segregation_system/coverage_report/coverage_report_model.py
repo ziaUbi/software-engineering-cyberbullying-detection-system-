@@ -5,7 +5,7 @@ from segregation_system.coverage_report.coverage_report import CoverageReportDat
 from segregation_system.prepared_session import PreparedSession
 
 class CoverageReportModel:
-    def generate_coverage_report(self, sessions: List[PreparedSession]) -> dict:
+    def generate_coverage_report(sessions: List[PreparedSession]) -> dict:
 
         bow_vocabulary = ["fuck", "bulli", "muslim", "gay", "nigger", "rape"]
         
