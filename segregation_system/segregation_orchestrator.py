@@ -7,6 +7,7 @@ from segregation_system.segregation_json_handler import SegregationSystemJsonHan
 from segregation_system.balancing_report.balancing_report_model import BalancingReportModel
 from segregation_system.balancing_report.balancing_report_view import BalancingReportView
 from segregation_system.coverage_report.coverage_report_model import CoverageReportModel
+from segregation_system.coverage_report.coverage_report_view import CoverageReportView
 from segregation_system.learning_set_splitter import LearningSetSplitter
 from segregation_system.segregation_database import SegregationSystemDatabaseController
 from segregation_system.segregation_configuration import SegregationSystemConfiguration
@@ -89,7 +90,9 @@ class SegregationSystemOrchestrator:
                     self.message_broker.send_configuration("unbalanced_classes")
                     self.reset_execution_state() 
 
-                # TODO: FARE COVERAGE
+                coverage_report_model = CoverageReportModel.generate_coverage_report(all_prepared_sessions) 
+                CoverageReportView.show_coverage_report(coverage_report_model, "plots")  
+
                 if randrange(5) == 0:
                     SegregationSystemJsonHandler.write_field_to_json(execution_state_file_path, "coverage_report", "OK")
                 else:
@@ -111,11 +114,10 @@ class SegregationSystemOrchestrator:
             # Get all the prepared sessions in the database.
             all_prepared_sessions = self.db.get_all_prepared_sessions()
 
-            # TODO: SISTEMARE COVERAGE
             print("Generating the input coverage report...")
-            report_model = CoverageReportModel(all_prepared_sessions)  # Create the BalancingReportModel Object.
-            report_model.generateCoverageReport()  # Generate the Balancing Report.
+            coverage_report_model = CoverageReportModel.generate_coverage_report(all_prepared_sessions) 
             print("Input coverage report generated!")
+            CoverageReportView.show_coverage_report(coverage_report_model, "plots")  
 
             return
 

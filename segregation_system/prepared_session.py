@@ -22,8 +22,8 @@ class PreparedSession:
     event_sending_off: int
     event_caution: int
     event_substitution: int
-    event_foul: List[float]
-    event_unknown: List[int]
+    event_foul: int
+    event_unknown: int
 
     audio_0: float
     audio_1: float

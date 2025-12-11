@@ -1,11 +1,11 @@
-from dataclasses import dataclass, field
-from typing import Dict, List, Any
+from typing import Dict
+from dataclasses import dataclass
 
 @dataclass
 class CoverageReportData:
     total_sessions: int
-    tweet_length_list: List[int]  
-    audio_db_list: List[int]    
-    badWords: List[int]
-    events_list: List[int]
-    coverage_satisfied: bool
+    tweet_length_map: Dict[int, int]
+    audio_db_map: Dict[int, int]
+    bad_words_map: Dict[str, int]
+    events_map: Dict[str, int]
+
