@@ -24,7 +24,6 @@
         "event_caution": { "type": "integer", "minimum": 0 },
         "event_substitution": { "type": "integer", "minimum": 0 },
         "event_foul": { "type": "integer", "minimum": 0 },
-        "event_unknown": { "type": "integer", "minimum": 0 },
         "audio_0": { "type": "number" },
         "audio_1": { "type": "number" },
         "audio_2": { "type": "number" },

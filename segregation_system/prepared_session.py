@@ -23,7 +23,6 @@ class PreparedSession:
     event_caution: int
     event_substitution: int
     event_foul: int
-    event_unknown: int
 
     audio_0: float
     audio_1: float
@@ -68,7 +67,6 @@ class PreparedSession:
             event_caution = data['event_caution']
             event_substitution = data['event_substitution']
             event_foul = data['event_foul']
-            event_unknown = data['event_unknown']
 
             audio_0 = data['audio_0']
             audio_1 = data['audio_1']
@@ -93,4 +91,4 @@ class PreparedSession:
         except KeyError as e:
             raise KeyError(f"Missing key in input dictionary: {e}")
             
-        return PreparedSession(uuid, label, tweet_length, word_fuck, word_bulli, word_muslim, word_gay, word_nigger, word_rape, event_score, event_sending_off, event_caution, event_substitution, event_foul, event_unknown, audio_0, audio_1, audio_2, audio_3, audio_4, audio_5, audio_6, audio_7, audio_8, audio_9, audio_10, audio_11, audio_12, audio_13, audio_14, audio_15, audio_16, audio_17, audio_18, audio_19)
+        return PreparedSession(uuid, label, tweet_length, word_fuck, word_bulli, word_muslim, word_gay, word_nigger, word_rape, event_score, event_sending_off, event_caution, event_substitution, event_foul, audio_0, audio_1, audio_2, audio_3, audio_4, audio_5, audio_6, audio_7, audio_8, audio_9, audio_10, audio_11, audio_12, audio_13, audio_14, audio_15, audio_16, audio_17, audio_18, audio_19)

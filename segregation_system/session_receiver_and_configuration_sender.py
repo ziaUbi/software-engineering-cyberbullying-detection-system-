@@ -36,7 +36,7 @@ class SessionReceiverAndConfigurationSender:
             data = request.json
             sender_ip = request.remote_addr
             sender_port = data.get('port')
-            message = data.get('message')
+            message = data.get('payload')
 
             with self.message_condition:
                 self.last_message = {
