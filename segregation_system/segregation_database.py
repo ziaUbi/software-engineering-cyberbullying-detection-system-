@@ -2,7 +2,7 @@ import sqlite3
 import json
 import os
 from typing import List, Dict
-from prepared_session import PreparedSession
+from segregation_system.prepared_session import PreparedSession
 
 class PreparedSessionDatabaseController:
     """
@@ -35,7 +35,6 @@ class PreparedSessionDatabaseController:
                 event_caution INTEGER,
                 event_substitution INTEGER,
                 event_foul INTEGER,
-                event_unknown INTEGER,
                        
                 audio_0 DOUBLE,
                 audio_1 DOUBLE,
@@ -72,7 +71,7 @@ class PreparedSessionDatabaseController:
         
         try:
             cursor.execute('''
-                INSERT OR REPLACE INTO prepared_sessions (uuid, label, tweet_length, word_fuck, word_bulli, word_muslim, word_gay, word_nigger, word_rape, event_score, event_sending_off, event_caution, event_substitution, event_foul, event_unknown, audio_0, audio_1, audio_2, audio_3, audio_4, audio_5, audio_6, audio_7, audio_8, audio_9, audio_10, audio_11, audio_12, audio_13, audio_14, audio_15, audio_16, audio_17, audio_18, audio_19)
+                INSERT OR REPLACE INTO prepared_sessions (uuid, label, tweet_length, word_fuck, word_bulli, word_muslim, word_gay, word_nigger, word_rape, event_score, event_sending_off, event_caution, event_substitution, event_foul, audio_0, audio_1, audio_2, audio_3, audio_4, audio_5, audio_6, audio_7, audio_8, audio_9, audio_10, audio_11, audio_12, audio_13, audio_14, audio_15, audio_16, audio_17, audio_18, audio_19)
                 VALUES (?, ?, ?, ?, ?, ?)
             ''', (
                 session_data["uuid"],
@@ -89,7 +88,6 @@ class PreparedSessionDatabaseController:
                 session_data["event_caution"],
                 session_data["event_substitution"],
                 session_data["event_foul"],
-                session_data["event_unknown"],
                 session_data["audio_0"],
                 session_data["audio_1"],
                 session_data["audio_2"],
@@ -144,7 +142,6 @@ class PreparedSessionDatabaseController:
                 "event_caution": row["event_caution"],
                 "event_substitution": row["event_substitution"],
                 "event_foul": row["event_foul"],
-                "event_unknown": row["event_unknown"],
                 "audio_0": row["audio_0"],
                 "audio_1": row["audio_1"],
                 "audio_2": row["audio_2"],

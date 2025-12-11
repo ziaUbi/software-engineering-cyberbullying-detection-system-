@@ -1,11 +1,11 @@
 from typing import List, Any
 from collections import Counter, defaultdict
 
-from coverage_report.coverage_report import CoverageReportData
-from prepared_session import PreparedSession
+from segregation_system.coverage_report.coverage_report import CoverageReportData
+from segregation_system.prepared_session import PreparedSession
 
 class CoverageReportModel:
-    def generate_coverage_report(self, sessions: list[PreparedSession]) -> dict:
+    def generate_coverage_report(self, sessions: List[PreparedSession]) -> dict:
 
         bow_vocabulary = ["fuck", "bulli", "muslim", "gay", "nigger", "rape"]
         
@@ -44,7 +44,6 @@ class CoverageReportModel:
         total_caution = 0
         total_substitution = 0
         total_foul = 0
-        total_unknown = 0
 
         for s in sessions:
             total_score += int(getattr(s, "event_score", 0))
@@ -52,15 +51,13 @@ class CoverageReportModel:
             total_caution += int(getattr(s, "event_caution", 0))
             total_substitution += int(getattr(s, "event_substitution", 0))
             total_foul += int(getattr(s, "event_foul", 0))
-            total_unknown += int(getattr(s, "event_unknown", 0))
 
         events_map = {
             "Score": total_score,
             "Sending-off": total_sending_off,
             "Caution": total_caution,
             "Substitution": total_substitution,
-            "Foul": total_foul,
-            "Unknown": total_unknown
+            "Foul": total_foul
         }
 
         # --------- Sessions ---------
