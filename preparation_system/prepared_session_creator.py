@@ -70,7 +70,6 @@ class PreparedSessionCreator:
             features=flat_features
         )
     
-    # --- METODI AGGIORNATI PER CONTEGGIO ---
 
     def _create_flat_bow(self, tokens: List[str]) -> Dict[str, int]:
         """
@@ -114,7 +113,7 @@ class PreparedSessionCreator:
                 
         return features
 
-    # --- (Altri metodi di supporto e raw extraction rimangono invariati) ---
+    # Helper Methods
     def _pad_or_truncate(self, vector: List[Any], target_len: int, fill_value: Any) -> List[Any]:
         current_len = len(vector)
         if current_len >= target_len:

@@ -10,8 +10,6 @@ from preparation_system.preparation_session_channel import PreparationSessionCha
 from preparation_system.session_corrector import SessionCorrector
 from preparation_system.prepared_session_creator import PreparedSessionCreator
 
-# Import opzionale per type hinting
-from typing import Dict, Any
 
 class PreparationSystemOrchestrator:
     """

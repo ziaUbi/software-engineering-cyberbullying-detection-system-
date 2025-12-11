@@ -19,8 +19,7 @@ class RecordBufferController:
         self.conn = sqlite3.connect(DATABASE_FILE_PATH, check_same_thread=False)
         self.cursor = self.conn.cursor()
 
-        # Opzionale: Pulisce il DB all'avvio 
-        # Se vuoi persistenza tra riavvii, commenta la riga sotto.
+        # Pulisce il DB all'avvio 
         self._drop_table()
 
         # Creazione Tabella

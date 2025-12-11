@@ -172,7 +172,6 @@ class IngestionSystemOrchestrator:
                         self._update_session()
 
             except Exception as e:
-                raise e
                 print(f"Error during ingestion: {e}")
                 time.sleep(1)  # brief pause before retrying
 

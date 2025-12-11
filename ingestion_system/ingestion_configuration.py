@@ -2,7 +2,7 @@
 Module: ingestion_system_parameters
 Loads and manages configuration parameters for the ingestion system.
 
-Author: Francesco Taverna
+Author: Martina Fabiani
 
 """
 import sys
