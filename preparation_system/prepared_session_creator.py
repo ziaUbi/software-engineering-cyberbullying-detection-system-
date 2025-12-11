@@ -9,7 +9,7 @@ from preparation_system.preparation_configuration import PreparationSystemParame
 
 @dataclass
 class PreparedSession:
-    # ... (La struttura della dataclass rimane identica) ...
+
     uuid: str
     label: str
     features: Dict[str, Union[int, float]] = field(default_factory=dict)
@@ -23,25 +23,24 @@ class PreparedSessionCreator:
     
     EVENT_MAPPING = {
         "score": 0, "sending-off": 1, "caution": 2, 
-        "substitution": 3, "foul": 4, "unknown": 99
+        "substitution": 3, "foul": 4
     }
 
     BOW_VOCABULARY = ["fuck", "bulli", "muslim", "gay", "nigger", "rape"]
 
-    MAX_AUDIO_SAMPLES = 50 
+    MAX_AUDIO_SAMPLES = 20
 
     def __init__(self, config: PreparationSystemParameters):
         self.config = config
 
     def create_prepared_session(self, raw_session: Any) -> PreparedSession:
-        # ... (Il flusso principale rimane identico, chiama i metodi sotto) ...
         
         enabled_features = self.config.features
         flat_features = {}
 
         clean_tokens = []
         if "tweetLength" in enabled_features or "badWords" in enabled_features:
-            clean_tokens = self._preprocess_text(raw_session.tweet)
+            clean_tokens = self._preprocess_text(raw_session.get("tweet"))
 
         if "tweetLength" in enabled_features:
             flat_features["tweet_length"] = len(clean_tokens)
@@ -53,20 +52,20 @@ class PreparedSessionCreator:
         
         # 3. AUDIO (FLATTENED & PADDED)
         if "audioDecibels" in enabled_features:
-            raw_audio = self._extract_audio_features(raw_session.audio)
+            raw_audio = self._extract_audio_features(raw_session.get("audio"))
             padded_audio = self._pad_or_truncate(raw_audio, self.MAX_AUDIO_SAMPLES, fill_value=0.0)
             for i, val in enumerate(padded_audio):
                 flat_features[f"audio_{i}"] = val
 
         # 4. EVENTS (FREQUENCY)
         if "matchEvents" in enabled_features:
-            events_dict = self._create_flat_events(raw_session.events)
+            events_dict = self._create_flat_events(raw_session.get("events"))
             flat_features.update(events_dict)
 
-        label_val = raw_session.label if raw_session.label else ""
+        label_val = raw_session.get("label", "")
 
         return PreparedSession(
-            uuid=raw_session.uuid,
+            uuid=raw_session.get("uuid"),
             label=label_val,
             features=flat_features
         )
@@ -104,17 +103,15 @@ class PreparedSessionCreator:
 
         # 2. Itera sugli eventi e incrementa i contatori
         for event_item in events:
-            raw_name = event_item.get("event")
-            if raw_name:
-                name_key = str(raw_name).lower()
-                
-                # Se l'evento è conosciuto, incrementa il suo contatore
-                if name_key in self.EVENT_MAPPING:
-                    features[f"event_{name_key}"] += 1
-                else:
-                    # Se è sconosciuto ma ha un nome, lo contiamo come 'unknown'
-                    features["event_unknown"] += 1
+            raw_name = None
 
+            raw_name = event_item
+            
+            name_key = str(raw_name).lower()
+                
+            if name_key in self.EVENT_MAPPING:
+                features[f"event_{name_key}"] += 1
+                
         return features
 
     # --- (Altri metodi di supporto e raw extraction rimangono invariati) ---
