@@ -35,21 +35,39 @@ class RawSessionCreator:
 
     def mark_missing_samples(self, raw_session: RawSession, placeholder: Any) -> Tuple[bool, RawSession]:
         """
-        Mark missing sources.
-        - Events: Check if specific keys inside are missing.
+        Mark missing/invalid sources.
+        - Events: Checks if the strings in the list belong to the allowed vocabulary.
         """
         missing_count = 0
+        
+        # Vocabolario valido (solo le chiavi: "score", "foul", ecc.)
+        EVENT_MAPPING = {
+            "score": 0, "sending-off": 1, "caution": 2, 
+            "substitution": 3, "foul": 4
+        }
+        
+        # Usiamo un set per rendere la ricerca più veloce (O(1))
+        VALID_EVENT_KEYS = set(EVENT_MAPPING.keys())
+
         events = raw_session.events
 
         if isinstance(events, list):
-            for event_item in events:
-                if event_item.get("timestamp") is None:
+            # Usiamo enumerate per poter modificare la lista all'indice 'i'
+            for i, event_item in enumerate(events):
+                
+                # 1. Controllo se è una stringa valida
+                if not isinstance(event_item, str):
                     missing_count += 1
-                    event_item["timestamp"] = placeholder
+                    events[i] = str(placeholder)
+                    continue
 
-                if event_item.get("event") is None or isinstance(event_item.get("event"), (int, float)):
+                # 2. Controllo Vocabolario:
+                # Normalizziamo a lowercase per sicurezza (es. "Foul" -> "foul")
+                # Se l'evento NON è nel vocabolario, è considerato "missing" o invalido
+                if event_item.lower() not in VALID_EVENT_KEYS:
                     missing_count += 1
-                    event_item["event"] = placeholder
+                    # Sostituiamo il valore invalido con il placeholder
+                    events[i] = str(placeholder)
 
         validate = self.validate_raw_session(missing_count)
         return validate, raw_session
