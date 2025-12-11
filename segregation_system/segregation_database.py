@@ -2,7 +2,7 @@ import sqlite3
 import json
 import os
 from typing import List, Dict
-from prepared_session import PreparedSession
+from segregation_system.prepared_session import PreparedSession
 
 class PreparedSessionDatabaseController:
     """

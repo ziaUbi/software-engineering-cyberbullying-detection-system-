@@ -9,23 +9,23 @@ from segregation_system.balancing_report.balancing_report_view import BalancingR
 from segregation_system.coverage_report.coverage_report_model import CoverageReportModel
 from segregation_system.coverage_report.coverage_report_view import CoverageReportView
 from segregation_system.learning_set_splitter import LearningSetSplitter
-from segregation_system.segregation_database import SegregationSystemDatabaseController
+from segregation_system.segregation_database import PreparedSessionDatabaseController
 from segregation_system.segregation_configuration import SegregationSystemConfiguration
 
-execution_state_file_path = "data/execution_state.json"
+execution_state_file_path = "./segregation_system/data/execution_state.json"
 
 class SegregationSystemOrchestrator:
 
     def __init__(self, testing: bool=True):
 
         self.set_testing(testing)
-        self.db = SegregationSystemDatabaseController()
+        self.db = PreparedSessionDatabaseController()
         self.message_broker = SessionReceiverAndConfigurationSender()
         self.message_broker.start_server()
 
     def run(self):
 
-        SegregationSystemConfiguration.configure_parameters() # Load the current Segregation System's parameters.
+        SegregationSystemConfiguration.load_parameters() # Load the current Segregation System's parameters.
 
         self.set_testing(SegregationSystemJsonHandler.read_field_from_json(execution_state_file_path,
                                                                                    "service_flag")) 
@@ -40,7 +40,7 @@ class SegregationSystemOrchestrator:
             # In this phase we must gather the prepared sessions, generate the balancing report and ask the user response.
             print("Waiting for a message...")
 
-            min_num = SegregationSystemConfiguration.LOCAL_PARAMETERS['minimum_number_of_collected_sessions']
+            min_num = SegregationSystemConfiguration.LOCAL_PARAMETERS['min_sessions_for_processing']
 
             while True:
                 # Receive a prepared session from the preparation system.
@@ -141,7 +141,7 @@ class SegregationSystemOrchestrator:
 
             self.message_broker.send_message(network_info['ip'], network_info['port'],
                                              SegregationSystemJsonHandler.dict_to_string(learning_sets.to_dict()))
-            self.db.reset_session_database() 
+            self.db.remove_all_prepared_sessions() 
             self.reset_execution_state() 
 
     def get_testing(self) -> bool:
@@ -163,8 +163,8 @@ if __name__ == "__main__":
 
     if orchestrator.get_testing():
         orchestrator.reset_execution_state()
-        db = SegregationSystemDatabaseController()
-        db.reset_session_database()
+        db = PreparedSessionDatabaseController()
+        db.remove_all_prepared_sessions()
         while orchestrator.get_testing():
             orchestrator.run()
     else:

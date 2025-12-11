@@ -1,8 +1,8 @@
 import os
 import json
-from segregation_json_handler import SegregationSystemJsonHandler
+from segregation_system.segregation_json_handler import SegregationSystemJsonHandler
 from segregation_system.balancing_report.balancing_report import BalancingReportData
-from segregation_configuration import SegregationSystemConfiguration
+from segregation_system.segregation_configuration import SegregationSystemConfiguration
 
 class BalancingReportModel:
     def generate_balancing_report(self, sessions: list) -> dict:

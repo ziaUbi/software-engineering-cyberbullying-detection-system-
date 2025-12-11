@@ -1,11 +1,11 @@
 from typing import List, Any
 from collections import Counter, defaultdict
 
-from coverage_report.coverage_report import CoverageReportData
-from prepared_session import PreparedSession
+from segregation_system.coverage_report.coverage_report import CoverageReportData
+from segregation_system.prepared_session import PreparedSession
 
 class CoverageReportModel:
-    def generate_coverage_report(self, sessions: list[PreparedSession]) -> dict:
+    def generate_coverage_report(self, sessions: List[PreparedSession]) -> dict:
 
         bow_vocabulary = ["fuck", "bulli", "muslim", "gay", "nigger", "rape"]
         

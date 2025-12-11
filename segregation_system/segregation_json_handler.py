@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any
+from typing import Any, Optional
 
 import jsonschema
 
@@ -48,7 +48,7 @@ class SegregationSystemJsonHandler:
         return SegregationSystemJsonHandler.read_json_file(file_path).get(field_name, None)
 
     @staticmethod
-    def get_system_address(json_filepath: str, system_name: str) -> Any | None:
+    def get_system_address(json_filepath: str, system_name: str) -> Optional[Any]:
         """
         Reads the IP address and port of a specified system from a JSON file.
 

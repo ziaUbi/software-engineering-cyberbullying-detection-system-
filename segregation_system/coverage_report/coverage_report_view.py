@@ -5,7 +5,7 @@ from typing import Optional
 import matplotlib.pyplot as plt
 import numpy as np
 
-from coverage_report.coverage_report import CoverageReportData
+from segregation_system.coverage_report.coverage_report import CoverageReportData
 
 
 class CoverageReportView:

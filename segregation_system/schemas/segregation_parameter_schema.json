@@ -1,28 +1,14 @@
 {
   "type": "object",
   "properties": {
-    "thresholds": {
-      "type": "object",
-      "properties": {
         "min_sessions_for_processing": {"type": "integer", "minimum": 1},
-        "balancing_report_threshold": {"type": "number", "minimum": 1},
+        "balancing_report_threshold": {"type": "number"},
         "minimum_coverage_report_threshold": {"type": "integer", "minimum": 1},
-        "number_of_record_of_session": {"type": "integer", "minimum": 1}
-      },
-      "required": ["min_sessions_for_processing", "balancing_report_threshold", "minimum_coverage_report_threshold", "number_of_record_of_session"],
-      "additionalProperties": false
-    },
-    "percentages": {
-      "type": "object",
-      "properties": {
+        "number_of_record_of_session": {"type": "integer", "minimum": 1},
         "training_set_percentage": {"type": "number", "minimum": 0, "maximum": 1},
         "validation_set_percentage": {"type": "number", "minimum": 0, "maximum": 1},
         "test_set_percentage": {"type": "number", "minimum": 0, "maximum": 1}
-      },
-      "required": ["training_set_percentage", "validation_set_percentage", "test_set_percentage"],
+    },
+      "required": ["min_sessions_for_processing", "balancing_report_threshold", "minimum_coverage_report_threshold", "number_of_record_of_session", "training_set_percentage", "validation_set_percentage", "test_set_percentage"],
       "additionalProperties": false
-    }
-  },
-  "required": ["thresholds", "percentages"],
-  "additionalProperties": false
 }
