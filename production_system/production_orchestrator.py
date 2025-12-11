@@ -27,7 +27,8 @@ class ProductionOrchestrator:
         self._prod_sys_io = ProductionSystemIO(prod_binding["ip"], prod_binding["port"])
         
         self._session_counter = 0
-        self._deployed = False
+        # self._deployed = False
+        self._deployed = True  # Per testare senza deployment !!!!!!!!!!!!!
         self._handler = JsonHandler()
         # Assicurati che la cartella si chiami 'production_schema' come nel tuo file system attuale
         self._schema_path = Path(__file__).resolve().parent / "production_schema" / "PreparedSessionSchema.json"
@@ -40,6 +41,9 @@ class ProductionOrchestrator:
             message = self._prod_sys_io.get_last_message()
             if not message:
                 continue
+                
+            # Print the message
+            print(f"\n[DEBUG] Messaggio Arrivato: {message}\n")
 
             if self._service:
                 self._prod_sys_io.send_timestamp(time.time(), "start")

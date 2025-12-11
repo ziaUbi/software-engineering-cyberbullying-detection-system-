@@ -32,13 +32,14 @@ class ProductionSystemIO:
             data = request.json or {}
             sender_ip = request.remote_addr
             sender_port = data.get("port")
-            message_content = data.get("message")
+            message_content = data.get("payload")
             message = {"ip": sender_ip, "port": sender_port, "message": message_content}
             self.msg_queue.put(message)
             return jsonify({"status": "received"}), 200
 
     def start_server(self) -> None:
         """Boot the Flask server on a background thread."""
+        print(f"Flask server listening on {self.host}:{self.port}")
         thread = threading.Thread(target=self.app.run, kwargs={"host": self.host, "port": self.port}, daemon=True)
         thread.start()
 
@@ -52,7 +53,7 @@ class ProductionSystemIO:
         msg_sys = configuration.global_netconf["Messaging System"]
         url = f"http://{msg_sys['ip']}:{msg_sys['port']}/MessagingSystem"
         try:
-            response = requests.post(url, json=payload, timeout=10)
+            response = requests.post(url, json=payload, timeout=2)  #lower timeout
             if response.status_code == 200:
                 return response.json()
         except requests.RequestException as exc:
