@@ -60,7 +60,7 @@ class SegregationSystemOrchestrator:
                             break
 
                     except Exception as e:
-                        raise e
+                        continue
 
             print("Enough prepared session stored!")
             enough_collected_sessions = "OK"
