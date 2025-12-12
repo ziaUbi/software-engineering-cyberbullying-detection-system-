@@ -4,8 +4,6 @@ import os
 import joblib
 import pandas as pd
 
-from development_system.training.prepared_session import PreparedSession
-
 class LearningSets:
     """
     Class representing the three sets using for development: training, validation, and testing.
@@ -140,11 +138,11 @@ class LearningSets:
         except json.JSONDecodeError as ex:
             raise ValueError(f"Error decoding JSON: {ex}")
 
-        # Convert each set in the JSON into a list of PreparedSession objects
+        """ # Convert each set in the JSON into a list of PreparedSession objects
         training_set = [PreparedSession.from_dictionary(session) for session in current_data.get('training_set', [])]
         validation_set = [PreparedSession.from_dictionary(session) for session in
                           current_data.get('validation_set', [])]
         test_set = [PreparedSession.from_dictionary(session) for session in current_data.get('test_set', [])]
 
         # Create and return the LearningSet object
-        return LearningSets(training_set=training_set, validation_set=validation_set, test_set=test_set)
+        return LearningSets(training_set=training_set, validation_set=validation_set, test_set=test_set) """

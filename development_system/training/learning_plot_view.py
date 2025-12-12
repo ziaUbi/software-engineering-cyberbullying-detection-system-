@@ -20,3 +20,4 @@ class LearningPlotView:
         if not os.path.exists(os.path.join(os.getcwd(), "development_system", "results")):
             os.makedirs(os.path.join(os.getcwd(), "development_system", "results"))
         plt.savefig(os.path.join(os.getcwd(), "development_system", "results", "learning_plot.png"))
+        plt.close()
