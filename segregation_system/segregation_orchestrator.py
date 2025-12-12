@@ -59,7 +59,8 @@ class SegregationSystemOrchestrator:
                             print(number_of_collected_sessions, min_num)
                             break
 
-                    except Exception as e:
+                    except Exception:
+                        # Ignore invalid prepared sessions
                         continue
 
             print("Enough prepared session stored!")
@@ -81,13 +82,13 @@ class SegregationSystemOrchestrator:
                 else:
                     SegregationSystemJsonHandler.write_field_to_json(execution_state_file_path, "balancing_report", "NOT OK")
                     balancing_report_status = "NOT OK"
-                    # self.message_broker.send_configuration("unbalanced_classes")
+                    self.message_broker.send_configuration("unbalanced_classes")
                     self.reset_execution_state() 
                     return
                 
                 print("Generating the coverage report...")
                 coverage_report_model = CoverageReportModel.generate_coverage_report(all_prepared_sessions) 
-                # CoverageReportView.show_coverage_report(coverage_report_model, "plots")  
+                CoverageReportView.show_coverage_report(coverage_report_model, "plots")  
                 print("Coverage report generated!")
 
                 if randrange(1) == 0:
@@ -95,13 +96,13 @@ class SegregationSystemOrchestrator:
                     coverage_report_status = "OK"
                 else:
                     SegregationSystemJsonHandler.write_field_to_json(execution_state_file_path, "coverage_report", "NOT OK")
-                    # self.message_broker.send_configuration("features_not_covered")
+                    self.message_broker.send_configuration("coverage_not_satisfied")
                     coverage_report_status = "NOT OK"
                     self.reset_execution_state()
                     return
             else:
                 if  coverage_report_status == "-" and balancing_report_status == "NOT OK" and enough_collected_sessions == "OK":
-                    # self.message_broker.send_configuration("unbalanced_classes")
+                    self.message_broker.send_configuration("unbalanced_classes")
                     self.reset_execution_state() 
                     return
             
@@ -117,7 +118,7 @@ class SegregationSystemOrchestrator:
 
         if not self.get_testing():
             if  coverage_report_status == "NOT OK" and balancing_report_status == "OK" and enough_collected_sessions == "OK":
-                # self.message_broker.send_configuration("coverage_not_satisfied")
+                self.message_broker.send_configuration("coverage_not_satisfied")
                 self.reset_execution_state()  
                 return
             

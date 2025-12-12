@@ -1,5 +1,6 @@
 import copy
 import itertools
+import os
 import random
 
 import joblib
@@ -13,8 +14,9 @@ from development_system.validation.validation_report_view import ValidationRepor
 class ValidationOrchestrator:
     """Orchestrator of the validation"""
 
-    def __init__(self):
+    def __init__(self, basedir):
         """Initialize the orchestrator."""
+        self.basedir = basedir
         self.service_flag = ConfigurationParameters.params['service_flag']
         self.validation_report_model = ValidationReportModel()
 
@@ -22,10 +24,10 @@ class ValidationOrchestrator:
         """
             Perform a grid search for hyperparameters and generate the validation report.
         """
-        classifier_trainer = Trainer()
+        classifier_trainer = Trainer(basedir=self.basedir)
         # if service flag is true, load the classifier with average hyperparameters
         if self.service_flag:
-            classifier = joblib.load("data/classifier_avg_hyperparams.sav")
+            classifier = joblib.load(os.path.join(self.basedir, "data", "classifier_avg_hyperparams.sav"))
             iterations = classifier.get_num_iterations()
         # else reads the iterations from the json
         else:

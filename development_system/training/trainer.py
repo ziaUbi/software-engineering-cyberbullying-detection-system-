@@ -1,17 +1,19 @@
 import math
 import joblib
-
+import os
 from sklearn.metrics import log_loss
 
 from development_system.configuration_parameters import ConfigurationParameters
 from development_system.json_handler_validator import JsonHandlerValidator
+from development_system.training.learning_plot_model import LearningPlotModel
 from development_system.training.learning_sets import LearningSets
 from development_system.training.classifier import Classifier
 
 class Trainer:
     """Class responsible for training a classifier."""
-    def __init__(self):
+    def __init__(self, basedir):
         """Initialize trainer parameters."""
+        self.basedir = basedir
         self.classifier = Classifier()
 
     
@@ -42,8 +44,8 @@ class Trainer:
             Returns:
                 int: The number of iterations.
         """
-        JsonHandlerValidator.validate_json("inputs/iterations.json", "schemas/iterations_schema.json")
-        data = JsonHandlerValidator.read_json_file("inputs/iterations.json")
+        JsonHandlerValidator.validate_json(os.path.join(self.basedir, "inputs", "iterations.json"), os.path.join(self.basedir, "schemas", "iterations_schema.json"))
+        data = JsonHandlerValidator.read_json_file(os.path.join(self.basedir, "inputs", "iterations.json"))
         return data["iterations"]
 
 
@@ -89,6 +91,7 @@ class Trainer:
         # Train the classifier
         self.classifier.fit(x=training_features, y=training_labels)
 
+        LearningPlotModel.set_loss_curve(self.classifier.get_loss_curve())
         return self.classifier
 
     def validate(self):
@@ -105,7 +108,6 @@ class Trainer:
 
         validation_features = result[0]
         validation_labels = result[1]
-
         validation_error = log_loss(y_true=validation_labels,
                                     y_pred=self.classifier.predict_proba(validation_features))
 

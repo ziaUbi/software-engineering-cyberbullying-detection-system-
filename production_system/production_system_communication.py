@@ -32,7 +32,7 @@ class ProductionSystemIO:
             data = request.json or {}
             sender_ip = request.remote_addr
             sender_port = data.get("port")
-            message_content = data.get("payload")
+            message_content = data.get("payload") or data.get("message")
             message = {"ip": sender_ip, "port": sender_port, "message": message_content}
             self.msg_queue.put(message)
             return jsonify({"status": "received"}), 200
