@@ -5,6 +5,7 @@ import threading
 import requests
 from queue import Queue
 from typing import Optional, Dict
+import os
 
 from development_system.json_handler_validator import JsonHandlerValidator
 
@@ -27,9 +28,9 @@ class LearningSetsReceiverAndClassifierSender:
         self.host = host
         self.port = port
         self.message_queue = Queue()
-
+        self.basedir = os.path.dirname(os.path.abspath(__file__))
         # Define a route to receive messages
-        @self.app.route('/learning-sets', methods=['POST'])
+        @self.app.route('/send', methods=['POST'])
         def rcv_learning_sets():
             """
             Receive learning sets via HTTP POST request.
@@ -79,12 +80,12 @@ class LearningSetsReceiverAndClassifierSender:
         :return: The response from the target, if any.
         """
         # Retrieve ip address and port of the target system        
-        JsonHandlerValidator.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
-        endpoint = JsonHandlerValidator.get_system_address("conf/netconf.json", "Production System")
+        JsonHandlerValidator.validate_json(os.path.join(self.basedir, "configuration/netconf.json"), os.path.join(self.basedir, "schemas/netconf_schema.json"))
+        endpoint = JsonHandlerValidator.get_system_ip_address(os.path.join(self.basedir, "configuration/netconf.json"), "Production System")
         target_ip = endpoint["ip"]
         target_port = endpoint["port"]
 
-        with open("data/classifier.sav", "rb") as f:
+        with open(os.path.join(self.basedir, "data/classifier.sav"), "rb") as f:
             file_content = f.read()
             message = file_content.decode('latin1')
 
@@ -112,8 +113,8 @@ class LearningSetsReceiverAndClassifierSender:
         :params test: Boolean which is True only to test the function locally
         :return: The response from the target, if any.
         """
-        JsonHandlerValidator.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
-        endpoint = JsonHandlerValidator.get_system_address("conf/netconf.json", "Messaging System")
+        JsonHandlerValidator.validate_json(os.path.join(self.basedir, "configuration/netconf.json"), os.path.join(self.basedir, "schemas/netconf_schema.json"))
+        endpoint = JsonHandlerValidator.get_system_ip_address(os.path.join(self.basedir, "configuration/netconf.json"), "Messaging System")
 
         target_ip = endpoint["ip"]
         target_port = endpoint["port"]
@@ -145,8 +146,8 @@ class LearningSetsReceiverAndClassifierSender:
         :return: True if the timestamp was sent successfully, False otherwise
         """
         # Retrieve ip address and port of the service class
-        JsonHandlerValidator.validate_json("conf/netconf.json", "schemas/netconf_schema.json")
-        endpoint = JsonHandlerValidator.get_system_address("conf/netconf.json", "Service Class")
+        JsonHandlerValidator.validate_json(os.path.join(self.basedir, "configuration/netconf.json"), os.path.join(self.basedir, "schemas/netconf_schema.json"))
+        endpoint = JsonHandlerValidator.get_system_ip_address(os.path.join(self.basedir, "configuration/netconf.json"), "Service Class")
         target_ip = endpoint["ip"]
         target_port = endpoint["port"]
 

@@ -8,7 +8,7 @@ from development_system.training.prepared_session import PreparedSession
 
 class LearningSets:
     """
-    Static class representing the three sets using for development: training, validation, and testing.
+    Class representing the three sets using for development: training, validation, and testing.
     Sets are represented as lists of PreparedSession objects. 
     Each set is stored in a separate .sav file using joblib.
     
@@ -19,10 +19,14 @@ class LearningSets:
         from_dict(dict): Creates a LearningSet object from a dictionary.
         save_learning_set(learning_set): Saves the learning set to .sav files using joblib
     """
-    def __new__(cls, *args, **kwargs):
-        if cls is LearningSets:
-            raise TypeError(f"'{cls.__name__}' cannot be instantiated")
-        return object.__new__(cls, *args, **kwargs)
+    def __init__(self,
+                 training_set: List[PreparedSession],
+                 validation_set: List[PreparedSession],
+                 test_set: List[PreparedSession]):
+
+        self.training_set = training_set
+        self.validation_set = validation_set
+        self.test_set = test_set
 
 
     @staticmethod
