@@ -1,7 +1,7 @@
 {
   "layers": {
     "min_layers": 1,
-    "max_layers": 5,
+    "max_layers": 4,
     "step_layers": 1
     },
   "neurons": {
@@ -13,5 +13,5 @@
     "validation_tolerance": 0.2,
     "test_tolerance": 0.2
   },
-  "service_flag": false
+  "service_flag": true
 }

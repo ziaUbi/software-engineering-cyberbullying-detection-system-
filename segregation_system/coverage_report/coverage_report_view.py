@@ -29,7 +29,8 @@ class CoverageReportView:
             return [0 for _ in values]
         return [v / max_v for v in values]
 
-    def show_coverage_report(self, report: CoverageReportData, workspace_dir, title: Optional[str] = "Coverage Report"):
+    @staticmethod
+    def show_coverage_report(report: CoverageReportData, workspace_dir, title: Optional[str] = "Coverage Report"):
         fig = plt.figure(figsize=(8, 8))
         ax = plt.subplot(111, polar=True)
 
@@ -64,7 +65,7 @@ class CoverageReportView:
             min_len, max_len = 5, 40
             lengths = []
         
-        max_count_tl = self._safe_max(tl_map.values(), default=1)
+        max_count_tl = safe_max(tl_map.values(), default=1)
 
         for length in lengths:
             count = tl_map[length]
@@ -228,6 +229,7 @@ class CoverageReportView:
 
         plt.title(title)
         plt.tight_layout()
-        plt.show()
-        plt_path = os.path.join(workspace_dir, 'balancing_report.png')
+        # plt.show()
+        plt_path = "segregation_system/" + workspace_dir + '/coverage_report.png'
         plt.savefig(plt_path)
+        return

@@ -43,9 +43,9 @@ class LearningSet:
 
     def to_dict(self) -> dict:
         return {
-            "training_set": [session.to_dictionary() for session in self._training_set],
-            "validation_set": [session.to_dictionary() for session in self._validation_set],
-            "test_set": [session.to_dictionary() for session in self._test_set],
+            "training_set": [session for session in self._training_set],
+            "validation_set": [session for session in self._validation_set],
+            "test_set": [session for session in self._test_set],
         }
 
     @classmethod
@@ -54,7 +54,7 @@ class LearningSet:
             raise ValueError("Input data must be a dictionary.")
 
         return cls(
-            training_set=[PreparedSession.from_dictionary(session) for session in data["training_set"]],
-            validation_set=[PreparedSession.from_dictionary(session) for session in data["validation_set"]],
-            test_set=[PreparedSession.from_dictionary(session) for session in data["test_set"]],
+            training_set=[PreparedSession(session) for session in data["training_set"]],
+            validation_set=[PreparedSession(session) for session in data["validation_set"]],
+            test_set=[PreparedSession(session) for session in data["test_set"]],
         )

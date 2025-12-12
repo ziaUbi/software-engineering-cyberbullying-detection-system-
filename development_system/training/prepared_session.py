@@ -1,93 +1,92 @@
+from dataclasses import dataclass, asdict
 from typing import List, Tuple
 
+@dataclass
 class PreparedSession:
-    # ... (La struttura della dataclass rimane identica) ...
     uuid: str
     label: str
-    features: Dict[str, Union[int, float]] = field(default_factory=dict)
+    tweet_length: int
 
-    def to_dict(self) -> Dict[str, Any]:
-        data = {"uuid": self.uuid, "label": self.label}
-        data.update(self.features)
-        return data
-class PreparedSession:
-    """
-    The `PreparedSession` class represents a prepared session for a data segregation system.
+    word_fuck: int
+    word_bulli: int
+    word_muslim: int
+    word_gay: int
+    word_nigger: int
+    word_rape: int
 
-    """
+    event_score: int
+    event_sending_off: int
+    event_caution: int
+    event_substitution: int
+    event_foul: List[float]
+    event_unknown: List[int]
 
-    def __init__(self, uuid: str, features, label: str):
-        """
-        Initializes a new instance of the `PreparedSession` class.
+    audio_0: float
+    audio_1: float
+    audio_2: float
+    audio_3: float
+    audio_4: float
+    audio_5: float
+    audio_6: float
+    audio_7: float
+    audio_8: float
+    audio_9: float
+    audio_10: float
+    audio_11: float
+    audio_12: float
+    audio_13: float
+    audio_14: float
+    audio_15: float
+    audio_16: float
+    audio_17: float
+    audio_18: float
+    audio_19: float
 
-        Args:
-            uuid (str): The unique ID of the session.
-            features (List[Tuple[float, float, float, float, str, str]]): A list of features associated with the session.
-            label (str): A label associated with the session.
-        """
-        self._uuid = uuid
-        self._features = features
-        self._label = label
-
+    def to_dict(self):
+        return asdict(self)
 
     @staticmethod
     def from_dictionary(data: dict) -> "PreparedSession":
-        """
-        Creates a PreparedSession object from a dictionary.
-
-        Args:
-            data (dict): A dictionary containing keys `uuid`, `psd_alpha_band`, `psd_beta_band`,
-                         `psd_theta_band`, `psd_delta_band`, `activity`, `environment`, and `label`.
-
-        Returns:
-            PreparedSession: A new PreparedSession object.
-
-        Raises:
-            KeyError: If required keys are missing in the dictionary.
-            ValueError: If the data types of values do not match the expected types.
-        """
         try:
             uuid = data['uuid']
-            alpha = data['psd_alpha_band']
-            beta = data['psd_beta_band']
-            theta = data['psd_theta_band']
-            delta = data['psd_delta_band']
-            activity = data['activity']
-            environment = data['environment']
             label = data['label']
+            tweet_length = data['tweet_length']
+
+            word_fuck = data['word_fuck']
+            word_bulli = data['word_bulli']
+            word_muslim = data['word_muslim']
+            word_gay = data['word_gay']
+            word_nigger = data['word_nigger']
+            word_rape = data['word_rape']
+
+            event_score = data['event_score']
+            event_sending_off = data['event_sending-off']
+            event_caution = data['event_caution']
+            event_substitution = data['event_substitution']
+            event_foul = data['event_foul']
+            event_unknown = data['event_unknown']
+
+            audio_0 = data['audio_0']
+            audio_1 = data['audio_1']
+            audio_2 = data['audio_2']
+            audio_3 = data['audio_3']
+            audio_4 = data['audio_4']
+            audio_5 = data['audio_5']
+            audio_6 = data['audio_6']
+            audio_7 = data['audio_7']
+            audio_8 = data['audio_8']
+            audio_9 = data['audio_9']
+            audio_10 = data['audio_10']
+            audio_11 = data['audio_11']
+            audio_12 = data['audio_12']
+            audio_13 = data['audio_13']
+            audio_14 = data['audio_14']
+            audio_15 = data['audio_15']
+            audio_16 = data['audio_16']
+            audio_17 = data['audio_17']
+            audio_18 = data['audio_18']
+            audio_19 = data['audio_19']
         except KeyError as e:
             raise KeyError(f"Missing key in input dictionary: {e}")
-
-        # Validate types
-        if not isinstance(uuid, str):
-            raise ValueError("uuid must be a string.")
-        if not all(isinstance(x, (float, int)) for x in [alpha, beta, theta, delta]):
-            raise ValueError("PSD bands must be floats or integers.")
-        if not isinstance(activity, str):
-            raise ValueError("activity must be a string.")
-        if not isinstance(environment, str):
-            raise ValueError("environment must be a string.")
-        if not isinstance(label, str):
-            raise ValueError("label must be a string.")
-
-        # Create and return the PreparedSession object
-        return PreparedSession(uuid, [alpha, beta, theta, delta, activity, environment], label)
-
-    def to_dictionary(self) -> dict:
-        """
-        Converts the `PreparedSession` object into a dictionary.
-
-        Returns:
-            dict: A dictionary representation of the `PreparedSession` object,
-            with keys `sessionID`, `features`, and `label`.
-        """
-        return  {
-            "uuid": self._uuid,
-            "label": self._label,
-            "psd_alpha_band": self._features[0],
-            "psd_beta_band": self._features[1],
-            "psd_theta_band": self._features[2],
-            "psd_delta_band": self._features[3],
-            "activity": self._features[4],
-            "environment": self._features[5]
-        }
+            
+        return PreparedSession(uuid, label, tweet_length, word_fuck, word_bulli, word_muslim, word_gay, word_nigger, word_rape, event_score, event_sending_off, event_caution, event_substitution, event_foul, event_unknown, audio_0, audio_1, audio_2, audio_3, audio_4, audio_5, audio_6, audio_7, audio_8, audio_9, audio_10, audio_11, audio_12, audio_13, audio_14, audio_15, audio_16, audio_17, audio_18, audio_19)

@@ -14,8 +14,6 @@ class LearningSetSplitter:
 
 
     def generateLearningSets(self, prepared_sessions: List[PreparedSession] , ) -> LearningSet:
-        if self._training_percentage + self._validation_percentage + self._test_percentage != 1:
-            raise ValueError("The percentages for training, validation, and test sets must sum to 100%.")
 
         # Shuffle the prepared sessions to ensure random distribution
         random.shuffle(prepared_sessions)
