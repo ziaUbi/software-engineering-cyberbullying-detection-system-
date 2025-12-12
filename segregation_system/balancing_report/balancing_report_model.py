@@ -1,26 +1,30 @@
 import os
 import json
-from segregation_json_handler import SegregationSystemJsonHandler
+from typing import List
+from segregation_system.prepared_session import PreparedSession
+from segregation_system.segregation_json_handler import SegregationSystemJsonHandler
 from segregation_system.balancing_report.balancing_report import BalancingReportData
-from segregation_configuration import SegregationSystemConfiguration
+from segregation_system.segregation_configuration import SegregationSystemConfiguration
 
 class BalancingReportModel:
-    def generate_balancing_report(self, sessions: list) -> dict:
+    def generate_balancing_report(sessions: List[PreparedSession]) -> BalancingReportData:
         total = len(sessions)
-
         counts = {}
         for s in sessions:
-            counts[s.label] = counts.get(s.label, 0) + 1
+            label = s["label"]
+            if label not in counts:
+                counts[label] = 0
+            counts[label] += 1
 
         is_minimum = True
         is_balanced = True
         report_details = {}
-        tolerance = SegregationSystemConfiguration.balancing_report_threshold
+        tolerance = SegregationSystemConfiguration.LOCAL_PARAMETERS["balancing_report_threshold"]
 
         average = total / len(counts) 
 
         for label, count in counts.items():
-            if count < SegregationSystemConfiguration.minimum_coverage_report_threshold:
+            if count < SegregationSystemConfiguration.LOCAL_PARAMETERS["minimum_coverage_report_threshold"]:
                 is_minimum = False
             if count < average * (1 - tolerance) or count > average * (1 + tolerance):
                 is_balanced = False

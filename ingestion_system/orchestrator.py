@@ -118,6 +118,8 @@ class IngestionSystemOrchestrator:
                 uuid = new_record["value"]["uuid"]
 
                 # checks if records are sufficient to create a raw session
+                # if we are in development mode, label is required
+                # in production, label is not required
                 if not self.sufficiency_checker.are_records_sufficient(uuid, self.current_phase):
                     continue
                 
@@ -138,7 +140,7 @@ class IngestionSystemOrchestrator:
     
                 
                 if not session_valid:
-                    continue  # do not send anything
+                  continue  # do not send anything
 
                 # if in evaluation phase, sends labels to evaluation system
                 if self.current_phase == "evaluation":
@@ -153,7 +155,7 @@ class IngestionSystemOrchestrator:
                                               target_port=self.parameters.configuration["port_evaluation"], label_data=label)
 
                 # sends raw session to preparation system
-                session_dict = asdict(marked_raw_session)
+                session_dict = asdict(raw_session)
                 print(session_dict)
                 if self.json_io.send_raw_session(target_ip=self.parameters.configuration["ip_preparation"],
                                           target_port=self.parameters.configuration["port_preparation"], session_data=session_dict):
@@ -170,7 +172,6 @@ class IngestionSystemOrchestrator:
                         self._update_session()
 
             except Exception as e:
-                raise e
                 print(f"Error during ingestion: {e}")
                 time.sleep(1)  # brief pause before retrying
 

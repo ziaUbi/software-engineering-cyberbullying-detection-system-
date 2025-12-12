@@ -45,8 +45,9 @@ class RecordSufficiencyChecker:
         if not core_requirements_met:
             return False
         
-        # if not production, label is also required
+        # if not production, label is required
         if current_phase != "production":
+            # check label presence 
             if not has_label:
                 return False
         

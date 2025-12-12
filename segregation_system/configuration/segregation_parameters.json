@@ -1,7 +1,7 @@
 {
-    "min_sessions_for_processing": 2000,
-    "balancing_report_threshold": 0.05,
-    "minimum_coverage_report_threshold": 100,
+    "min_sessions_for_processing": 10,
+    "balancing_report_threshold": 0.5,
+    "minimum_coverage_report_threshold": 1,
     "number_of_record_of_session": 4,
     "training_set_percentage": 0.70,
     "validation_set_percentage": 0.20,

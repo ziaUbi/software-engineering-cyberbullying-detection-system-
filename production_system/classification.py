@@ -75,7 +75,6 @@ class Classification:
             "event_caution": prepared_session["event_caution"],
             "event_substitution": prepared_session["event_substitution"],
             "event_foul": prepared_session["event_foul"],
-            "event_unknown": prepared_session["event_unknown"],
             
             # 4. Feature Audio (flattened vector 0-19)
             "audio_0": prepared_session["audio_0"],
