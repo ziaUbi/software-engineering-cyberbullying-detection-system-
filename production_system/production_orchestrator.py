@@ -34,7 +34,7 @@ class ProductionOrchestrator:
         self._prod_sys_io = ProductionSystemIO(prod_binding["ip"], prod_binding["port"])
 
         # self._deployed = False
-        self._deployed = True  # Per testare senza deployment !!!!!!!!!!!!!
+        self._deployed = False
         self._handler = JsonHandler()
         # Assicurati che la cartella si chiami 'production_schema' come nel tuo file system attuale
         self._schema_path = Path(__file__).resolve().parent / "production_schema" / "PreparedSessionSchema.json"
@@ -48,7 +48,7 @@ class ProductionOrchestrator:
             if not message:
                 continue
 
-            print(f"\n[DEBUG] Messaggio Arrivato: {message}\n")
+            # print(f"\n[DEBUG] Messaggio Arrivato: {message}\n")
 
             if self._service:
                 self._prod_sys_io.send_timestamp(time.time(), "start")
@@ -70,18 +70,40 @@ class ProductionOrchestrator:
             if self._unit_test:
                 return
 
-    def _handle_deployment(self, classifier_payload: str) -> None:
-        print("Classifier payload received")
-        deployment = Deployment()
-        if deployment.deploy(classifier_payload) is False:
-            print("Error while deploying cyberbullying classifier")
+    # def _handle_deployment(self, classifier_payload: str) -> None:
+    #     if not classifier_payload:
+    #         print("ERROR: Empty classifier payload received from Development System")
+    #     return
+    #     print("Classifier payload received")
+    #     deployment = Deployment()
+    #     if deployment.deploy(classifier_payload) is False:
+    #         print("Error while deploying cyberbullying classifier")
+    #         return
+
+    #     self._deployed = True
+    #     print("Classifier deployed successfully")
+    #     self._prod_sys_io.send_configuration()
+    #     if self._service:
+    #         self._prod_sys_io.send_timestamp(time.time(), "end")
+
+    def _handle_deployment(self, classifier_payload: str | None) -> None:
+    # Se il payload è mancante o vuoto, interrompe senza rumore
+        if not classifier_payload or not isinstance(classifier_payload, str):
             return
 
+        deployment = Deployment()
+        if not deployment.deploy(classifier_payload):
+            return
+
+        # Aggiorna stato interno
         self._deployed = True
-        print("Classifier deployed successfully")
+
+        # Notifica agli altri sistemi (messaging / service)
         self._prod_sys_io.send_configuration()
+
         if self._service:
             self._prod_sys_io.send_timestamp(time.time(), "end")
+
 
     def _handle_classification(self, prepared_session_raw: str) -> None:
         try:

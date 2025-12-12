@@ -33,12 +33,14 @@ class CoverageReportModel:
         for s in sessions:
             for band_idx in range(20):
                 attr_name = f"audio_{band_idx}"
-                # value = getattr(s, attr_name, None)
                 value = s[attr_name]
+                print(value)
                 if value is None:
                     continue
                 db_value = int(round(float(value)))
+                print(db_value)
                 audio_db_counter[db_value] += 1
+        print(audio_db_counter)
 
         # --------- Events: {event -> count} ---------
         total_score = 0
@@ -80,8 +82,3 @@ class CoverageReportModel:
 
         return report
 
-
-        
-        
-
-        return report

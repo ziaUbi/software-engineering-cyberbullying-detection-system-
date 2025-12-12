@@ -147,7 +147,7 @@ class PreparedSessionCreator:
             try:
                 y, sr = librosa.load(file_path, sr=None)
                 rms = librosa.feature.rms(y=y)[0]
-                db_values = librosa.amplitude_to_db(rms, ref=np.max)
+                db_values = librosa.amplitude_to_db(rms, ref=0.00001, amin=0.00001)
                 return db_values.tolist()
             except Exception as e:
                 print(f"Error processing audio: {e}")
