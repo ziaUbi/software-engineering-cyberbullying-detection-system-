@@ -42,6 +42,7 @@ class PreparedSessionCreator:
         if "tweetLength" in enabled_features or "badWords" in enabled_features:
             clean_tokens = self._preprocess_text(raw_session.get("tweet"))
 
+        # 1. TWEET LENGTH
         if "tweetLength" in enabled_features:
             flat_features["tweet_length"] = len(clean_tokens)
 
@@ -73,34 +74,32 @@ class PreparedSessionCreator:
 
     def _create_flat_bow(self, tokens: List[str]) -> Dict[str, int]:
         """
-        Conta quante volte ogni parola del vocabolario appare nei token.
+        Counts occurrences of target words in the token list.
         """
         features = {}
         
-        # Counter crea automaticamente un dizionario {parola: numero_occorrenze}
+        # Counter creates occurrences of each token
         token_counts = Counter(tokens)
 
         for target_word in self.BOW_VOCABULARY:
             key_name = f"word_{target_word}"
-            # Se la parola c'è restituisce il numero, altrimenti 0
+            # Set count or 0 if not present
             features[key_name] = token_counts[target_word]
         
         return features
 
     def _create_flat_events(self, events: List[Dict]) -> Dict[str, int]:
         """
-        Conta quante volte ogni tipo di evento appare nella sessione.
+        Count occurrences of each event type based on EVENT_MAPPING.
         """
         features = {}
         
-        # 1. Inizializza tutti i contatori a 0 per ogni tipo di evento mappato
         for event_type in self.EVENT_MAPPING.keys():
             features[f"event_{event_type}"] = 0
             
         if not events or not isinstance(events, list):
             return features
 
-        # 2. Itera sugli eventi e incrementa i contatori
         for event_item in events:
             raw_name = None
 
@@ -113,8 +112,9 @@ class PreparedSessionCreator:
                 
         return features
 
-    # Helper Methods
+    # Helper Methods ------------------------------
     def _pad_or_truncate(self, vector: List[Any], target_len: int, fill_value: Any) -> List[Any]:
+        # Pads or truncates a list to the target length.
         current_len = len(vector)
         if current_len >= target_len:
             return vector[:target_len]
@@ -123,6 +123,7 @@ class PreparedSessionCreator:
             return vector + padding
 
     def _preprocess_text(self, text: str) -> List[str]:
+        # Simple text preprocessing: lowercase, remove punctuation, tokenize, remove stopwords.
         if not text: return []
         text = text.lower()
         text = re.sub(r'[^\w\s]', '', text)
@@ -131,6 +132,7 @@ class PreparedSessionCreator:
         return [t for t in tokens if t not in stop_words]
 
     def _extract_audio_features(self, file_path_dict: Union[Dict, str]) -> List[float]:
+        # Extract decibel values from audio file.
         
         file_path = ""
         if isinstance(file_path_dict, dict):

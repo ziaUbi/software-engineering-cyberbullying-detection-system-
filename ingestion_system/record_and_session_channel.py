@@ -41,9 +41,9 @@ class RecordAndSessionChannel:
             data = request.json
             sender_ip = request.remote_addr
             sender_port = data.get('port')
-            # Il payload può essere un record, una sessione o una label
+            # Extract the actual data payload
             payload = data.get('payload')
-            data_type = data.get('type', 'unknown') # Utile per sapere cosa si riceve
+            data_type = data.get('type', 'unknown') # e.g., 'record', 'raw_session', 'label'
 
             if not payload:
                 return jsonify({"error": "Invalid format, 'payload' missing"}), 400
@@ -74,7 +74,7 @@ class RecordAndSessionChannel:
         + send_raw_session(): Sends a RawSession object (or dict representation) to a target.
         Returns True if successful.
         """
-        # Se session_data è un oggetto RawSession, convertilo in dict
+        # Convert to dict if it's an object
         # if hasattr(session_data, '__dict__'): session_data = session_data.__dict__
         
         return self._send_generic(target_ip, target_port, 'raw_session', session_data)
@@ -118,7 +118,7 @@ class RecordAndSessionChannel:
 
         except Empty:
             # Timeout occurred
-            print("No messages received.") 
+            # print("No messages received.") 
             return None
             
         except Exception as e:
@@ -131,14 +131,14 @@ class RecordAndSessionChannel:
         """Internal helper to handle the HTTP POST logic."""
         url = f"http://{target_ip}:{target_port}/send"
         
-        # Struttura standard del messaggio
+        # Structure the payload
         payload = {
             "port": self.port,
             "type": msg_type,
             "payload": content
         }
         try:
-            # Usa un timeout breve per non bloccare l'esecuzione
+            # Use a timeout to avoid hanging indefinitely
             response = requests.post(url, json=payload, timeout=10)
             if response.status_code == 200:
                 return True

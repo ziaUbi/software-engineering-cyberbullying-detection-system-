@@ -48,25 +48,28 @@ class PreparationSystemOrchestrator:
 
         while True:
             try:
-                # --- 1. RECEIVE RAW SESSION ---
+                # --- RECEIVE RAW SESSION ---
                 raw_session= self.json_io.get_raw_session()
 
                 if raw_session is None:
-                    continue  # Nessun messaggio, riprovo
+                    continue  # No session received, retry
                 
                 
-                print(f"Processing UUID: {raw_session.get('uuid')}")
-                # Stampa tutto il contenuto formattato
+                # print(f"Processing UUID: {raw_session.get('uuid')}")
                 # print(json.dumps(raw_session, indent=4, default=str))
 
-                prepared_session = self.creator.create_prepared_session(raw_session)
+                # --- CORRECT MISSING SAMPLES (events) ---
+                corrected_raw_session = self.corrector.correct_missing_samples(raw_session, None)
+
+                # Create prepared session from raw session, extracting features
+                prepared_session = self.creator.create_prepared_session(corrected_raw_session)
 
                 print("Prepared Session Created")
 
-                # B. Correzione Outliers Audio (sulla lista di float appena estratta)
+                # Correct absolute outliers
                 correct_prepared_session = self.corrector.correct_absolute_outliers(prepared_session)
                 
-                print("Absolute Outliers Corrected")
+                # print("Absolute Outliers Corrected")
 
                 target_ip = ""
                 target_port = 0
@@ -81,13 +84,13 @@ class PreparationSystemOrchestrator:
                     target_port = self.parameters.configuration["port_production"]
                     dest_name = "PRODUCTION"
 
-                # --- 5. SEND PREPARED SESSION ---
+                # --- SEND PREPARED SESSION ---
                 success = self.json_io.send_prepared_session(target_ip, target_port, correct_prepared_session)
 
                 if success:
-                    print(f"Session {prepared_session.uuid} sent to {dest_name}.")
+                    print(f"Session {correct_prepared_session.uuid} sent to {dest_name}.")
                 else:
-                    print(f"ERROR: Failed to send session {prepared_session.uuid} to {dest_name}.")
+                    print(f"ERROR: Failed to send session {correct_prepared_session.uuid} to {dest_name}.")
 
             except Exception as e:
                 print(f"CRITICAL ERROR in Preparation Loop: {e}")
