@@ -34,13 +34,10 @@ class CoverageReportModel:
             for band_idx in range(20):
                 attr_name = f"audio_{band_idx}"
                 value = s[attr_name]
-                print(value)
                 if value is None:
                     continue
                 db_value = int(round(float(value)))
-                print(db_value)
                 audio_db_counter[db_value] += 1
-        print(audio_db_counter)
 
         # --------- Events: {event -> count} ---------
         total_score = 0

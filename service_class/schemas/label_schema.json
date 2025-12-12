@@ -10,7 +10,7 @@
       "type": "string",
       "format": "uuid"
     },
-    "movements": {
+    "label": {
       "type": "string",
       "enum": ["cyberbullying", "not_cyberbullying"]
     }

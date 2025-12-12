@@ -119,7 +119,7 @@ class LearningSetsReceiverAndClassifierSender:
         target_ip = endpoint["ip"]
         target_port = endpoint["port"]
 
-        restart_config = {"action": "restart"}
+        restart_config = {"configuration": "restart"}
 
         url = f"http://{target_ip}:{target_port}/MessagingSystem"
 
