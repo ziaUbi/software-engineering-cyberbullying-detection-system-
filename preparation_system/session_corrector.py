@@ -20,44 +20,50 @@ class SessionCorrector:
         self.config = config
 
 
-    def correct_missing_samples(self, raw_session: RawSession, placeholder: Any) -> RawSession:
+    def correct_missing_samples(self, raw_session: Any, placeholder: Any) -> Any:
         """
             Corrects missing samples in the RawSession.
             - Events: Replaces placeholders with the MODE (most frequent event) of the list.
-            """
+            Handles both Dictionary and Object (RawSession) input.
+        """
         
-        # Access the events list directly from the object
-        events = raw_session.events
-        
+        events = None
+        if isinstance(raw_session, dict):
+            events = raw_session.get("events")
+        else:
+            events = raw_session.events
+
         # Proceed only if events is a valid, non-empty list
         if isinstance(events, list) and events:
             
-            # 1. Filter out placeholders to find valid events
-            # We look for strings that are NOT the placeholder and NOT None
+            # Filter out placeholders to find valid events
             valid_events = [
                 e for e in events 
                 if e != str(placeholder) and e is not None
             ]
 
-            # 2. Calculate the MODE (most frequent event)
+            # Calculate the MODE
             if valid_events:
-            # most_common(1) returns a list like [('foul', 3)]
                 mode_event = Counter(valid_events).most_common(1)[0][0]
             else:
-                return raw_session  # No valid events to determine mode
-            
+                return raw_session 
 
-            # 3. Replace placeholders with the mode
+            # Replace placeholders with the mode
             for i in range(len(events)):
                 current_event = events[i]
                 
-                # Check if current event is a placeholder, None, or invalid type
                 if (current_event == str(placeholder) or 
                     current_event is None or 
                     not isinstance(current_event, str)):
                     
                     events[i] = mode_event
-
+            
+            # Update the raw_session with corrected events
+            if isinstance(raw_session, dict):
+                raw_session["events"] = events
+            else:
+                raw_session.events = events
+                
         return raw_session
 
     def correct_absolute_outliers(self, session):
@@ -75,23 +81,23 @@ class SessionCorrector:
         min_gain = self.config.min_decibel_gain
         max_gain = self.config.max_decibel_gain
         
-        # Iteriamo su tutte le feature presenti nel dizionario
+        # Iterate through all features
         for key, value in session.features.items():
             
-            # Applichiamo la logica SOLO alle feature audio
+            # Apply logic ONLY to audio features
             if key.startswith("audio_"):
                 
-                # Controllo di sicurezza se il valore fosse None (non dovrebbe, ma per robustezza)
+                # Safety check if the value is None (should not be, but for robustness)
                 if value is None:
                     session.features[key] = 0.0
                     continue
                 
-                # Logica di Clamping
+                # Clamping logic
                 if value < min_gain:
                     session.features[key] = min_gain
                 elif value > max_gain:
                     session.features[key] = max_gain
                 
-                # Se il valore è nel range, lo lasciamo invariato
+                # If the value is within range, leave it unchanged
 
         return session

@@ -60,29 +60,31 @@ class JsonHandler:
 
     def save_base64_audio_to_file(base64_string: str, output_folder: str = "./temp_audio") -> str:
         """
-        Decodifica una stringa Base64 e la salva come file audio su disco.
-        Restituisce il percorso assoluto del file salvato.
+        Decodes a Base64 audio string and saves it to a file.
+        :param base64_string: The Base64 encoded audio string.
+        :param output_folder: The folder where to save the audio file.
+        :return: The path to the saved audio file. Returns empty string if error.
         """
-        # 1. Crea la cartella se non esiste
+
         os.makedirs(output_folder, exist_ok=True)
         
-        # 2. Pulizia dell'header (se presente)
-        # A volte il base64 arriva come "data:audio/wav;base64,UklGR..."
+        # Clean the header (if present)
+        # Sometimes the base64 comes as "data:audio/wav;base64,UklGR..."
         if "," in base64_string:
             base64_string = base64_string.split(",")[1]
         
-        # 3. Decodifica da Testo a Bytes
+        # Decode from Text to Bytes
         try:
             audio_bytes = base64.b64decode(base64_string)
         except Exception as e:
-            print(f"Errore nella decodifica Base64: {e}")
+            print(f"Error decoding Base64: {e}")
             return ""
 
-        # 4. Genera un nome file univoco
-        filename = f"{uuid.uuid4()}.wav" # Assumiamo wav, o mp3 se sai il formato
+        # Generate a unique filename
+        filename = f"{uuid.uuid4()}.wav" # Assuming wav, or mp3 if you know the format
         file_path = os.path.join(output_folder, filename)
         
-        # 5. Scrivi i bytes su file (modalità 'wb' = write binary)
+        # Write bytes to file (mode 'wb' = write binary)
         with open(file_path, "wb") as f:
             f.write(audio_bytes)
             

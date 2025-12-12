@@ -87,31 +87,29 @@ class PreparationSessionChannel:
             queue_item = self._input_queue.get(timeout=timeout, block=True)
             raw_session_data = queue_item.get('data')
 
-            # --- CORREZIONE: Parsing pre-validazione ---
             if raw_session_data:
-                # 1. Correzione EVENTI: da stringa '["a", "b"]' a lista ["a", "b"]
+                # Correction EVENTS: from string '["a", "b"]' to list ["a", "b"]
                 if "events" in raw_session_data and isinstance(raw_session_data["events"], str):
                     try:
                         raw_session_data["events"] = json.loads(raw_session_data["events"])
                     except Exception as e:
                         print(f"Warning: Failed to parse events string: {e}")
-                        # Se fallisce, lasciamolo com'è (il validatore poi darà errore, giustamente)
 
-                # 2. Correzione TWEET (opzionale, se arriva come stringa JSON)
+                # Correction TWEET (optional, if it arrives as a JSON string)
                 if "tweet" in raw_session_data and isinstance(raw_session_data["tweet"], str):
-                    # A volte il tweet è salvato come '"testo"', rimuoviamo doppi apici extra se necessario
-                    # Ma attenzione: se è testo semplice non va toccato. 
-                    # json.loads su "ciao" (senza quote) fallisce, su "\"ciao\"" funziona.
+                    # Sometimes the tweet is saved as '"text"', we remove extra double quotes if necessary
+                    # But be careful: if it is plain text it should not be touched. 
+                    # We try to parse it as JSON, if it fails we leave it as is. 
                     try:
-                        # Tentativo euristico: se inizia con { o [ o ", proviamo a parsarlo
+                        # If it is a JSON string, parse it
                         val = raw_session_data["tweet"]
                         if val.startswith(('"', '{', '[')):
                              raw_session_data["tweet"] = json.loads(val)
                     except:
-                        pass # Era testo normale
+                        pass 
             # -------------------------------------------
 
-            # Ora raw_session_data['events'] è una LISTA vera, e il validatore sarà felice.
+            # Now validate the RawSession schema
             handler = JsonHandler()
             if not handler.validate_json(raw_session_data, RAW_SESSION_SCHEMA_PATH):
                 print("Invalid RawSession schema received.")
