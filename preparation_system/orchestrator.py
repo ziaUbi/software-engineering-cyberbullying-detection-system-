@@ -68,6 +68,7 @@ class PreparationSystemOrchestrator:
 
                 # Correct absolute outliers
                 correct_prepared_session = self.corrector.correct_absolute_outliers(prepared_session)
+                # print(json.dumps(asdict(correct_prepared_session), indent=4, default=str))
                 
                 # print("Absolute Outliers Corrected")
 
