@@ -1,0 +1,124 @@
+@startuml evaluation_system_sequence
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 250
+autonumber "1."
+
+actor "Human Operator" as Human
+participant "Ingestion / Classifier\nSystem" as ExtSystem
+participant "EvaluationSystemOrchestrator\n:Orchestrator" as Orch
+participant "EvaluationSystemParameters\n:Parameters" as Params
+participant "LabelReceiverAndConfigurationSender\n:LabelReceiver" as Comm
+participant "LabelBuffer\n:LabelBuffer" as Buffer
+participant "EvaluationReportModel\n:ReportModel" as Model
+participant "Messaging System" as MsgSys
+
+== Initialization Phase ==
+
+Human -> Orch : __init__()
+activate Orch
+
+Orch -> Params : loadParameters()
+activate Params
+Params --> Orch : parameters loaded
+deactivate Params
+
+Orch -> Comm : __init__()
+Orch -> Buffer : __init__()
+Orch -> Model : __init__()
+
+== Runtime Phase ==
+
+Human -> Orch : evaluate()
+
+Orch -> Comm : start_server()
+activate Comm
+note right of Comm: Server starts in thread\nlistening on /send
+Comm --> Orch : server_started
+deactivate Comm
+
+loop Main Execution Loop
+
+    Orch -> Orch : _get_classifier_evaluation()
+    note right: Checks if 'classifier_evaluation.json' exists
+
+    alt [Evaluation File does NOT exist] (Label Collection State)
+        
+        loop until (num_clf >= min_req AND num_exp >= min_req)
+            
+            Orch -> Comm : get_label()
+            activate Comm
+            
+            ExtSystem -> Comm : POST /send (json_label)
+            note right: Async arrival
+            Comm -> Comm : _validate_json_label()
+            Comm -> Comm : queue.put(label)
+            
+            Comm --> Orch : Label Object
+            deactivate Comm
+
+            Orch -> Buffer : save_label(label)
+            activate Buffer
+            Buffer --> Orch : void
+            deactivate Buffer
+
+            Orch -> Buffer : get_num_classifier_labels()
+            activate Buffer
+            Buffer --> Orch : count_clf
+            deactivate Buffer
+
+            Orch -> Buffer : get_num_expert_labels()
+            activate Buffer
+            Buffer --> Orch : count_exp
+            deactivate Buffer
+        
+        end
+
+        note over Orch: Thresholds reached. Preparing Report.
+
+        Orch -> Params : get("min_number_labels")
+        Orch -> Buffer : get_classifier_labels(limit)
+        Orch -> Buffer : get_expert_labels(limit)
+
+        Orch -> Model : create_evaluation_report(c_labels, e_labels...)
+        activate Model
+        Model -> Model : compute_metrics()
+        Model -> Human : write "classifier_evaluation.json"\n(status="waiting_for_evaluation")
+        Model --> Orch : EvaluationReport Object
+        deactivate Model
+
+        Orch -> Buffer : delete_labels(limit)
+        
+        note right of Orch: System waits for Human Operator\nto read the generated report
+
+    else [Evaluation File EXISTS] (Waiting/Verdict State)
+        
+        Orch -> Human : Read "classifier_evaluation.json"
+        
+        alt status == "waiting_for_evaluation"
+            Orch -> Orch : sleep(5)
+            
+        else status == "good"
+            Orch -> Human : remove "classifier_evaluation.json"
+            note left: Loop restarts to\ncollection phase
+            
+        else status == "bad"
+            note over Orch: Human marked classifier as BAD.\nTriggering Retraining.
+            
+            Orch -> Comm : send_configuration(restart)
+            activate Comm
+            Comm -> MsgSys : POST /Configuration
+            activate MsgSys
+            MsgSys --> Comm : 200 OK
+            deactivate MsgSys
+            Comm --> Orch : success
+            deactivate Comm
+
+            Orch -> Human : remove "classifier_evaluation.json"
+        end
+
+    end
+
+end
+
+deactivate Orch
+@enduml
