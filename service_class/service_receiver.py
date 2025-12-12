@@ -89,16 +89,14 @@ class ServiceReceiver:
         def receive_configuration():
 
             packet = request.get_json()
-
             # Get the json configuration from the packet
             json_configuration = json.loads(packet["message"])
 
+            print(f"Received configuration: {json_configuration}")
+            
             # Validate the configuration
             if self._validate_json(json_configuration, self.configuration_schema_path):
                 # JSON configuration is valid
-
-                print(f"Received configuration: {json_configuration}")
-
                 with open(self.timestamp_log_path, "a") as log_file:
                     log_file.write(f"{time.time()},Service Class,{json_configuration['configuration']}\n")
 
