@@ -6,8 +6,8 @@
   "port_segregation": 5003,
   "ip_production": "172.20.10.11",
   "port_production": 5105,
-  "MinDecibelGain": -20,
-  "MaxDecibelGain": 5,
+  "MinDecibelGain": 0,
+  "MaxDecibelGain": 100,
   "stopWordList": [
     "a",
     "about",
