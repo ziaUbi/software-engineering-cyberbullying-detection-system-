@@ -25,3 +25,4 @@ class BalancingReportView:
         # plt.show()
         plt_path = "segregation_system/" + workspace_dir + '/balancing_report.png'
         plt.savefig(plt_path)
+        return

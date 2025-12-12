@@ -4,8 +4,8 @@
         "port": 5102
     },
     "Development System": {
-        "ip": "192.168.10.2",
-        "port": 5104
+        "ip": "172.20.10.12",
+        "port": 5004
     },
     "Messaging System": {
         "ip": "192.168.10.3",

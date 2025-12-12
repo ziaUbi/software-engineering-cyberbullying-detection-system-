@@ -232,3 +232,4 @@ class CoverageReportView:
         # plt.show()
         plt_path = "segregation_system/" + workspace_dir + '/coverage_report.png'
         plt.savefig(plt_path)
+        return
