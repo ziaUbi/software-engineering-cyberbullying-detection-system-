@@ -40,33 +40,30 @@ class RawSessionCreator:
         """
         missing_count = 0
         
-        # Vocabolario valido (solo le chiavi: "score", "foul", ecc.)
         EVENT_MAPPING = {
             "score": 0, "sending-off": 1, "caution": 2, 
             "substitution": 3, "foul": 4
         }
         
-        # Usiamo un set per rendere la ricerca più veloce (O(1))
+        # Use a set for faster lookup (O(1))
         VALID_EVENT_KEYS = set(EVENT_MAPPING.keys())
 
         events = raw_session.events
 
         if isinstance(events, list):
-            # Usiamo enumerate per poter modificare la lista all'indice 'i'
+            # Use enumerate to modify the list at index 'i'
             for i, event_item in enumerate(events):
                 
-                # 1. Controllo se è una stringa valida
+                # Check if it is a valid string
                 if not isinstance(event_item, str):
                     missing_count += 1
                     events[i] = str(placeholder)
                     continue
 
-                # 2. Controllo Vocabolario:
-                # Normalizziamo a lowercase per sicurezza (es. "Foul" -> "foul")
-                # Se l'evento NON è nel vocabolario, è considerato "missing" o invalido
+                # Check if the event is in the valid keys
                 if event_item.lower() not in VALID_EVENT_KEYS:
                     missing_count += 1
-                    # Sostituiamo il valore invalido con il placeholder
+                    # Replace the invalid value with the placeholder
                     events[i] = str(placeholder)
 
         validate = self.validate_raw_session(missing_count)

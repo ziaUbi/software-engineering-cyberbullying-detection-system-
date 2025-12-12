@@ -78,7 +78,7 @@ class IngestionSystemOrchestrator:
         while True:  # receive records iteratively
             try:
                 # receives new record
-                incoming_result = self.json_io.get_record()
+                incoming_result = self.json_io.get_record()  
 
                 if incoming_result is None:
                     continue  # no record received, continue the loop
@@ -91,23 +91,23 @@ class IngestionSystemOrchestrator:
                 processed_count += 1
                 print(f"Processed records count: {processed_count}")
 
-                # 1. Controlliamo se è un pacchetto di tipo "audio"
+                # process AUDIO records: convert base64 to file and update record
                 if new_record.get("source") == "audio":
                     
-                    # 2. Estraiamo il dizionario interno "value"
+                    # Extract the internal "value" dictionary
                     value_data = new_record.get("value", {})
                     base64_audio = value_data.get("audio")
 
                     if base64_audio:
-                        # A. TRASFORMAZIONE: Base64 -> File
+                        # A. TRANSFORMATION: Base64 -> File
                         audio_path = JsonHandler.save_base64_audio_to_file(base64_audio)
                         
-                        # B. AGGIORNAMENTO RECORD
-                        # Attenzione: Dobbiamo aggiornare dentro "value", non alla radice!
-                        # Così store_record salverà il path nel DB.
+                        # B. RECORD UPDATE
+                        # Note: We need to update inside "value", not at the root!
+                        # This way store_record will save the path in the DB.
                         new_record["value"]["file_path"] = audio_path 
                         
-                        # Rimuoviamo il campo pesante
+                        # Remove the heavy field
                         if "audio" in new_record["value"]:
                             del new_record["value"]["audio"]
 
@@ -132,7 +132,7 @@ class IngestionSystemOrchestrator:
                 sessions_created += 1
                 print(f"RawSessions created count: {sessions_created}")
 
-                # removes records
+                # removes records from buffer
                 self.buffer_controller.remove_records(new_record["value"]["uuid"])
 
                 # marks missing samples with "None" and checks if the session is valid
@@ -142,13 +142,13 @@ class IngestionSystemOrchestrator:
                 if not session_valid:
                   continue  # do not send anything
 
-                # if in evaluation phase, sends labels to evaluation system
+                # if in evaluation phase, sends label to evaluation system
                 if self.current_phase == "evaluation":
                     label = {
                         "uuid": marked_raw_session.uuid,
                         "label": marked_raw_session.label
                     }
-                    print(label)
+                    # print(label)
                     print("Send Label to Evaluation System")
 
                     self.json_io.send_label(target_ip=self.parameters.configuration["ip_evaluation"],
@@ -156,7 +156,7 @@ class IngestionSystemOrchestrator:
 
                 # sends raw session to preparation system
                 session_dict = asdict(raw_session)
-                print(session_dict)
+                # print(session_dict)
                 if self.json_io.send_raw_session(target_ip=self.parameters.configuration["ip_preparation"],
                                           target_port=self.parameters.configuration["port_preparation"], session_data=session_dict):
 
@@ -166,8 +166,8 @@ class IngestionSystemOrchestrator:
                 #update the session sent counter only it is production/evaluation
                 #because development is changed by the human
                 if self.current_phase != "development":
-                    #if it is not production testing phase, count sessions to change then phase
-                    #otherwise, if it is production testing, stop counting, no phase change needed
+                    #if it is not testing phase, count sessions to change then phase
+                    #otherwise, if it is testing phase, stop counting, no phase change needed
                     if not self.parameters.configuration["service"]:
                         self._update_session()
 

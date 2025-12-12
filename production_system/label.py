@@ -1,4 +1,7 @@
-"""Domain representation of a cyberbullying moderation decision."""
+"""Domain representation of a cyberbullying moderation decision.
+
+Labels use the values "not cyberbullying" and "cyberbullying".
+"""
 from __future__ import annotations
 
 import json
@@ -8,10 +11,15 @@ from typing import Dict, Optional
 
 @dataclass
 class Label:
-    """Describe the moderation outcome restricted to safe/bullying enum."""
+    """Describe the moderation outcome restricted to the allowed enum values.
+
+    The allowed values are:
+    - "not cyberbullying"
+    - "cyberbullying"
+    """
 
     uuid: str
-    label: Optional[str]  # Enum: "safe", "bullying" or None
+    label: Optional[str]  # Enum: "not cyberbullying", "cyberbullying" or None
 
     def to_dictionary(self) -> Dict[str, Optional[str]]:
         """Convert the label to a dictionary."""

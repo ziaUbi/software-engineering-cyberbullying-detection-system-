@@ -14,15 +14,14 @@ class RecordBufferController:
         """
         Initialize the connection and the table.
         """
-        # Connessione diretta al database SQLite
-        # check_same_thread=False è utile se il controller viene chiamato da thread diversi
+        # Connection to SQLite DB
         self.conn = sqlite3.connect(DATABASE_FILE_PATH, check_same_thread=False)
         self.cursor = self.conn.cursor()
 
-        # Pulisce il DB all'avvio 
+        # Clear the DB on startup 
         self._drop_table()
 
-        # Creazione Tabella
+        # Create Table
         self._create_table()
 
     def _drop_table(self):
@@ -50,19 +49,19 @@ class RecordBufferController:
         uuid = value_data["uuid"]
         source_type = record["source"] 
 
-        # 1. INSERT OR IGNORE: crea la riga vuota se non esiste
+        # 1. INSERT OR IGNORE: create a new row if UUID does not exist
         insert_query = ("INSERT OR IGNORE INTO records (uuid, tweet, audio, events, label) "
                         "VALUES (?, NULL, NULL, NULL, NULL);")
         self.cursor.execute(insert_query, (uuid,))
 
-        # 2. EXTRACT & PREPARE: Estraiamo SOLO il dato che ci serve
+        # 2. EXTRACT & PREPARE: Extract ONLY the data we need
         content_to_save = None
 
         if source_type == "tweet":
             content_to_save = value_data.get("tweet")
         
         elif source_type == "audio":
-            # Gestiamo entrambi i casi (file_path o audio) per sicurezza
+            # Handle both cases (file_path or audio) for safety
             content_to_save = value_data.get("file_path") or value_data.get("audio")
         
         elif source_type == "events":
@@ -71,22 +70,22 @@ class RecordBufferController:
         elif source_type == "label":
             content_to_save = value_data.get("label")
 
-        # Se non abbiamo trovato il dato, usciamo o logghiamo errore
+        # If no valid data found, exit or log warning
         if content_to_save is None:
             print(f"Warning: No valid data found for source '{source_type}' in record {uuid}")
             return
 
-        # Convertiamo il SINGOLO VALORE in stringa JSON
-        # Esempio: "testo" diventa "\"testo\"", [1,2] diventa "[1, 2]"
+        # Convert the SINGLE VALUE to a JSON string
+        # Example: "text" becomes "\"text\"", [1,2] becomes "[1, 2]"
         json_content = json.dumps(content_to_save)
 
-        # 3. UPDATE: aggiorniamo la colonna specifica
+        # UPDATE: update the specific column
         if source_type in ["tweet", "audio", "events", "label"]:
             update_query = f"UPDATE records SET {source_type} = ? WHERE uuid = ?;"
             self.cursor.execute(update_query, (json_content, uuid))
             
             self.conn.commit()
-            # print(f"Stored {source_type} for {uuid}") # Debug opzionale
+            # print(f"Stored {source_type} for {uuid}") 
         else:
             print(f"Warning: Unknown source type '{source_type}' for uuid {uuid}")
 
@@ -102,16 +101,16 @@ class RecordBufferController:
         if not row:
             return []
 
-        # row è una tupla: (uuid, tweet_json, audio_json, ...)
-        result = [row[0]] # Inseriamo l'UUID come primo elemento
+        # row is a tuple: (uuid, tweet_json, audio_json, ...)
+        result = [row[0]] # Insert the UUID as the first element
 
-        # Iteriamo sugli altri campi (tweet, audio, events, label)
+        # Iterate over the other fields (tweet, audio, events, label)
         for col_value in row[1:]:
             if col_value:
-                # Se c'è del testo (JSON), lo convertiamo in Dizionario
+                # If there is text (JSON), convert it to a dictionary
                 result.append(json.loads(col_value))
             else:
-                # Se è NULL nel DB, mettiamo None
+                # If it is NULL in the DB, put None
                 result.append(None)
 
         return result

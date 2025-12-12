@@ -44,7 +44,7 @@ class PreparationSystemParameters:
             self.stopword_list = self.configuration.get("StopwordList", [])
             self.features = self.configuration.get("features", [])
             
-            # Parametri di connessione
+            # Parameters for communication
             self.ip_classification = self.configuration.get("ip_classification")
             self.port_classification = self.configuration.get("port_classification")
             self.ip_segregation = self.configuration.get("ip_segregation")

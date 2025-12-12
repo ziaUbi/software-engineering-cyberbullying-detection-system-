@@ -10,28 +10,15 @@ from segregation_system.coverage_report.coverage_report import CoverageReportDat
 
 class CoverageReportView:
     """
-    Prende un CoverageReportData e disegna un radar / bubble chart
-    con 4 assi:
+    four axes:
     - Tweet lenght [5,40]
     - Game Events
     - Bad Words
     - dB Gain [40,120]
     """
     @staticmethod
-    def safe_max(values, default=0):
-        return max(values) if values else default
-
-    def normalize(self, values):
-        if not values:
-            return []
-        max_v = max(values)
-        if max_v == 0:
-            return [0 for _ in values]
-        return [v / max_v for v in values]
-
-    @staticmethod
     def show_coverage_report(report: CoverageReportData, workspace_dir, title: Optional[str] = "Coverage Report"):
-        fig = plt.figure(figsize=(8, 8))
+        fig = plt.figure(figsize=(10, 10))
         ax = plt.subplot(111, polar=True)
 
         ax.set_theta_zero_location("N")
@@ -45,190 +32,92 @@ class CoverageReportView:
         r_max = 1.0
         ax.set_rlim(0, r_max)
 
-        ax.set_rgrids(
-            np.linspace(0.2, r_max, 4),
-            angle=0,
-            fontsize=8,
-            linestyle="dotted",
-        )
-
+        # Draw concentric circles
+        ax.set_rgrids(np.linspace(0.2, r_max, 5), angle=0, fontsize=8, color='gray', alpha=0.5)
         ax.set_xticklabels([])
 
         # ---------------- Tweet length ----------------
         tl_map = report.tweet_length_map or {}
-        if tl_map:
-            lengths = sorted(tl_map.keys())
-            min_len = min(lengths)
-            max_len = max(lengths)
-        else:
-            # default range come da titolo
-            min_len, max_len = 5, 40
-            lengths = []
+        if not tl_map:
+            return
+        lengths = sorted(tl_map.keys())
+        min_len = min(lengths)
+        max_len = max(lengths)
+        if min_len == max_len:
+            max_len += 1
         
-        max_count_tl = safe_max(tl_map.values(), default=1)
+        max_count = max(tl_map.values()) if tl_map else 1
 
-        for length in lengths:
-            count = tl_map[length]
-            # raggio in base alla lunghezza
-            if max_len != min_len:
-                r = (length - min_len) / (max_len - min_len)
-            else:
-                r = 0.5
-            r = 0.1 + 0.8 * r  # evito di stare troppo al centro/bordo
+        for length, count in tl_map.items():
+            # Normalize position along axis [5,40] -> [0.2, 1.0]
+            normalized_r = 0.2 + 0.8 * (length - min_len) / (max_len - min_len)
+            # Bubble size proportional to count
+            bubble_size = 100 + (count / max_count) * 1500
+            ax.scatter(angle_tweet, normalized_r, s=bubble_size, alpha=0.6, color='lightblue', edgecolors='black', linewidth=1.5)
+            if count == max_count:  # Label only the largest
+                ax.text(angle_tweet, normalized_r, f'{length}', ha='center', va='center', fontsize=10, fontweight='bold')
 
-            # dimensione bolla in base al conteggio
-            size = 50 + 400 * (count / max_count_tl)
-
-            ax.scatter(angle_tweet, r, s=size, edgecolors="black", facecolors="white")
-            ax.text(
-                angle_tweet,
-                r,
-                str(length),
-                fontsize=8,
-                ha="center",
-                va="center",
-            )
-
-        ax.text(
-            angle_tweet,
-            r_max + 0.05,
-            "Tweet lenght\n[5,40]",
-            ha="center",
-            va="center",
-            fontsize=12,
-        )
+        ax.text(angle_tweet, r_max + 0.15, 'Tweet length\n[5,40]', ha='center', va='center', fontsize=12, fontweight='bold')
 
         # ---------------- Game events ----------------
         events_map = report.events_map or {}
-        event_names = ["Score", "Sending-off", "Caution", "Substitution", "Foul"]
-        max_ev = self._safe_max(events_map.values(), default=1)
+        if events_map:
+            event_names = ["Score", "Sending-off", "Caution", "Substitution", "Foul"]
+            max_event_count = max(events_map.values()) if events_map else 1
+            
+            for i, event_name in enumerate(event_names):
+                count = events_map.get(event_name, 0)
+                # Position along axis
+                normalized_r = 0.3 + (i / (len(event_names) - 1)) * 0.6
+                bubble_size = 100 + (count / max_event_count) * 1500
+                ax.scatter(angle_events, normalized_r, s=bubble_size, alpha=0.6, color='lightgreen', edgecolors='black', linewidth=1.5)
+                ax.text(angle_events + 0.1, normalized_r, event_name, ha='left', va='center', fontsize=9)
 
-        for name in event_names:
-            value = events_map.get(name, 0)
-            if value <= 0:
-                continue
-            r = value / max_ev
-            r = 0.1 + 0.8 * r
-
-            size = 80 + 300 * (value / max_ev)
-
-            ax.scatter(angle_events, r, s=size, edgecolors="black", facecolors="white")
-            ax.text(
-                angle_events,
-                r,
-                name,
-                fontsize=8,
-                ha="left",
-                va="center",
-            )
-
-        ax.text(
-            angle_events,
-            r_max + 0.05,
-            "Game Events",
-            ha="center",
-            va="center",
-            fontsize=12,
-        )
+        ax.text(angle_events, r_max + 0.15, 'Game Events', ha='center', va='center', fontsize=12, fontweight='bold')
 
         # ---------------- Bad words ----------------
         bw_map = report.bad_words_map or {}
-        bw_order = ["fuck", "bulli", "muslim", "gay", "nigger", "rape"]
-        label_map = {
-            "fuck": "F**k",
-            "bulli": "Bulli",
-            "muslim": "Muslim",
-            "gay": "Gay",
-            "nigger": "Ni****r",
-            "rape": "Rape",
-        }
+        if bw_map:
+            word_names = ["Fuck", "Bulli", "Muslim", "Gay", "Nigger", "Rape"]
+            max_bw_count = max(bw_map.values()) if bw_map else 1
+            
+            for i, word in enumerate(word_names):
+                count = bw_map.get(word.lower(), 0)
+                normalized_r = 0.3 + (i / (len(word_names) - 1)) * 0.6
+                bubble_size = 100 + (count / max_bw_count) * 1500
+                ax.scatter(angle_badwords, normalized_r, s=bubble_size, alpha=0.6, color='lightcoral', edgecolors='black', linewidth=1.5)
+                display_word = word if word.lower() != "nigger" else "Ni****"
+                ax.text(angle_badwords - 0.1, normalized_r, display_word, ha='right', va='center', fontsize=9)
 
-        max_bw = self._safe_max(bw_map.values(), default=1)
-
-        for key in bw_order:
-            value = bw_map.get(key, 0)
-            if value <= 0:
-                continue
-            r = value / max_bw
-            r = 0.1 + 0.8 * r
-            size = 60 + 300 * (value / max_bw)
-
-            ax.scatter(angle_badwords, r, s=size, edgecolors="black", facecolors="white")
-            ax.text(
-                angle_badwords,
-                r,
-                label_map.get(key, key),
-                fontsize=8,
-                ha="right",
-                va="center",
-            )
-
-        ax.text(
-            angle_badwords,
-            r_max + 0.05,
-            "Bad Words",
-            ha="center",
-            va="center",
-            fontsize=12,
-        )
-
-
+        ax.text(angle_badwords, r_max + 0.15, 'Bad Words', ha='center', va='center', fontsize=12, fontweight='bold')
+       
         # ---------------- dB Gain ----------------
         db_map = report.audio_db_map or {}
         if db_map:
-            db_values = sorted(db_map.keys())
-            min_db = min(db_values)
-            max_db = max(db_values)
-        else:
-            min_db, max_db = 40, 120
-            db_values = []
+            decibels = sorted(db_map.keys())
+            min_db = min(decibels)
+            max_db = max(decibels)
+            if min_db == max_db:
+                max_db += 1  
+            max_db_count = max(db_map.values()) if db_map else 1
+            
+            # Group by ranges for cleaner visualization
+            sorted_dbs = sorted(db_map.items())
+            for db_value, count in sorted_dbs: 
+                normalized_r = 0.2 + 0.8 * (db_value - min_db) / (max_db - min_db)
+                bubble_size = 100 + (count / max_db_count) * 1500
+                ax.scatter(angle_db, normalized_r, s=bubble_size, alpha=0.6, color='yellow', edgecolors='black', linewidth=1.5)
+                ax.text(angle_db, db_value, f'{db_value:.2f}', ha='center', va='center', fontsize=8)
 
-        max_count_db = self._safe_max(db_map.values(), default=1)
+        ax.text(angle_db, r_max + 0.15, 'dB Gain\n[40,120]', ha='center', va='center', fontsize=12, fontweight='bold')
 
-        for db in db_values:
-            count = db_map[db]
-            if max_db != min_db:
-                r = (db - min_db) / (max_db - min_db)
-            else:
-                r = 0.5
-            r = 0.1 + 0.8 * r
+        # ---------------- Center info ----------------
+        total = report.total_sessions
+        ax.text(0, 0, f'{total}\nSessions', ha='center', va='center', fontsize=14, fontweight='bold', bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
 
-            size = 50 + 400 * (count / max_count_db)
-            # valore normalizzato da scrivere dentro la bolla
-            norm_count = round(count / max_count_db, 2)
-
-            ax.scatter(angle_db, r, s=size, edgecolors="black", facecolors="white")
-            ax.text(
-                angle_db,
-                r,
-                f"{norm_count}",
-                fontsize=8,
-                ha="center",
-                va="center",
-            )
-
-        ax.text(
-            angle_db,
-            r_max + 0.05,
-            "dB Gain\n[40,120]",
-            ha="center",
-            va="center",
-            fontsize=12,
-        )
-
-        # Bordo esterno spesso
-        circle = plt.Circle(
-            (0.0, 0.0),
-            r_max,
-            transform=ax.transData._b,
-            fill=False,
-            linewidth=3,
-            color="black",
-        )
-        ax.add_artist(circle)
-
-        plt.title(title)
+        plt.title(title, fontsize=16, fontweight='bold', pad=20)
         plt.tight_layout()
         # plt.show()
         plt_path = "segregation_system/" + workspace_dir + '/coverage_report.png'
         plt.savefig(plt_path)
+        return
