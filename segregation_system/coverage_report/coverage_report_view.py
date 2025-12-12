@@ -49,7 +49,7 @@ class CoverageReportView:
         max_count = max(tl_map.values()) if tl_map else 1
 
         for length, count in tl_map.items():
-            if count < 2:
+            if count < 3:
                 continue
             # Normalize position along axis [5,40] -> [0.2, 1.0]
             normalized_r = 0.2 + 0.8 * (length - min_len) / (max_len - min_len)
@@ -104,7 +104,7 @@ class CoverageReportView:
             # Group by ranges for cleaner visualization
             sorted_dbs = sorted(db_map.items())
             for db_value, count in sorted_dbs: 
-                if count < 3:
+                if count < 4:
                     continue
                 normalized_r = 0.2 + 0.8 * (db_value - min_db) / (max_db - min_db)
                 bubble_size = 100 + (count / max_db_count) * 1500
