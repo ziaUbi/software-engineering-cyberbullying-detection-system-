@@ -1,5 +1,4 @@
-from typing import List
-
+import os
 import joblib
 
 from development_system.training.classifier import Classifier
@@ -52,7 +51,7 @@ class ValidationReportModel:
             classifier_report.update(top_classifier.classifier_report())
             top_5_classifiers.append(classifier_report)
             # save the top classifier and remove it from the list
-            joblib.dump(top_classifier, "data/classifier" + str(i) + ".sav")
+            joblib.dump(top_classifier, os.path.join(os.getcwd(), "development_system/data", "classifier" + str(i) + ".sav"))
             self.classifiers.remove(top_classifier)
 
         return {

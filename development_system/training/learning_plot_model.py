@@ -1,7 +1,7 @@
 class LearningPlotModel:
     """Stores and manages the learning plot data."""
 
-    loss_curve: list
+    loss_curve: list = []
 
     @staticmethod
     def set_loss_curve(loss_curve: list):

@@ -1,4 +1,5 @@
 import math
+import os
 import random
 
 import joblib
@@ -13,10 +14,12 @@ from development_system.training.trainer import Trainer
 class TrainingOrchestrator:
     """Orchestrator of the training"""
 
-    def __init__(self):
+    def __init__(self, basedir):
         """Initialize the orchestrator."""
-        self.trainer = Trainer()
+        self.trainer = Trainer(basedir=basedir)
         self.service_flag = ConfigurationParameters.params['service_flag']
+        self.basedir = basedir
+
 
     def train_classifier(self, set_avg_hyperparams):
         """
@@ -28,7 +31,7 @@ class TrainingOrchestrator:
         """
         if set_avg_hyperparams:
             self.trainer.set_avg_hyperparameters()
-            self.trainer.save_classifier("data/classifier_avg_hyperparams.sav")
+            self.trainer.save_classifier(os.path.join(self.basedir, "data/classifier_avg_hyperparams.sav"))
 
         else:
             #if service flag is true, simulate user decisions, else read from json iterations
@@ -36,7 +39,7 @@ class TrainingOrchestrator:
                 iterations = random.randint(200, 300)
 
                 while True:
-                    self.trainer.load_classifier("data/classifier_avg_hyperparams.sav")
+                    self.trainer.load_classifier(os.path.join(self.basedir, "data/classifier_avg_hyperparams.sav"))
                     classifier = self.trainer.train(iterations)
                     # Generate learning report
                     loss_curve = LearningPlotModel.get_loss_curve()

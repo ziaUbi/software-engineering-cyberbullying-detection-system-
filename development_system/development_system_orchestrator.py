@@ -15,21 +15,20 @@ class DevelopmentSystemOrchestrator:
 
     def __init__(self):
         """Initialize the orchestrator."""
+        self.basedir = os.path.dirname(os.path.abspath(__file__))
         ConfigurationParameters.load_configuration()
         self.service_flag = ConfigurationParameters.params['service_flag']
         self.message_manager = LearningSetsReceiverAndClassifierSender(host='0.0.0.0', port=5004)
-        self.training_orchestrator = TrainingOrchestrator()
-        self.validation_orchestrator = ValidationOrchestrator()
-        self.testing_orchestrator = TestingOrchestrator()
+        self.training_orchestrator = TrainingOrchestrator(basedir=self.basedir)
+        self.validation_orchestrator = ValidationOrchestrator(basedir=self.basedir)
+        self.testing_orchestrator = TestingOrchestrator(basedir=self.basedir)
 
 
     def develop(self):
         """Handle development logic."""
-
         # Read the responses of the user for the Stop&Go interaction
-        THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-        JsonHandlerValidator.validate_json(os.path.join(THIS_DIR, "responses", "user_responses.json"), os.path.join(THIS_DIR, "schemas", "user_responses_schema.json"))
-        user_responses = JsonHandlerValidator.read_json_file(os.path.join(THIS_DIR, "responses", "user_responses.json"))
+        JsonHandlerValidator.validate_json(os.path.join(self.basedir, "responses", "user_responses.json"), os.path.join(self.basedir, "schemas", "user_responses_schema.json"))
+        user_responses = JsonHandlerValidator.read_json_file(os.path.join(self.basedir, "responses", "user_responses.json"))
 
         print("Service Flag: ", self.service_flag)
 
@@ -53,12 +52,10 @@ class DevelopmentSystemOrchestrator:
                         print("learning set received")
                         response = self.message_manager.send_timestamp(time.time(), "start")
                         print("start timestamp sent")
-                        print("Response from Module Service System:", response)
                         # convert the received string into a dictionary and the dictionary to a learning set object
                         learning_sets = LearningSets.from_dict(JsonHandlerValidator.string_to_dict(message['message']))
                     else:
-                        THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-                        learning_sets = LearningSets.from_json(os.path.join(THIS_DIR, "inputs", "learning_sets.json"))
+                        learning_sets = LearningSets.from_json(os.path.join(self.basedir, "inputs", "learning_sets.json"))
                     # save learning sets in .sav files
                     LearningSets.save_learning_sets(learning_sets)
 

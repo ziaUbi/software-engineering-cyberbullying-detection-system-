@@ -1,0 +1,20 @@
+{
+  "title": "Timestamp",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "system",
+    "status"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "number"
+    },
+    "system": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    }
+  }
+}

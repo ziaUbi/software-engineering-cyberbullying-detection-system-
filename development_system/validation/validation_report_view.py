@@ -1,4 +1,5 @@
 from development_system.json_handler_validator import JsonHandlerValidator
+import os
 
 class ValidationReportView:
     """Shows the validation report"""
@@ -17,4 +18,4 @@ class ValidationReportView:
         print("Validation Report:")
         print(report)
         
-        JsonHandlerValidator.write_json_file(report, "results/validation_report.json")
+        JsonHandlerValidator.write_json_file(report, os.path.join(os.getcwd(), "development_system", "results", "validation_report.json"))

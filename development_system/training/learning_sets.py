@@ -1,6 +1,6 @@
 import json
 from typing import List
-
+import os
 import joblib
 import pandas as pd
 
@@ -19,10 +19,11 @@ class LearningSets:
         from_dict(dict): Creates a LearningSet object from a dictionary.
         save_learning_set(learning_set): Saves the learning set to .sav files using joblib
     """
+    basedir = os.path.join(os.getcwd(), 'development_system')
     def __init__(self,
-                 training_set: List[PreparedSession],
-                 validation_set: List[PreparedSession],
-                 test_set: List[PreparedSession]):
+                 training_set: List[dict],
+                 validation_set: List[dict],
+                 test_set: List[dict]):
 
         self.training_set = training_set
         self.validation_set = validation_set
@@ -41,89 +42,61 @@ class LearningSets:
             None
         """
         # Converts data using the to_dictionary method
-        training_data = [session.to_dictionary() for session in learning_sets.training_set]
-        validation_data = [session.to_dictionary() for session in learning_sets.validation_set]
-        test_data = [session.to_dictionary() for session in learning_sets.test_set]
+        training_data = [session for session in learning_sets.training_set]
+        validation_data = [session for session in learning_sets.validation_set]
+        test_data = [session for session in learning_sets.test_set]
 
         # Save data in the respective file .sav using joblib
-        joblib.dump(training_data, 'data/training_set.sav')
-        joblib.dump(validation_data, 'data/validation_set.sav')
-        joblib.dump(test_data, 'data/test_set.sav')
+        if not os.path.exists(os.path.join(LearningSets.basedir, 'data')):
+            os.makedirs(os.path.join(LearningSets.basedir, 'data'))
+
+        joblib.dump(training_data, os.path.join(LearningSets.basedir, 'data', 'training_set.sav'))
+        joblib.dump(validation_data, os.path.join(LearningSets.basedir, 'data', 'validation_set.sav'))
+        joblib.dump(test_data, os.path.join(LearningSets.basedir, 'data', 'test_set.sav'))
 
 
     @staticmethod
     def get_training_set():
         """Loads and returns the training set from the .sav file."""
-        training_data = joblib.load('data/training_set.sav')
+        training_data = joblib.load(os.path.join(LearningSets.basedir, 'data', 'training_set.sav'))
         return training_data
     
 
     @staticmethod
     def get_validation_set():
         """Loads and returns the validation set from the .sav file."""
-        validation_data = joblib.load('data/validation_set.sav')
+        validation_data = joblib.load(os.path.join(LearningSets.basedir, 'data', 'validation_set.sav'))
         return validation_data
     
 
     @staticmethod
     def get_test_set():
         """Loads and returns the test set from the .sav file."""
-        test_data = joblib.load('data/test_set.sav')
+        test_data = joblib.load(os.path.join(LearningSets.basedir, 'data', 'test_set.sav'))
         return test_data
     
 
     @staticmethod
-    def extract_features_and_labels(data_set):
+    def extract_features_and_labels(dataset):
         """
         Extracts features and labels from a set of data.
 
         Args:
-            data_set (dict): A dictionary which contains a set of data (ex. "test_set").
-
+            dataset (list): A list of dictionaries representing the dataset.
 
         Returns:
             list: A list containing two elements:
                   - features (pd.DataFrame): A DataFrame with the characteristics.
                   - labels (pd.Series): Series with the labels.
         """
-
-        activity_mapping = {"shopping": 0, "sport": 1, "cooking": 2, "relax": 3, "gaming": 4}
-
-        environment_mapping = {"slippery": 0, "plain": 1, "slope": 2, "house": 3, "track": 4}
-
-        label_mapping = {"turnRight": 0, "turnLeft": 1, "move": 2}
-
-
-        current_data = pd.DataFrame([
-            {
-                "psd_alpha_band": record["psd_alpha_band"],
-                "psd_beta_band": record["psd_beta_band"],
-                "psd_theta_band": record["psd_theta_band"],
-                "psd_delta_band": record["psd_delta_band"],
-                "activity": activity_mapping.get(record["activity"]),
-                "environment": environment_mapping.get(record["environment"]),
-                "label": record["label"]
-            }
-            for record in data_set
-        ])
-
-        # Separation of the features and labels
-        features = current_data.drop(columns=["label"])
-        true_labels = current_data["label"]
-
+        df = pd.DataFrame(dataset)
         # converts string labels in integers using map
-        true_labels = true_labels.map(label_mapping)
-
-        labels = []
-        num_classes = len(label_mapping)  # number of classes
-
-        for label in true_labels:
-            new_labels = [0] * num_classes  # create an array of zeros with number of class length
-            new_labels[label] = 1  # set to 1 the correspondent index of the class
-            labels.append(new_labels)
-
-        return [features, labels]
-
+        df["label"] = df["label"].map({
+            "cyberbullying": 1,
+            "not_cyberbullying": 0
+        })
+        return df.drop(columns=["label", "uuid"]), df["label"]
+        
 
     @classmethod
     def from_dict(cls, data: dict) -> 'LearningSets':
@@ -138,10 +111,11 @@ class LearningSets:
         if not isinstance(data, dict):
             raise ValueError("Input data must be a dictionary.")
 
+        print(data["training_set"])
         return cls(
-            training_set=[PreparedSession.from_dictionary(session) for session in data["training_set"]],
-            validation_set=[PreparedSession.from_dictionary(session) for session in data["validation_set"]],
-            test_set=[PreparedSession.from_dictionary(session) for session in data["test_set"]],
+            training_set=data["training_set"],
+            validation_set=data["validation_set"],
+            test_set=data["test_set"],
         )
     
 

@@ -1,0 +1,55 @@
+{
+    "report": [
+        {
+            "index": 1,
+            "num_iterations": 200,
+            "validation_error": 0.4046932132311932,
+            "training_error": 0.5258123374066026,
+            "difference": -0.29928627467794083,
+            "num_layers": 4,
+            "num_neurons": 100,
+            "network_complexity": 400
+        },
+        {
+            "index": 2,
+            "num_iterations": 200,
+            "validation_error": 0.4046932132311932,
+            "training_error": 0.5258123374066026,
+            "difference": -0.29928627467794083,
+            "num_layers": 4,
+            "num_neurons": 100,
+            "network_complexity": 400
+        },
+        {
+            "index": 3,
+            "num_iterations": 200,
+            "validation_error": 0.4046932132311932,
+            "training_error": 0.5258123374066026,
+            "difference": -0.29928627467794083,
+            "num_layers": 4,
+            "num_neurons": 100,
+            "network_complexity": 400
+        },
+        {
+            "index": 4,
+            "num_iterations": 200,
+            "validation_error": 0.4046932132311932,
+            "training_error": 0.5258123374066026,
+            "difference": -0.29928627467794083,
+            "num_layers": 4,
+            "num_neurons": 100,
+            "network_complexity": 400
+        },
+        {
+            "index": 5,
+            "num_iterations": 200,
+            "validation_error": 0.4046932132311932,
+            "training_error": 0.5258123374066026,
+            "difference": -0.29928627467794083,
+            "num_layers": 4,
+            "num_neurons": 100,
+            "network_complexity": 400
+        }
+    ],
+    "validation_tolerance": 0.2
+}
