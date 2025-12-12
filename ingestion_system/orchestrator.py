@@ -63,6 +63,10 @@ class IngestionSystemOrchestrator:
             self.current_phase = "production"
             self.current_sessions = 0
             print("CHANGED TO PRODUCTION")
+        elif self.current_phase == "development" and self.current_sessions == self.parameters.configuration["development_sessions"]:
+            self.current_phase = "production"
+            self.current_sessions = 0
+            print("CHANGED TO PRODUCTION")
 
 
     def process_record(self):
@@ -165,11 +169,15 @@ class IngestionSystemOrchestrator:
 
                 #update the session sent counter only it is production/evaluation
                 #because development is changed by the human
-                if self.current_phase != "development":
+                # if self.current_phase != "development":
                     #if it is not testing phase, count sessions to change then phase
                     #otherwise, if it is testing phase, stop counting, no phase change needed
-                    if not self.parameters.configuration["service"]:
-                        self._update_session()
+                    # if not self.parameters.configuration["service"]:
+                    #     self._update_session()
+
+                if self.parameters.configuration["service"]:
+                    self._update_session()
+
 
             except Exception as e:
                 print(f"Error during ingestion: {e}")

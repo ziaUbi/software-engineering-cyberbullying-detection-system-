@@ -39,6 +39,7 @@ class PreparationSystemParameters:
         # Map dictionary to class attributes
         try:
             self.development_mode = self.configuration.get("development", False)
+            self.development_sessions = self.configuration.get("development_sessions", 0)
             self.min_decibel_gain = self.configuration.get("MinDecibelGain", -100.0)
             self.max_decibel_gain = self.configuration.get("MaxDecibelGain", 0.0)
             self.stopword_list = self.configuration.get("StopwordList", [])
