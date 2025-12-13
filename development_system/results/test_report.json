@@ -1,6 +1,6 @@
 {
     "test_tolerance": 0.2,
-    "validation_error": 0.3797933788736813,
-    "test_error": 0.4656036651040023,
-    "difference": 0.18429899217213738
+    "validation_error": 0.7185525513722347,
+    "test_error": 0.3504457381943401,
+    "difference": -1.050396032990878
 }

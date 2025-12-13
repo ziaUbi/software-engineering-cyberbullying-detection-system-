@@ -153,7 +153,7 @@ class PreparationSessionChannel:
         try:
             response = requests.post(url, json=message, timeout=5)
             if response.status_code == 200:
-                print(f"PreparedSession sent successfully to {target_ip}:{target_port}")
+                # print(f"PreparedSession sent successfully to {target_ip}:{target_port}")
                 return True
             else:
                 print(f"Failed to send PreparedSession. Status: {response.status_code}")

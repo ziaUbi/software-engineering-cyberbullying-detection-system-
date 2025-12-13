@@ -1,8 +1,11 @@
 {
   "development": true,
+  "current_phase": "development",
+  "service": true,
+  "development_sessions": 50,
   "ip_preparation": "127.0.0.1",
   "port_preparation": 5002,
-  "ip_segregation": "127.0.0.1",
+  "ip_segregation": "172.20.10.13",
   "port_segregation": 5003,
   "ip_production": "172.20.10.11",
   "port_production": 5105,

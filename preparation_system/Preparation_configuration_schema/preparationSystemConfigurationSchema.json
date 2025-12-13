@@ -5,6 +5,9 @@
   "type": "object",
   "required": [
     "development",
+    "service",
+    "current_phase",
+    "development_sessions",
     "ip_preparation",
     "port_preparation",
     "ip_segregation",
@@ -20,6 +23,20 @@
     "development": {
       "type": "boolean",
       "description": "Flag to enable development mode."
+    },
+    "service": {
+      "type": "boolean",
+      "description": "Flag to enable service mode."
+    },
+    "current_phase": {
+      "type": "string",
+      "enum": ["development", "production", "evaluation"],
+      "description": "Current phase of the system."
+    },
+    "development_sessions": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of sessions for development phase."
     },
     "ip_preparation": {
       "type": "string",
