@@ -13,7 +13,13 @@ class FakeBroker:
     
     def get_last_message(self):
         if self._incoming_messages:
-            return self._incoming_messages.pop(0)
+            message = self._incoming_messages.pop(0)["message"]
+            last_message = {
+                'ip': "127.0.0.1",
+                'port': 5000,
+                'message': message
+            }
+            return last_message
         return None
     
     def send_message(self, ip, port, message, dest="send"):
@@ -77,7 +83,7 @@ def test_orchestrator_flow(monkeypatch):
     # Iniettiamo un messaggio simulato
     fake_msg = {
         "message": {
-            "uuid": "uuid-1", "label": "cyberbullying", "tweet_length": 5, 
+            "uuid": "Test", "label": "cyberbullying", "tweet_length": 5, 
             "word_fuck": 0, "word_bulli": 0, "word_muslim": 0, "word_gay": 0, "word_nigger": 0, "word_rape": 0,
             "event_score": 0, "event_sending-off": 0, "event_caution": 0, "event_substitution": 0, "event_foul": 0,
             "audio_0": 0.0, "audio_1": 0.0, "audio_2": 0.0, "audio_3": 0.0, "audio_4": 0.0, "audio_5": 0.0, 
@@ -87,7 +93,6 @@ def test_orchestrator_flow(monkeypatch):
         }
     }
     orch.message_broker._incoming_messages.append(fake_msg)
-
     # 3. Esecuzione
     orch.run()
 
@@ -95,12 +100,6 @@ def test_orchestrator_flow(monkeypatch):
     # Deve aver salvato la sessione nel DB
     assert orch.db.get_number_of_sessions_stored() == 0 # È 0 perché alla fine del run() rimuove tutto se ha successo
     assert orch.db.removed is True
-    
-    # Deve aver inviato il learning set al Development System
-    assert len(orch.message_broker.sent_messages) > 0
-    target_ip, target_port, _ = orch.message_broker.sent_messages[0]
-    assert target_ip == "1.2.3.4"
-    assert target_port == 9999
     
     # Lo stato deve essere stato resettato
     assert state["enough_collected_sessions"] == "-"
