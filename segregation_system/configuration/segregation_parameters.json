@@ -1,5 +1,5 @@
 {
-    "min_sessions_for_processing": 100,
+    "min_sessions_for_processing": 50,
     "balancing_report_threshold": 0.5,
     "minimum_coverage_report_threshold": 1,
     "number_of_record_of_session": 4,
