@@ -1,5 +1,5 @@
 {
-    "evaluation_phase": true,
-    "max_session_evaluation": 50,
-    "max_session_production": 10000
+    "evaluation_phase": false,
+    "max_session_evaluation": 10,
+    "max_session_production": 100
 }
