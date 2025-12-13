@@ -2,6 +2,6 @@
     "phase" : "all_phases",
     "classifiers_to_develop" : 50,
     "development_sessions" : 50,
-    "production_sessions" : 200,
+    "production_sessions" : 100,
     "evaluation_sessions" : 10
 }
