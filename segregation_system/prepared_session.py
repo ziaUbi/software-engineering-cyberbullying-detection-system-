@@ -19,7 +19,10 @@ class PreparedSession:
         self.word_rape = data['word_rape']
 
         self.event_score = data['event_score']
-        self.event_sending_off = data['event_sending-off']
+        if data['event_sending-off']:
+            self.event_sending_off = data['event_sending-off']
+        elif data['event_sending_off']:
+            self.event_sending_off = data['event_sending_off']
         self.event_caution = data['event_caution']
         self.event_substitution = data['event_substitution']
         self.event_foul = data['event_foul']

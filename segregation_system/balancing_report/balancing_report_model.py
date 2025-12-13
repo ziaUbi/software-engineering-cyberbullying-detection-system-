@@ -11,6 +11,7 @@ class BalancingReportModel:
         total = len(sessions)
         counts = {}
         for s in sessions:
+            s = PreparedSession(s)
             # label = s[label]
             label = s.label
             if label not in counts:
