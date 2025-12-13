@@ -5,3 +5,6 @@ temp_audio/
 .env
 
 .pytest_cache/
+
+__pycache__/
+*.pyc

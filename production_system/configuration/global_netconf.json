@@ -12,12 +12,12 @@
         "port": 5105
     },
     "Evaluation System": {
-        "ip": "171.20.10.2",
-        "port": 5030
+        "ip": "172.20.10.2",
+        "port": 5210
     },
     "Messaging System": {
-        "ip": "192.168.10.70",
-        "port": 5110
+        "ip": "172.20.10.12",
+        "port": 5010
     },
     "Service Class": {
         "ip": "172.20.10.12",

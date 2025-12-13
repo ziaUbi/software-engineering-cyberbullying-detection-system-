@@ -60,27 +60,106 @@ class ProductionSystemIO:
             print(f"Error sending message: {exc}")
         return None
 
+    # def send_label(self, target_ip: str, target_port: int, label: Label, rule: str) -> Optional[Dict[str, str]]:
+    #     """Dispatch labels to downstream services (with TX counters and safe logs)."""
+    #     # init counters lazily (no need to change __init__)
+    #     if not hasattr(self, "_tx_client_counter"):
+    #         self._tx_client_counter = 0
+    #     if not hasattr(self, "_tx_eval_counter"):
+    #         self._tx_eval_counter = 0
+
+    #     label_json = label.to_json_string()
+
+
+    #     if rule == "send":
+    #         endpoint = "/send"
+    #         tag = "EVAL"
+    #     elif rule == "client":
+    #         endpoint = "/ClientSide"
+    #         tag = "CLIENT"
+    #     else:
+    #         print(f"[TX ERROR] unsupported rule '{rule}'")
+    #         return None
+
+    #     url = f"http://{target_ip}:{target_port}{endpoint}"
+    #     payload = {"port": self.port, "payload": label_json}
+
+    #     try:
+    #         response = requests.post(url, json=payload, timeout=10)
+
+    #         if response.status_code != 200:
+    #             print(f"[TX ERROR] {tag} http={response.status_code} to={target_ip}:{target_port}{endpoint} uuid={label.uuid}")
+    #             return None
+
+    #         # increment only on success
+    #         if tag == "CLIENT":
+    #             self._tx_client_counter += 1
+    #             n = self._tx_client_counter
+    #         else:
+    #             self._tx_eval_counter += 1
+    #             n = self._tx_eval_counter
+
+    #         print(f"[TX {tag} #{n}] to={target_ip}:{target_port}{endpoint} uuid={label.uuid}")
+    #         return response.json()
+
+    #     except requests.RequestException as exc:
+    #         print(f"[TX ERROR] {tag} exception to={target_ip}:{target_port}{endpoint} uuid={label.uuid} err={exc}")
+    #         return None
+
     def send_label(self, target_ip: str, target_port: int, label: Label, rule: str) -> Optional[Dict[str, str]]:
-        """Dispatch labels to downstream services."""
-        # Usa il metodo che forza la stringa JSON
-        label_json = label.to_json_string()
-        
+        """Dispatch labels to downstream services (with TX counters and safe logs)."""
+        # init counters lazily (no need to change __init__)
+        if not hasattr(self, "_tx_client_counter"):
+            self._tx_client_counter = 0
+        if not hasattr(self, "_tx_eval_counter"):
+            self._tx_eval_counter = 0
+
+        # --- MODIFICA SSE INIZIO ---
+        # Determiniamo endpoint, tag e FORMATO del payload in base alla regola
         if rule == "send":
             endpoint = "/send"
+            tag = "EVAL"
+            # L'Evaluation System vuole un DIZIONARIO (JSON Object annidato)
+            # Assumiamo che la classe Label abbia il metodo to_dictionary() come visto nei file precedenti
+            label_content = label.to_dictionary() 
         elif rule == "client":
             endpoint = "/ClientSide"
+            tag = "CLIENT"
+            # Il Client Side (o il vecchio standard) usa una STRINGA JSON
+            label_content = label.to_json_string()
         else:
-            raise ValueError(f"Unsupported rule {rule}")
+            print(f"[TX ERROR] unsupported rule '{rule}'")
+            return None
+        # --- MODIFICA SSE FINE ---
 
         url = f"http://{target_ip}:{target_port}{endpoint}"
-        payload = {"port": self.port, "message": label_json}
+        
+        # Qui label_content sarà un dict per 'eval' e una str per 'client'
+        payload = {"port": self.port, "message": label_content}
+
         try:
+            # requests.post con parametro 'json=' serializza automaticamente
+            # se label_content è un dict, diventa un oggetto JSON nel body.
             response = requests.post(url, json=payload, timeout=10)
-            if response.status_code == 200:
-                return response.json()
+
+            if response.status_code != 200:
+                print(f"[TX ERROR] {tag} http={response.status_code} to={target_ip}:{target_port}{endpoint} uuid={label.uuid}")
+                return None
+
+            # increment only on success
+            if tag == "CLIENT":
+                self._tx_client_counter += 1
+                n = self._tx_client_counter
+            else:
+                self._tx_eval_counter += 1
+                n = self._tx_eval_counter
+
+            print(f"[TX {tag} #{n}] to={target_ip}:{target_port}{endpoint} uuid={label.uuid}")
+            return response.json()
+
         except requests.RequestException as exc:
-            print(f"Error sending label: {exc}")
-        return None
+            print(f"[TX ERROR] {tag} exception to={target_ip}:{target_port}{endpoint} uuid={label.uuid} err={exc}")
+            return None
 
     # Questa è l'attesa bloccante originale per i messaggi in arrivo
     # def get_last_message(self) -> Optional[Dict[str, str]]:

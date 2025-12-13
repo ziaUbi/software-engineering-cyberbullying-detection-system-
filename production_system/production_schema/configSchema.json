@@ -10,7 +10,7 @@
         },
         "max_session_production": {
             "type": "integer",
-            "minimum": 100
+            "minimum": 10
         }
     },
     "required": [

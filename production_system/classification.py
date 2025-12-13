@@ -42,7 +42,7 @@ class Classification:
 
         # Mapping binario: 0 -> not cyberbullying, 1 -> cyberbullying
         if prediction_int == 0:
-            verdict = "not cyberbullying"
+            verdict = "not_cyberbullying"
         else:
             verdict = "cyberbullying"
 
@@ -71,7 +71,7 @@ class Classification:
             
             # 3. Eventi di gioco (conteggi)
             "event_score": prepared_session["event_score"],
-            "event_sending-off": prepared_session["event_sending-off"],
+            "event_sending_off": prepared_session["event_sending-off"],
             "event_caution": prepared_session["event_caution"],
             "event_substitution": prepared_session["event_substitution"],
             "event_foul": prepared_session["event_foul"],
@@ -101,3 +101,5 @@ class Classification:
         
         # Creazione del DataFrame con una sola riga (index=[0])
         return pd.DataFrame([feature_struct])
+
+

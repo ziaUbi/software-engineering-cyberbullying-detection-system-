@@ -30,3 +30,5 @@ class ConfigurationParameters:
     def start_config(self) -> Dict[str, str]:
         """Payload sent to the messaging system to kick-off production."""
         return {"configuration": "production"}
+
+
