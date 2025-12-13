@@ -74,7 +74,7 @@ class IngestionSystemOrchestrator:
         Process a record through the ingestion workflow.
         Main Loop of the Ingestion System.
         """
-        processed_count = 0
+        total_record_count = 0
         sessions_created = 0
         
         print("Starting processing loop...")
@@ -92,8 +92,8 @@ class IngestionSystemOrchestrator:
                     print("Received invalid record, skipping...")
                     continue  # skip invalid records
                 
-                processed_count += 1
-                print(f"Processed records count: {processed_count}")
+                total_record_count += 1
+                print(f"Processed records count: {total_record_count}")
 
                 # process AUDIO records: convert base64 to file and update record
                 if new_record.get("source") == "audio":
@@ -134,7 +134,7 @@ class IngestionSystemOrchestrator:
                 # creates raw session
                 raw_session = self.session_creator.create_raw_session(stored_records)
                 sessions_created += 1
-                print(f"RawSessions created count: {sessions_created}")
+                print(f"RAW SESSION created count: {sessions_created}")
 
                 # removes records from buffer
                 self.buffer_controller.remove_records(new_record["value"]["uuid"])
@@ -153,7 +153,7 @@ class IngestionSystemOrchestrator:
                         "label": marked_raw_session.label
                     }
                     # print(label)
-                    print("Send Label to Evaluation System")
+                    print("Send Label to EVALUATION System")
 
                     self.json_io.send_label(target_ip=self.parameters.configuration["ip_evaluation"],
                                               target_port=self.parameters.configuration["port_evaluation"], label_data=label)
@@ -170,9 +170,9 @@ class IngestionSystemOrchestrator:
                 #update the session sent counter only it is production/evaluation
                 #because development is changed by the human
                 # if self.current_phase != "development":
-                    #if it is not testing phase, count sessions to change then phase
-                    #otherwise, if it is testing phase, stop counting, no phase change needed
-                    # if not self.parameters.configuration["service"]:
+                    #if it is testing phase, count sessions to change then phase
+                    #otherwise, if it is not testing phase, stop counting, no phase change needed
+                    # if self.parameters.configuration["service"]:
                     #     self._update_session()
 
                 if self.parameters.configuration["service"]:
