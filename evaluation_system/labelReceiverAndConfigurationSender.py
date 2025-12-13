@@ -49,19 +49,24 @@ class LabelReceiverAndConfigurationSender:
         sender_ip = request.remote_addr
 
         try:
+            #Source Identification (Expert vs Classifier)
+            ingestion_ip = EvaluationSystemParameters.GLOBAL_PARAMETERS["Ingestion System"]["ip"]
+            production_ip = EvaluationSystemParameters.GLOBAL_PARAMETERS["Production System"]["ip"]
+            
             packet = request.get_json()
-            if not packet or "payload" not in packet:
+            if sender_ip == ingestion_ip:
+                if not packet or "payload" not in packet:
                     return jsonify({"status": "error", "payload": "Invalid packet format"}), 400
+                json_label = packet.get("payload")
+            elif sender_ip == production_ip:
+                if not packet or "message" not in packet:
+                    return jsonify({"status": "error", "payload": "Invalid packet format"}), 400
+                json_label = packet.get("message")
 
-            # The message is a JSON string inside the 'payload' field
-            json_label = packet.get("payload")
+            
             #Schema Validation
             if self._validate_json_label(json_label):
-                
-                #Source Identification (Expert vs Classifier)
-                ingestion_ip = EvaluationSystemParameters.GLOBAL_PARAMETERS["Ingestion System"]["ip"]
-                production_ip = EvaluationSystemParameters.GLOBAL_PARAMETERS["Production System"]["ip"]
-
+            
                 expert = False
                 
                 if sender_ip == ingestion_ip:
