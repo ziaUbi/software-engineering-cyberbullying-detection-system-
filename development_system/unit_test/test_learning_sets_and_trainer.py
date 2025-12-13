@@ -58,8 +58,8 @@ def test_trainer_set_avg_hyperparameters(monkeypatch, tmp_path: Path):
     t = Trainer(basedir=str(tmp_path))
     t.set_avg_hyperparameters()
 
-    assert t.classifier.get_num_neurons() == 4  # ceil((6+2)/2)
-    assert t.classifier.get_num_layers() == 2   # ceil((3+1)/2)
+    assert t.classifier.get_num_neurons() == 4
+    assert t.classifier.get_num_layers() == 2
 
 
 def test_trainer_save_and_load_classifier(tmp_path: Path):
