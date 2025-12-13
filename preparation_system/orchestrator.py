@@ -37,7 +37,20 @@ class PreparationSystemOrchestrator:
         self.corrector = SessionCorrector(self.parameters)
         self.creator = PreparedSessionCreator(self.parameters)
 
+        self.current_phase = self.parameters.configuration["current_phase"]  # current phase
+        self.current_sessions = 0  # number of sessions processed in the current phase
+
         print(f"PREPARATION ORCHESTRATOR INITIALIZED ")
+    
+    def _update_session(self):
+        # updates the number of session received and eventually changes the current phase
+        self.current_sessions += 1
+
+        # if we are in development and the number of sessions sent is reached, change to production
+        if self.current_phase == "development" and self.current_sessions == self.parameters.configuration["development_sessions"]:
+            self.current_phase = "production"
+            self.current_sessions = 0
+            print("CHANGED TO PRODUCTION")
 
     def prepare_session(self):
         """
@@ -74,8 +87,9 @@ class PreparationSystemOrchestrator:
 
                 target_ip = ""
                 target_port = 0
+
                 
-                if self.parameters.development_mode:
+                if self.current_phase == "development":
                     target_ip = self.parameters.configuration["ip_segregation"]
                     target_port = self.parameters.configuration["port_segregation"]
                     dest_name = "SEGREGATION"
@@ -85,11 +99,14 @@ class PreparationSystemOrchestrator:
                     target_port = self.parameters.configuration["port_production"]
                     dest_name = "PRODUCTION"
 
+                if self.parameters.configuration["service"]:
+                    self._update_session()
+
                 # --- SEND PREPARED SESSION ---
                 success = self.json_io.send_prepared_session(target_ip, target_port, correct_prepared_session)
 
                 if success:
-                    print(f"Session {correct_prepared_session.uuid} sent to {dest_name}.")
+                    print(f"Prepared Session sent to {dest_name}.")
                 else:
                     print(f"ERROR: Failed to send session {correct_prepared_session.uuid} to {dest_name}.")
 
