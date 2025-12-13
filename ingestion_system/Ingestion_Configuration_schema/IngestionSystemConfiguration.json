@@ -6,7 +6,7 @@
     "development_sessions": 50,
     "evaluation_sessions": 10,
     "ip_preparation": "127.0.0.1",
-    "ip_evaluation": "172.20.10.2",
+    "ip_evaluation": "127.0.0.1",
     "port_preparation": 5002,
     "port_evaluation": 5210,
     "ip_ingestion": "0.0.0.0",

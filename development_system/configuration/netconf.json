@@ -4,7 +4,7 @@
     "port": 5010
   },
   "Production System": {
-    "ip": "172.20.10.11",
+    "ip": "127.0.0.1",
     "port": 5105
   },
   "Messaging System": {
