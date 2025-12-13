@@ -43,9 +43,9 @@ class LearningSet:
 
     def to_dict(self) -> dict:
         return {
-            "training_set": [session.to_dict() for session in self._training_set],
-            "validation_set": [session.to_dict() for session in self._validation_set],
-            "test_set": [session.to_dict() for session in self._test_set],
+            "training_set": [session for session in self._training_set],
+            "validation_set": [session for session in self._validation_set],
+            "test_set": [session for session in self._test_set],
         }
 
     @classmethod

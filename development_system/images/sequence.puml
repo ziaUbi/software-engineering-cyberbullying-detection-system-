@@ -1,0 +1,152 @@
+@startuml development_system_sequence
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 250
+autonumber "1."
+
+participant "DevelopmentSystemOrchestrator\n:Orchestrator" as Orch
+participant "ConfigurationParameters\n:Parameters" as Config
+participant "LearningSetsReceiver...\n:MsgManager" as Comm
+participant "TrainingOrchestrator\n:Trainer" as Trainer
+participant "ValidationOrchestrator\n:Validator" as Validator
+participant "TestingOrchestrator\n:Tester" as Tester
+participant "External Systems\n(Service/Prod/Msg)" as ExtSys
+
+== Initialization Phase ==
+
+[-> Orch : __init__()
+activate Orch
+
+Orch -> Config : load_configuration()
+activate Config
+Config --> Orch : params loaded
+deactivate Config
+
+Orch -> Comm : __init__()
+Orch -> Trainer : __init__()
+Orch -> Validator : __init__()
+Orch -> Tester : __init__()
+
+== Runtime Phase ==
+
+[-> Orch : develop()
+
+opt service_flag == True
+    Orch -> Comm : start_server()
+    activate Comm
+    note right: Listening for Learning Sets
+    Comm --> Orch : server_started
+    deactivate Comm
+end
+
+loop Main Development Loop (Stop&Go Interaction)
+
+    Orch -> Orch : Check user_responses.json state
+
+    alt [State: Start / ClassifierCheck]
+        
+        opt service_flag == True
+            Orch -> Comm : get_learning_set()
+            activate Comm
+            ExtSys -> Comm : POST /send (learning_set)
+            Comm --> Orch : LearningSets Object
+            deactivate Comm
+
+            Orch -> Comm : send_timestamp(start)
+            activate Comm
+            Comm -> ExtSys : POST /Timestamp
+            Comm --> Orch : ack
+            deactivate Comm
+        end
+
+        Orch -> Trainer : train_classifier(set_avg_hyperparams=True)
+        activate Trainer
+        Trainer -> Trainer : set_avg_hyperparameters()
+        Trainer -> Trainer : save_classifier()
+        Trainer --> Orch : void
+        deactivate Trainer
+        
+        note right of Orch: State advances to\nIterationCheck
+
+    else [State: IterationCheck]
+        
+        Orch -> Trainer : train_classifier(set_avg_hyperparams=False)
+        activate Trainer
+        Trainer -> Trainer : train(iterations)
+        note right: Simulates/Reads iteration\ntuning via Learning Plot
+        Trainer --> Orch : Classifier (Trained)
+        deactivate Trainer
+
+        note right of Orch: State advances to\nValidation
+
+    else [State: Validation]
+        
+        Orch -> Validator : validation()
+        activate Validator
+        
+        loop Grid Search (Layers, Neurons)
+            Validator -> Validator : train_and_validate()
+            Validator -> Validator : append_classifier()
+        end
+        
+        Validator -> Validator : show_validation_report()
+        Validator --> Orch : result (True/False)
+        deactivate Validator
+
+        alt result == True
+            note right of Orch: State advances to\nGenerateTest
+        else result == False
+            note right of Orch: Validation Failed.\nRestarting from ClassifierCheck.
+        end
+
+    else [State: GenerateTest]
+        
+        Orch -> Tester : test()
+        activate Tester
+        Tester -> Tester : load_winner_network()
+        Tester -> Tester : predict_on_test_set()
+        Tester -> Tester : generate_test_report()
+        Tester --> Orch : result (True/False)
+        deactivate Tester
+
+        alt result == True
+            note right of Orch: State advances to\nTestOK (Success)
+        else result == False
+             note right of Orch: State advances to\nTestOK=0 (Failure)
+        end
+
+    else [State: Delivery & Teardown]
+        
+        alt TestOK == 1 (Success)
+            Orch -> Comm : send_classifier()
+            activate Comm
+            Comm -> ExtSys : POST /send (Classifier)
+            activate ExtSys
+            ExtSys --> Comm : 200 OK
+            deactivate ExtSys
+            Comm --> Orch : response
+            deactivate Comm
+        
+        else TestOK == 0 (Failure)
+            Orch -> Comm : send_configuration(restart)
+            activate Comm
+            Comm -> ExtSys : POST /MessagingSystem
+            activate ExtSys
+            ExtSys --> Comm : 200 OK
+            deactivate ExtSys
+            Comm --> Orch : response
+            deactivate Comm
+        end
+
+        Orch -> Comm : send_timestamp(end)
+        activate Comm
+        Comm -> ExtSys : POST /Timestamp
+        Comm --> Orch : ack
+        deactivate Comm
+
+        note right of Orch: Loop restarts to\nStart state
+    end
+
+end
+
+deactivate Orch
+@enduml

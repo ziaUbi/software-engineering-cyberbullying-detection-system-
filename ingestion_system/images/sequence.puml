@@ -1,0 +1,147 @@
+@startuml ingestion_system_sequence
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 250
+autonumber "1."
+
+participant "External Source\n(Tweets/Audio/Events)" as Source
+participant "IngestionSystemOrchestrator\n:Orchestrator" as Orch
+participant "Parameters\n:Parameters" as Params
+participant "RecordAndSessionChannel\n:Channel" as Comm
+participant "RecordBufferController\n:Buffer" as Buffer
+participant "RecordSufficiencyChecker\n:Checker" as Checker
+participant "RawSessionCreator\n:Creator" as Creator
+participant "JsonHandler\n:Handler" as Json
+participant "Preparation / Evaluation\nSystem" as TargetSys
+
+== Initialization Phase ==
+
+[-> Orch : __init__()
+activate Orch
+
+Orch -> Params : __init__()
+activate Params
+Params --> Orch : configuration loaded
+deactivate Params
+
+Orch -> Buffer : __init__()
+activate Buffer
+Buffer -> Buffer : _drop_table()
+Buffer -> Buffer : _create_table()
+Buffer --> Orch : db_connected
+deactivate Buffer
+
+Orch -> Checker : __init__(buffer)
+Orch -> Creator : __init__(params)
+
+Orch -> Comm : __init__(host, port)
+Orch -> Comm : start_server()
+activate Comm
+note right of Comm: Server starts in thread\nlistening on /send
+Comm --> Orch : server_started
+deactivate Comm
+
+== Runtime Phase ==
+
+[-> Orch : process_record()
+
+loop Main Processing Loop
+
+    Orch -> Comm : get_record()
+    activate Comm
+    
+    Source -> Comm : POST /send (json_record)
+    note right: Async arrival
+    Comm -> Comm : queue.put(record)
+    
+    Comm -> Json : validate_json(record)
+    activate Json
+    Json --> Comm : is_valid
+    deactivate Json
+
+    Comm --> Orch : Record Object
+    deactivate Comm
+
+    opt Record is Valid
+        
+        opt Source == "audio"
+            Orch -> Json : save_base64_audio_to_file(b64)
+            activate Json
+            Json --> Orch : file_path
+            deactivate Json
+            Orch -> Orch : update record (value=path)
+        end
+
+        Orch -> Buffer : store_record(record)
+        activate Buffer
+        Buffer --> Orch : void
+        deactivate Buffer
+
+        Orch -> Checker : are_records_sufficient(uuid, phase)
+        activate Checker
+        Checker -> Buffer : get_records(uuid)
+        activate Buffer
+        Buffer --> Checker : records_list
+        deactivate Buffer
+        Checker --> Orch : boolean
+        deactivate Checker
+
+        alt [Records Sufficient]
+            
+            note over Orch: Triggering Session Creation
+
+            Orch -> Buffer : get_records(uuid)
+            activate Buffer
+            Buffer --> Orch : full_record_list
+            deactivate Buffer
+
+            Orch -> Creator : create_raw_session(list)
+            activate Creator
+            Creator --> Orch : RawSession Object
+            deactivate Creator
+
+            Orch -> Buffer : remove_records(uuid)
+            
+            Orch -> Creator : mark_missing_samples(session)
+            activate Creator
+            Creator -> Creator : validate_raw_session()
+            Creator --> Orch : valid, marked_session
+            deactivate Creator
+
+            alt [Session is Valid]
+                
+                opt Current Phase == "evaluation"
+                    Orch -> Comm : send_label(target_ip, label_data)
+                    activate Comm
+                    Comm -> TargetSys : POST /send (label)
+                    Comm --> Orch : success
+                    deactivate Comm
+                end
+
+                Orch -> Comm : send_raw_session(target_ip, session)
+                activate Comm
+                Comm -> TargetSys : POST /send (raw_session)
+                activate TargetSys
+                TargetSys --> Comm : 200 OK
+                deactivate TargetSys
+                Comm --> Orch : success
+                deactivate Comm
+                
+                note right of Orch: Session successfully sent\nto next stage
+
+                opt Service Mode Active
+                    Orch -> Orch : _update_session()
+                end
+
+            else [Session Invalid]
+                note right of Orch: Discard session due to\ntoo many missing samples
+            end
+
+        else [Records NOT Sufficient]
+            note right of Orch: Continue loop, waiting\nfor more parts (Audio/Events/etc.)
+        end
+
+    end
+end
+
+deactivate Orch
+@enduml

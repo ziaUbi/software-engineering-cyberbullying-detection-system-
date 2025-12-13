@@ -1,0 +1,164 @@
+@startuml segregation_system_sequence
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 250
+autonumber "1."
+
+participant "Preparation System" as PrepSys
+participant "SegregationSystemOrchestrator\n:Orchestrator" as Orch
+participant "SegregationSystemConfiguration\n:Config" as Config
+participant "SessionReceiver...\n:MsgBroker" as Comm
+participant "SegregationSystemJsonHandler\n:Handler" as Json
+participant "PreparedSessionDatabaseController\n:Database" as DB
+participant "BalancingReportModel\n:Balancing" as Balancer
+participant "CoverageReportModel\n:Coverage" as Coverage
+participant "LearningSetSplitter\n:Splitter" as Splitter
+participant "Development System" as DevSys
+participant "Messaging System" as MsgSys
+
+== Initialization Phase ==
+
+[-> Orch : __init__()
+activate Orch
+
+Orch -> DB : __init__()
+activate DB
+DB -> DB : _init_db()
+DB --> Orch : db_connected
+deactivate DB
+
+Orch -> Comm : __init__()
+Orch -> Comm : start_server()
+activate Comm
+note right of Comm: Server starts in thread\nlistening on /send
+Comm --> Orch : server_started
+deactivate Comm
+
+== Runtime Phase ==
+
+[-> Orch : run()
+
+Orch -> Config : load_parameters()
+Orch -> Json : read_field(execution_state)
+note right: Check collection status
+
+alt [Not Enough Sessions Collected]
+
+    loop Collection Loop (until count >= min_req)
+        Orch -> Comm : get_last_message()
+        activate Comm
+        
+        PrepSys -> Comm : POST /send (prepared_session)
+        note right: Async arrival
+        Comm -> Comm : queue.put(message)
+        
+        Comm --> Orch : Message Payload
+        deactivate Comm
+
+        Orch -> Json : validate_json(payload)
+        activate Json
+        Json --> Orch : is_valid
+        deactivate Json
+
+        opt Session is Valid
+            Orch -> DB : store_prepared_session(session)
+            activate DB
+            DB --> Orch : void
+            deactivate DB
+            
+            Orch -> DB : get_number_of_sessions_stored()
+            activate DB
+            DB --> Orch : count
+            deactivate DB
+        end
+    end
+    
+    note over Orch: Threshold reached. State updated.
+
+end
+
+Orch -> DB : get_all_prepared_sessions()
+activate DB
+DB --> Orch : sessions_list
+deactivate DB
+
+note over Orch: Generating Balancing Report
+
+Orch -> Balancer : generate_balancing_report(sessions)
+activate Balancer
+Balancer --> Orch : BalancingReport Object
+deactivate Balancer
+
+alt [Data is BALANCED]
+    
+    note over Orch: Generating Coverage Report
+    
+    Orch -> Coverage : generate_coverage_report(sessions)
+    activate Coverage
+    Coverage --> Orch : CoverageReport Object
+    deactivate Coverage
+
+    alt [Coverage SATISFIED]
+        
+        note over Orch: Generating Learning Sets
+        
+        Orch -> DB : get_all_prepared_sessions()
+        activate DB
+        DB --> Orch : sessions_list
+        deactivate DB
+
+        Orch -> Splitter : generateLearningSets(sessions)
+        activate Splitter
+        Splitter -> Splitter : shuffle & split
+        Splitter --> Orch : LearningSets Object
+        deactivate Splitter
+
+        Orch -> Comm : send_message(target=DevSystem, payload=LearningSets)
+        activate Comm
+        Comm -> DevSys : POST /send (learning_sets)
+        activate DevSys
+        DevSys --> Comm : 200 OK
+        deactivate DevSys
+        Comm --> Orch : success
+        deactivate Comm
+
+        Orch -> DB : remove_all_prepared_sessions()
+        Orch -> Orch : reset_execution_state()
+
+    else [Coverage NOT Satisfied]
+        
+        note right of Orch: Trigger Restart due to Coverage
+        
+        Orch -> Comm : send_configuration("coverage_not_satisfied")
+        activate Comm
+        Comm -> MsgSys : POST /MessagingSystem (restart)
+        activate MsgSys
+        MsgSys --> Comm : 200 OK
+        deactivate MsgSys
+        Comm --> Orch : success
+        deactivate Comm
+        
+        Orch -> Orch : reset_execution_state()
+        return
+
+    end
+
+else [Data is UNBALANCED]
+
+    note right of Orch: Trigger Restart due to Balancing
+    
+    Orch -> Comm : send_configuration("unbalanced_classes")
+    activate Comm
+    Comm -> MsgSys : POST /MessagingSystem (restart)
+    activate MsgSys
+    MsgSys --> Comm : 200 OK
+    deactivate MsgSys
+    Comm --> Orch : success
+    deactivate Comm
+
+    Orch -> Orch : reset_execution_state()
+    return
+
+end
+
+deactivate Orch
+@enduml

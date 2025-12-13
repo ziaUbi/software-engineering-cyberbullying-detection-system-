@@ -1,0 +1,110 @@
+{
+    "classifier_labels": [
+        {
+            "uuid": "17225c8a-82d2-4d71-a751-530270901762",
+            "label": "not_cyberbullying",
+            "expert": false
+        },
+        {
+            "uuid": "3b032423-9fee-4802-8ae5-0b528128afc6",
+            "label": "not_cyberbullying",
+            "expert": false
+        },
+        {
+            "uuid": "611f1697-afce-4c28-9d0e-d0ff5fff60fe",
+            "label": "not_cyberbullying",
+            "expert": false
+        },
+        {
+            "uuid": "6bf40ef4-32ce-4cd7-b50d-6528a515b8b1",
+            "label": "not_cyberbullying",
+            "expert": false
+        },
+        {
+            "uuid": "76142ba1-12f8-4891-869f-b91aae96a1d0",
+            "label": "cyberbullying",
+            "expert": false
+        },
+        {
+            "uuid": "7fd37191-b207-417b-a3bc-d103ea1141e0",
+            "label": "not_cyberbullying",
+            "expert": false
+        },
+        {
+            "uuid": "9d0fcb09-c813-4d2e-8696-e1370b0e80c9",
+            "label": "not_cyberbullying",
+            "expert": false
+        },
+        {
+            "uuid": "d1f28f34-f084-4a75-a8d1-772acdff82ac",
+            "label": "not_cyberbullying",
+            "expert": false
+        },
+        {
+            "uuid": "d275c92c-6d01-47e8-8776-d4647d136f00",
+            "label": "cyberbullying",
+            "expert": false
+        },
+        {
+            "uuid": "e65a9e92-01b3-4c63-8e1a-3ad5289ceaaa",
+            "label": "cyberbullying",
+            "expert": false
+        }
+    ],
+    "expert_labels": [
+        {
+            "uuid": "17225c8a-82d2-4d71-a751-530270901762",
+            "label": "not_cyberbullying",
+            "expert": true
+        },
+        {
+            "uuid": "3b032423-9fee-4802-8ae5-0b528128afc6",
+            "label": "cyberbullying",
+            "expert": true
+        },
+        {
+            "uuid": "611f1697-afce-4c28-9d0e-d0ff5fff60fe",
+            "label": "not_cyberbullying",
+            "expert": true
+        },
+        {
+            "uuid": "6bf40ef4-32ce-4cd7-b50d-6528a515b8b1",
+            "label": "cyberbullying",
+            "expert": true
+        },
+        {
+            "uuid": "76142ba1-12f8-4891-869f-b91aae96a1d0",
+            "label": "cyberbullying",
+            "expert": true
+        },
+        {
+            "uuid": "7fd37191-b207-417b-a3bc-d103ea1141e0",
+            "label": "not_cyberbullying",
+            "expert": true
+        },
+        {
+            "uuid": "9d0fcb09-c813-4d2e-8696-e1370b0e80c9",
+            "label": "not_cyberbullying",
+            "expert": true
+        },
+        {
+            "uuid": "d1f28f34-f084-4a75-a8d1-772acdff82ac",
+            "label": "not_cyberbullying",
+            "expert": true
+        },
+        {
+            "uuid": "d275c92c-6d01-47e8-8776-d4647d136f00",
+            "label": "cyberbullying",
+            "expert": true
+        },
+        {
+            "uuid": "e65a9e92-01b3-4c63-8e1a-3ad5289ceaaa",
+            "label": "cyberbullying",
+            "expert": true
+        }
+    ],
+    "total_errors": 3,
+    "max_consecutive_errors": 2,
+    "actual_total_errors": 2,
+    "actual_max_consecutive_errors": 1
+}

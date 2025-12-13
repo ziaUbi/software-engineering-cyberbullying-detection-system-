@@ -1,0 +1,128 @@
+@startuml production_system_sequence
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 250
+autonumber "1."
+
+participant "Prep / Dev / Msg\nSystem" as Sender
+participant "ProductionSystemOrchestrator\n:Orchestrator" as Orch
+participant "ConfigurationParameters\n:Parameters" as Params
+participant "ProductionSystemCommunication\n:Comm" as Comm
+participant "Deployment\n:Deployment" as Deploy
+participant "Classification\n:Classifier" as Classif
+participant "JsonValidation\n:Validator" as Json
+participant "ProductionPhaseManager\n:PhaseMgr" as PhaseMgr
+participant "Evaluation / Dev\nSystem" as Receiver
+
+== Initialization Phase ==
+
+[-> Orch : __init__()
+activate Orch
+
+Orch -> Params : __init__()
+activate Params
+Params --> Orch : parameters loaded
+deactivate Params
+
+Orch -> Comm : __init__()
+Orch -> Comm : start_server()
+activate Comm
+note right of Comm: Server starts in thread\nlistening on /send
+Comm --> Orch : server_started
+deactivate Comm
+
+Orch -> PhaseMgr : __init__()
+Orch -> Deploy : __init__()
+
+Orch -> Classif : __init__()
+activate Classif
+Classif -> Classif : load_model()
+note right: Loads 'cyberbullying_classifier.sav'
+Classif --> Orch : model ready
+deactivate Classif
+
+== Runtime Phase ==
+
+[-> Orch : produce()
+
+loop Main Production Loop
+
+    Orch -> Comm : get_message()
+    activate Comm
+    
+    Sender -> Comm : POST /send (payload)
+    note right: Async arrival
+    Comm -> Comm : queue.put(payload)
+    
+    Comm --> Orch : message
+    deactivate Comm
+
+    Orch -> Deploy : identify_message_type(message)
+    activate Deploy
+    Deploy --> Orch : type (Session/Classifier/Config)
+    deactivate Deploy
+
+    alt [Type: Classifier Message]
+        
+        note over Orch: Updating Model from Development
+        
+        Orch -> Deploy : save_classifier(message)
+        activate Deploy
+        Deploy -> Deploy : write .sav file
+        Deploy --> Orch : saved
+        deactivate Deploy
+
+        Orch -> Classif : load_model()
+        activate Classif
+        Classif --> Orch : new model loaded
+        deactivate Classif
+
+    else [Type: Prepared Session]
+        
+        Orch -> Json : validate_json(message)
+        activate Json
+        Json --> Orch : is_valid
+        deactivate Json
+
+        opt Session is Valid
+            
+            Orch -> Classif : classify(session)
+            activate Classif
+            Classif -> Classif : extract_features()
+            Classif -> Classif : model.predict()
+            Classif --> Orch : Label (cyberbullying/not...)
+            deactivate Classif
+
+            note right of Orch: Sending Label to Evaluation
+
+            Orch -> Comm : send_label(label, target="Evaluation")
+            activate Comm
+            Comm -> Receiver : POST /send (label)
+            activate Receiver
+            Receiver --> Comm : 200 OK
+            deactivate Receiver
+            Comm --> Orch : success
+            deactivate Comm
+
+            Orch -> PhaseMgr : update_phase()
+            activate PhaseMgr
+            PhaseMgr --> Orch : send_to_development (bool)
+            deactivate PhaseMgr
+
+            opt send_to_development == True
+                note right of Orch: Forwarding copy to Development
+                Orch -> Comm : send_label(label, target="Development")
+                activate Comm
+                Comm -> Receiver : POST /send (label)
+                Comm --> Orch : success
+                deactivate Comm
+            end
+        end
+
+    else [Type: Configuration Message]
+        note right of Orch: Handle configuration\n(e.g., logging)
+    end
+
+end
+
+deactivate Orch
+@enduml

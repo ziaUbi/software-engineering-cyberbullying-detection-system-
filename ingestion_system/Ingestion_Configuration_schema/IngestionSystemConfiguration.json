@@ -1,7 +1,7 @@
 {
     "maxNumMissingSamples": 3,
-    "current_phase": "development",
-    "service": true,
+    "current_phase": "production",
+    "service": false,
     "production_sessions": 100,
     "development_sessions": 50,
     "evaluation_sessions": 10,
