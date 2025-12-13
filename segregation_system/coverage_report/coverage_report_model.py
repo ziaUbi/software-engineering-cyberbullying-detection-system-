@@ -12,7 +12,8 @@ class CoverageReportModel:
         # --------- Tweet length: {lenght -> count} ---------
         tweet_length_counter: Counter[int] = Counter()
         for s in sessions:
-            length=s["tweet_length"]
+            # length=s["tweet_length"]
+            length = s.tweet_length
             if length is not None:
                 tweet_length_counter[int(length)] += 1
 
@@ -24,7 +25,8 @@ class CoverageReportModel:
             total_for_word = 0
             for s in sessions:
                 # total_for_word += int(getattr(s, attr_name, 0))
-                total_for_word += int(s[f"word_{word}"])
+                # total_for_word += int(s[f"word_{word}"])
+                total_for_word += int(getattr(s, attr_name, 0))
             bad_words_map[word] = total_for_word
 
 
@@ -33,7 +35,8 @@ class CoverageReportModel:
         for s in sessions:
             for band_idx in range(20):
                 attr_name = f"audio_{band_idx}"
-                value = s[attr_name]
+                # value = s[attr_name]
+                value = getattr(s, attr_name)
                 if value is None:
                     continue
                 db_value = int(round(float(value)))
@@ -47,16 +50,16 @@ class CoverageReportModel:
         total_foul = 0
 
         for s in sessions:
-            # total_score += int(getattr(s, "event_score", 0))
-            # total_sending_off += int(getattr(s, "event_sending_off", 0))
-            # total_caution += int(getattr(s, "event_caution", 0))
-            # total_substitution += int(getattr(s, "event_substitution", 0))
-            # total_foul += int(getattr(s, "event_foul", 0))
-            total_score += int(s["event_score"])
-            total_sending_off += int(s["event_sending_off"])
-            total_caution += int(s["event_caution"])
-            total_substitution += int(s["event_substitution"])
-            total_foul += int(s["event_foul"])
+            total_score += int(getattr(s, "event_score", 0))
+            total_sending_off += int(getattr(s, "event_sending_off", 0))
+            total_caution += int(getattr(s, "event_caution", 0))
+            total_substitution += int(getattr(s, "event_substitution", 0))
+            total_foul += int(getattr(s, "event_foul", 0))
+            # total_score += int(s["event_score"])
+            # total_sending_off += int(s["event_sending_off"])
+            # total_caution += int(s["event_caution"])
+            # total_substitution += int(s["event_substitution"])
+            # total_foul += int(s["event_foul"])
 
         events_map = {
             "Score": total_score,

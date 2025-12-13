@@ -1,6 +1,7 @@
 from dataclasses import dataclass, asdict
 from typing import List, Tuple
 
+@dataclass
 class PreparedSession:
     """
     The `PreparedSession` class represents a prepared session for a data segregation system.

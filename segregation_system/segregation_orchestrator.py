@@ -45,6 +45,9 @@ class SegregationSystemOrchestrator:
 
             while True:
                 message = self.message_broker.get_last_message()
+                if message is None:
+                    time.sleep(1)
+                    break
                 message = message['message']
 
                 if SegregationSystemJsonHandler.validate_json(message, "segregation_system/schemas/prepared_session_schema.json"):
