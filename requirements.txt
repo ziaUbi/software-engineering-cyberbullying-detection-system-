@@ -1,6 +1,6 @@
 matplotlib
 scikit-learn
-pytest~=5.4.3
+pytest
 pylint
 requests
 flask
