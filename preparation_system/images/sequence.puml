@@ -1,0 +1,108 @@
+@startuml preparation_system_sequence
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 250
+autonumber "1."
+
+participant "Ingestion System\n(Raw Source)" as Source
+participant "PreparationSystemOrchestrator\n:Orchestrator" as Orch
+participant "PreparationSystemParameters\n:Parameters" as Params
+participant "PreparationSessionChannel\n:Channel" as Comm
+participant "SessionCorrector\n:Corrector" as Corrector
+participant "PreparedSessionCreator\n:Creator" as Creator
+participant "JsonHandler\n:Handler" as Json
+participant "Production / Segregation\nSystem" as TargetSys
+
+== Initialization Phase ==
+
+[-> Orch : __init__()
+activate Orch
+
+Orch -> Params : __init__()
+activate Params
+Params -> Json : read_json_file(config)
+Params --> Orch : parameters loaded
+deactivate Params
+
+Orch -> Comm : __init__(host, port)
+Orch -> Comm : start_server()
+activate Comm
+note right of Comm: Server starts in thread\nlistening on /send
+Comm --> Orch : server_started
+deactivate Comm
+
+Orch -> Corrector : __init__(params)
+Orch -> Creator : __init__(params)
+
+== Runtime Phase ==
+
+[-> Orch : prepare_session()
+
+loop Main Preparation Loop
+
+    Orch -> Comm : get_raw_session()
+    activate Comm
+    
+    Source -> Comm : POST /send (raw_session)
+    note right: Async arrival
+    Comm -> Comm : queue.put(payload)
+    
+    Comm -> Json : validate_json(schema)
+    activate Json
+    Json --> Comm : is_valid
+    deactivate Json
+
+    Comm --> Orch : RawSession Object
+    deactivate Comm
+
+    alt Session Received
+
+        note over Orch: Step 1: Correct Missing Samples
+        Orch -> Corrector : correct_missing_samples(raw_session, None)
+        activate Corrector
+        Corrector -> Corrector : calculate_mode(events)
+        Corrector --> Orch : Corrected RawSession
+        deactivate Corrector
+
+        note over Orch: Step 2: Feature Extraction
+        Orch -> Creator : create_prepared_session(raw_session)
+        activate Creator
+        Creator -> Creator : _preprocess_text(tweet)
+        Creator -> Creator : _extract_audio_features(file)
+        Creator -> Creator : _create_flat_events(events)
+        Creator --> Orch : PreparedSession Object
+        deactivate Creator
+
+        note over Orch: Step 3: Correct Outliers
+        Orch -> Corrector : correct_absolute_outliers(prepared_session)
+        activate Corrector
+        Corrector -> Corrector : clamp_gain(min, max)
+        Corrector --> Orch : Final PreparedSession
+        deactivate Corrector
+
+        alt Current Phase == "development"
+            note right of Orch: Routing to Segregation System
+        else Phase == "production" OR "evaluation"
+            note right of Orch: Routing to Production System
+        end
+
+        Orch -> Comm : send_prepared_session(target_ip, session)
+        activate Comm
+        Comm -> TargetSys : POST /send (prepared_session)
+        activate TargetSys
+        TargetSys --> Comm : 200 OK
+        deactivate TargetSys
+        Comm --> Orch : success
+        deactivate Comm
+
+        opt Service Mode Active
+            Orch -> Orch : _update_session()
+        end
+
+    else No Session (Timeout)
+        note right of Orch: Retry loop
+    end
+
+end
+
+deactivate Orch
+@enduml
