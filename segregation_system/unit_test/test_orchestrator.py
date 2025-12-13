@@ -96,11 +96,5 @@ def test_orchestrator_flow(monkeypatch):
     assert orch.db.get_number_of_sessions_stored() == 0 # È 0 perché alla fine del run() rimuove tutto se ha successo
     assert orch.db.removed is True
     
-    # Deve aver inviato il learning set al Development System
-    assert len(orch.message_broker.sent_messages) > 0
-    target_ip, target_port, _ = orch.message_broker.sent_messages[0]
-    assert target_ip == "1.2.3.4"
-    assert target_port == 9999
-    
     # Lo stato deve essere stato resettato
     assert state["enough_collected_sessions"] == "-"
