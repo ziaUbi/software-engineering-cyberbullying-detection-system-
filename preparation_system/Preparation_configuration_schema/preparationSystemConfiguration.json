@@ -1,7 +1,7 @@
 {
   "development": true,
-  "current_phase": "development",
-  "service": true,
+  "current_phase": "production",
+  "service": false,
   "development_sessions": 50,
   "ip_preparation": "127.0.0.1",
   "port_preparation": 5002,

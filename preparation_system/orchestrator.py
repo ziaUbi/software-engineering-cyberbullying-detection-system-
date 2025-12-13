@@ -45,21 +45,13 @@ class PreparationSystemOrchestrator:
     def _update_session(self):
         # updates the number of session received and eventually changes the current phase
         self.current_sessions += 1
+        print(f"Sessions Processed: {self.current_sessions}")
 
-        #if we are in production and the number of sessions sent is reached, change to evaluation
-        if self.current_phase == "production" and self.current_sessions == self.parameters.configuration["production_sessions"]:
-            self.current_phase = "evaluation"
-            self.current_sessions = 0
-            print("CHANGED TO EVALUATION")
-        # if we are in evaluation and the number of sessions sent is reached, change to production
-        elif self.current_phase == "evaluation" and self.current_sessions == self.parameters.configuration["evaluation_sessions"]:
+        # if we are in development phase and we reached the max number of sessions, change to production
+        if self.current_phase == "development" and self.current_sessions == self.parameters.configuration["development_sessions"]:
             self.current_phase = "production"
             self.current_sessions = 0
-            print("CHANGED TO PRODUCTION")
-        elif self.current_phase == "development" and self.current_sessions == self.parameters.configuration["development_sessions"]:
-            self.current_phase = "production"
-            self.current_sessions = 0
-            print("CHANGED TO PRODUCTION")
+            print("DEVELOPMENT PHASE COMPLETED.")
 
         
     def prepare_session(self):
@@ -118,6 +110,7 @@ class PreparationSystemOrchestrator:
 
                 if self.parameters.configuration["service"]:
                     self._update_session()
+
 
             except Exception as e:
                 print(f"CRITICAL ERROR in Preparation Loop: {e}")
