@@ -127,9 +127,9 @@ class ServiceClassOrchestrator:
             # Writing headers to the CSV file
             self.logger.write_header("sessions,timestamp,status")
 
-            for i in range(1, ServiceClassParameters.LOCAL_PARAMETERS["production_sessions"]+1):
+            for i in range(1, ServiceClassParameters.LOCAL_PARAMETERS["production_sessions"]+1, 10):
 
-                print(f"Starting production phase {i}.")
+                print(f"Sending {i} sessions.")
 
                 # Preparing the bucket for the production
                 bucket = self.recordSender.prepare_bucket(i, include_labels=False)

@@ -11,6 +11,10 @@ def make_session(label="cyberbullying", **kwargs):
         "uuid": "0", "label": label, "tweet_length": 5,
         "word_fuck": 0, "word_bulli": 0, "word_muslim": 0, "word_gay": 0, "word_nigger": 0, "word_rape": 0,
         "event_score": 0, "event_sending-off": 0, "event_caution": 0, "event_substitution": 0, "event_foul": 0,
+        "audio_0": 0.0, "audio_1": 0.0, "audio_2": 0.0, "audio_3": 0.0, "audio_4": 0.0,
+        "audio_5": 0.0, "audio_6": 0.0, "audio_7": 0.0, "audio_8": 0.0, "audio_9": 0.0,
+        "audio_10": 0.0, "audio_11": 0.0, "audio_12": 0.0, "audio_13": 0.0, "audio_14": 0.0,
+        "audio_15": 0.0, "audio_16": 0.0, "audio_17": 0.0, "audio_18": 0.0, "audio_19": 0.0
     }
     # Aggiungi campi audio
     for i in range(20): data[f"audio_{i}"] = 0.0

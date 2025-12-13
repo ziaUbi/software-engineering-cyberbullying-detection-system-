@@ -54,12 +54,17 @@ class SegregationSystemOrchestrator:
                         self.db.store_prepared_session(new_prepared_session)
                         number_of_collected_sessions = self.db.get_number_of_sessions_stored()
                         print("Prepared Session STORED! [", number_of_collected_sessions, "].")
+                        if(new_prepared_session.uuid == ("Test")):
+                            self.db.remove_all_prepared_sessions() 
+                            self.reset_execution_state() 
+                            return
 
                         if number_of_collected_sessions >= min_num:
                             print(number_of_collected_sessions, min_num)
                             break
 
                     except Exception:
+                        print("Prepared Session Invalid! Can't store it.")
                         # Ignore invalid prepared sessions
                         continue
 

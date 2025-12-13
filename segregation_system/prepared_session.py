@@ -1,6 +1,7 @@
 from dataclasses import dataclass, asdict
 from typing import List, Tuple
 
+@dataclass
 class PreparedSession:
     """
     The `PreparedSession` class represents a prepared session for a data segregation system.
@@ -18,7 +19,10 @@ class PreparedSession:
         self.word_rape = data['word_rape']
 
         self.event_score = data['event_score']
-        self.event_sending_off = data['event_sending-off']
+        if 'event_sending-off' in data.keys():
+            self.event_sending_off = data['event_sending-off']
+        elif 'event_sending_off' in data.keys():
+            self.event_sending_off = data['event_sending_off']
         self.event_caution = data['event_caution']
         self.event_substitution = data['event_substitution']
         self.event_foul = data['event_foul']
