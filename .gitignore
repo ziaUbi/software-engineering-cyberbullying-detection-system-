@@ -3,3 +3,5 @@ __pycache__/
 temp_audio/
 
 .env
+
+.pytest_cache/
