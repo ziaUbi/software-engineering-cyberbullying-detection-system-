@@ -49,15 +49,15 @@ class CoverageReportView:
         max_count = max(tl_map.values()) if tl_map else 1
 
         for length, count in tl_map.items():
+            if count < 3:
+                continue
             # Normalize position along axis [5,40] -> [0.2, 1.0]
             normalized_r = 0.2 + 0.8 * (length - min_len) / (max_len - min_len)
             # Bubble size proportional to count
             bubble_size = 100 + (count / max_count) * 1500
             ax.scatter(angle_tweet, normalized_r, s=bubble_size, alpha=0.6, color='lightblue', edgecolors='black', linewidth=1.5)
-            if count == max_count:  # Label only the largest
-                ax.text(angle_tweet, normalized_r, f'{length}', ha='center', va='center', fontsize=10, fontweight='bold')
 
-        ax.text(angle_tweet, r_max + 0.15, 'Tweet length\n[5,40]', ha='center', va='center', fontsize=12, fontweight='bold')
+        ax.text(angle_tweet, r_max + 0.15, f'Tweet length\n[{min_len},{max_len}]', ha='center', va='center', fontsize=12, fontweight='bold')
 
         # ---------------- Game events ----------------
         events_map = report.events_map or {}
@@ -104,12 +104,13 @@ class CoverageReportView:
             # Group by ranges for cleaner visualization
             sorted_dbs = sorted(db_map.items())
             for db_value, count in sorted_dbs: 
+                if count < 4:
+                    continue
                 normalized_r = 0.2 + 0.8 * (db_value - min_db) / (max_db - min_db)
                 bubble_size = 100 + (count / max_db_count) * 1500
                 ax.scatter(angle_db, normalized_r, s=bubble_size, alpha=0.6, color='yellow', edgecolors='black', linewidth=1.5)
-                ax.text(angle_db, db_value, f'{db_value:.2f}', ha='center', va='center', fontsize=8)
 
-        ax.text(angle_db, r_max + 0.15, 'dB Gain\n[40,120]', ha='center', va='center', fontsize=12, fontweight='bold')
+        ax.text(angle_db, r_max + 0.15, f'dB Gain\n[{min_db},{max_db}]', ha='center', va='center', fontsize=12, fontweight='bold')
 
         # ---------------- Center info ----------------
         total = report.total_sessions

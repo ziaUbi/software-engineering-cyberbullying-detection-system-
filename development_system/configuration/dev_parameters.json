@@ -1,12 +1,12 @@
 {
   "layers": {
-    "min_layers": 1,
-    "max_layers": 4,
+    "min_layers": 3,
+    "max_layers": 8,
     "step_layers": 1
     },
   "neurons": {
     "min_neurons": 50,
-    "max_neurons": 100,
+    "max_neurons": 300,
     "step_neurons": 10
   },
   "tolerance": {

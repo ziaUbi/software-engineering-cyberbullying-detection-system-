@@ -33,7 +33,6 @@ class CoverageReportModel:
         for s in sessions:
             for band_idx in range(20):
                 attr_name = f"audio_{band_idx}"
-                # value = getattr(s, attr_name, None)
                 value = s[attr_name]
                 if value is None:
                     continue
@@ -80,8 +79,3 @@ class CoverageReportModel:
 
         return report
 
-
-        
-        
-
-        return report

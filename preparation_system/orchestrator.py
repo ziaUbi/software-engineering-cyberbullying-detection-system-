@@ -37,8 +37,31 @@ class PreparationSystemOrchestrator:
         self.corrector = SessionCorrector(self.parameters)
         self.creator = PreparedSessionCreator(self.parameters)
 
-        print(f"PREPARATION ORCHESTRATOR INITIALIZED ")
+        self.current_phase = self.parameters.configuration["current_phase"]  # current phase
+        self.current_sessions = 0  # number of sessions processed in the current phase
 
+        print(f"PREPARATION ORCHESTRATOR INITIALIZED ")
+    
+    def _update_session(self):
+        # updates the number of session received and eventually changes the current phase
+        self.current_sessions += 1
+
+        #if we are in production and the number of sessions sent is reached, change to evaluation
+        if self.current_phase == "production" and self.current_sessions == self.parameters.configuration["production_sessions"]:
+            self.current_phase = "evaluation"
+            self.current_sessions = 0
+            print("CHANGED TO EVALUATION")
+        # if we are in evaluation and the number of sessions sent is reached, change to production
+        elif self.current_phase == "evaluation" and self.current_sessions == self.parameters.configuration["evaluation_sessions"]:
+            self.current_phase = "production"
+            self.current_sessions = 0
+            print("CHANGED TO PRODUCTION")
+        elif self.current_phase == "development" and self.current_sessions == self.parameters.configuration["development_sessions"]:
+            self.current_phase = "production"
+            self.current_sessions = 0
+            print("CHANGED TO PRODUCTION")
+
+        
     def prepare_session(self):
         """
         Main Loop: Process sessions iteratively.
@@ -68,13 +91,14 @@ class PreparationSystemOrchestrator:
 
                 # Correct absolute outliers
                 correct_prepared_session = self.corrector.correct_absolute_outliers(prepared_session)
+                # print(json.dumps(asdict(correct_prepared_session), indent=4, default=str))
                 
                 # print("Absolute Outliers Corrected")
 
                 target_ip = ""
                 target_port = 0
                 
-                if self.parameters.development_mode:
+                if self.current_phase == "development":
                     target_ip = self.parameters.configuration["ip_segregation"]
                     target_port = self.parameters.configuration["port_segregation"]
                     dest_name = "SEGREGATION"
@@ -88,9 +112,12 @@ class PreparationSystemOrchestrator:
                 success = self.json_io.send_prepared_session(target_ip, target_port, correct_prepared_session)
 
                 if success:
-                    print(f"Session {correct_prepared_session.uuid} sent to {dest_name}.")
+                    print(f"Prepared Session sent to {dest_name}.")
                 else:
                     print(f"ERROR: Failed to send session {correct_prepared_session.uuid} to {dest_name}.")
+
+                if self.parameters.configuration["service"]:
+                    self._update_session()
 
             except Exception as e:
                 print(f"CRITICAL ERROR in Preparation Loop: {e}")
