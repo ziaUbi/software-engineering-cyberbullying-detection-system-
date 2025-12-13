@@ -12,7 +12,7 @@ class ClassificationPhaseManager:
         evaluation_phase: bool,
         prod_threshold: int,
         eval_threshold: int,
-        lock_phase: bool = True,  # non modificare la fase (default: blocca switch)
+        lock_phase: bool = False,  # non modificare la fase (default: blocca switch)
     ) -> None:
         if prod_threshold < 1:
             raise ValueError(f"prod_threshold must be >= 1, got {prod_threshold}")
@@ -39,11 +39,24 @@ class ClassificationPhaseManager:
         else:
             self.prod_counter += 1
 
+    # def check_thresholds(self) -> bool:
+    #     """Return True if a phase switch happened."""
+    #     if self.lock_phase:
+    #         return False  # non modifica la fase
+
+    #     if self.current_phase == self.PHASE_EVALUATION and self.eval_counter >= self.eval_threshold:
+    #         self.switch_phase()
+    #         return True
+
+    #     if self.current_phase == self.PHASE_PRODUCTION and self.prod_counter >= self.prod_threshold:
+    #         self.switch_phase()
+    #         return True
+
+    #     return False
+
     def check_thresholds(self) -> bool:
         """Return True if a phase switch happened."""
-        if self.lock_phase:
-            return False  # non modifica la fase
-
+        # NOTA: Assicurati che sia >= e non >
         if self.current_phase == self.PHASE_EVALUATION and self.eval_counter >= self.eval_threshold:
             self.switch_phase()
             return True
@@ -53,6 +66,11 @@ class ClassificationPhaseManager:
             return True
 
         return False
+
+    def on_session_completed(self) -> bool:
+        """Call once after each classified session."""
+        self.increment_counter()  # <--- Incrementa PRIMA del check
+        return self.check_thresholds()
 
     def switch_phase(self) -> None:
         if self.lock_phase:
