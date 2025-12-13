@@ -12,7 +12,8 @@ class CoverageReportModel:
         # --------- Tweet length: {lenght -> count} ---------
         tweet_length_counter: Counter[int] = Counter()
         for s in sessions:
-            s = PreparedSession(s)
+            if type(s) is dict:
+                s = PreparedSession(s)
             # length=s["tweet_length"]
             length = s.tweet_length
             if length is not None:
@@ -25,7 +26,8 @@ class CoverageReportModel:
             attr_name = f"word_{word}"
             total_for_word = 0
             for s in sessions:
-                s = PreparedSession(s)
+                if type(s) is dict:
+                    s = PreparedSession(s)
                 # total_for_word += int(getattr(s, attr_name, 0))
                 # total_for_word += int(s[f"word_{word}"])
                 total_for_word += int(getattr(s, attr_name, 0))
@@ -35,7 +37,8 @@ class CoverageReportModel:
         # --------- Audio dB: {decibel value -> count} ---------
         audio_db_counter: Counter[int] = Counter()
         for s in sessions:
-            s = PreparedSession(s)
+            if type(s) is dict:
+                s = PreparedSession(s)
             for band_idx in range(20):
                 attr_name = f"audio_{band_idx}"
                 # value = s[attr_name]
@@ -53,7 +56,8 @@ class CoverageReportModel:
         total_foul = 0
 
         for s in sessions:
-            s = PreparedSession(s)
+            if type(s) is dict:
+                s = PreparedSession(s)
             total_score += int(getattr(s, "event_score", 0))
             total_sending_off += int(getattr(s, "event_sending_off", 0))
             total_caution += int(getattr(s, "event_caution", 0))
