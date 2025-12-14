@@ -52,11 +52,7 @@ class ServiceReceiver:
         # Path of the timestamp log
         self.timestamp_log_path = f"{basedir}/logs/timestamp_log.txt"
 
-        # Developed Classifiers counter, used only when the phase is "development"
-        self.developed_classifiers = 1
-
         # Sessions tracker and labels counter are used only when the phase is "production"
-        self.sessions_tracker = 1
         self.labels_counter = 0
 
         # Define a route to receive timestamps
@@ -103,8 +99,7 @@ class ServiceReceiver:
                 if ServiceClassParameters.LOCAL_PARAMETERS["phase"] == "development":
                     if json_configuration["configuration"] == "production":
                         if self.csv_logger is not None:
-                            self.csv_logger.log(f"{self.developed_classifiers},{time.time()},{json_configuration['configuration']}")
-                            self.developed_classifiers += 1
+                            self.csv_logger.log(f"{time.time()},classifier_deployed")
 
                 else:
                     # Add the configuration to the queue
@@ -133,15 +128,14 @@ class ServiceReceiver:
 
                     self.labels_counter += 1
 
-                    if self.labels_counter == self.sessions_tracker:
-                        print (f"Production phase {self.sessions_tracker} completed. Received {self.sessions_tracker} labels.")
+                    if self.labels_counter == ServiceClassParameters.LOCAL_PARAMETERS["production_sessions"]:
+                        print (f"Production phase completed. Received {self.labels_counter} labels.")
 
                         self.labels_counter = 0
 
                         if self.csv_logger is not None:
                             # Update the CSV file
-                            self.csv_logger.log(f"{self.sessions_tracker},{time.time()},labels_received")
-                            self.sessions_tracker += 1
+                            self.csv_logger.log(f"{time.time()},labels_received")
 
                 else:
                     # Add the label to the queue

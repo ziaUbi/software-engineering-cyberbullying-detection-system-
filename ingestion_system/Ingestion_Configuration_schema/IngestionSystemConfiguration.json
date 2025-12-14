@@ -3,7 +3,7 @@
     "current_phase": "production",
     "service": false,
     "production_sessions": 100,
-    "development_sessions": 50,
+    "development_sessions": 100,
     "evaluation_sessions": 10,
     "ip_preparation": "127.0.0.1",
     "ip_evaluation": "127.0.0.1",

@@ -68,9 +68,9 @@ class ProductionOrchestrator:
             else:
                 size = 0
 
-            if sender_ip == self._configuration.global_netconf["Development System"]["ip"]:
+            if sender_ip == self._configuration.global_netconf["Development System"]["ip"] and sender_port == self._configuration.global_netconf["Development System"]["port"]:
                 msg_type = "classifier"
-            elif sender_ip == self._configuration.global_netconf["Preparation System"]["ip"]:
+            elif sender_ip == self._configuration.global_netconf["Preparation System"]["ip"] and sender_port == self._configuration.global_netconf["Preparation System"]["port"]:
                 msg_type = "prepared_session"
             else:
                 msg_type = "unknown"
@@ -84,13 +84,13 @@ class ProductionOrchestrator:
                 self._prod_sys_io.send_timestamp(time.time(), "start")
 
             # sender_ip = message["ip"]
-            if sender_ip == self._configuration.global_netconf["Development System"]["ip"]:
+            if sender_ip == self._configuration.global_netconf["Development System"]["ip"] and sender_port == self._configuration.global_netconf["Development System"]["port"]:
                 self._handle_deployment(message["message"])
                 if self._unit_test:
                     return
                 continue
 
-            if sender_ip == self._configuration.global_netconf["Preparation System"]["ip"]:
+            if sender_ip == self._configuration.global_netconf["Preparation System"]["ip"] and sender_port == self._configuration.global_netconf["Preparation System"]["port"]:
                 self._handle_classification(message["message"])
                 if self._unit_test:
                     return
@@ -228,5 +228,5 @@ class ProductionOrchestrator:
 
 
 if __name__ == "__main__":
-    orchestrator = ProductionOrchestrator(service=True, test_mode=False)
+    orchestrator = ProductionOrchestrator(service=True, unit_test=False)
     orchestrator.production()
