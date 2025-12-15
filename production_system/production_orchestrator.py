@@ -28,14 +28,13 @@ class ProductionOrchestrator:
 
         self._configuration = ConfigurationParameters()
 
-        # Phase manager (spostiamo qui la logica che prima era in _rotate_evaluation_phase)
+        # Phase manager
         self._phase_manager = ClassificationPhaseManager(
             evaluation_phase=bool(self._configuration.parameters["evaluation_phase"]),
             prod_threshold=int(self._configuration.parameters["max_session_production"]),
             eval_threshold=int(self._configuration.parameters["max_session_evaluation"]),
         )
 
-        # Manteniamo la chiave "Production System" per compatibilità col tuo JSON attuale
         prod_binding = self._configuration.global_netconf["Production System"]
         self._prod_sys_io = ProductionSystemIO(prod_binding["ip"], prod_binding["port"])
 
@@ -44,7 +43,6 @@ class ProductionOrchestrator:
         self._deployed = model_path.exists()
 
         self._handler = JsonHandler()
-        # Assicurati che la cartella si chiami 'production_schema' come nel tuo file system attuale
         self._schema_path = Path(__file__).resolve().parent / "production_schema" / "PreparedSessionSchema.json"
 
     def production(self) -> None:
@@ -79,7 +77,7 @@ class ProductionOrchestrator:
             print(f"[RX] #{self._rx_counter} from={sender_ip}:{sender_port} type={msg_type} size={size}")
 
 
-            #   ############### GESTIONE TIMESTAMP INIZIO ###############
+            #   Timestamp
             if self._service:
                 self._prod_sys_io.send_timestamp(time.time(), "start")
 
@@ -100,24 +98,7 @@ class ProductionOrchestrator:
             if self._unit_test:
                 return
 
-    # def _handle_deployment(self, classifier_payload: str) -> None:
-    #     if not classifier_payload:
-    #         print("ERROR: Empty classifier payload received from Development System")
-    #     return
-    #     print("Classifier payload received")
-    #     deployment = Deployment()
-    #     if deployment.deploy(classifier_payload) is False:
-    #         print("Error while deploying cyberbullying classifier")
-    #         return
-
-    #     self._deployed = True
-    #     print("Classifier deployed successfully")
-    #     self._prod_sys_io.send_configuration()
-    #     if self._service:
-    #         self._prod_sys_io.send_timestamp(time.time(), "end")
-
     def _handle_deployment(self, classifier_payload: str | None) -> None:
-    # Se il payload è mancante o vuoto, interrompe senza rumore
         if not classifier_payload or not isinstance(classifier_payload, str):
             return
 
@@ -125,52 +106,18 @@ class ProductionOrchestrator:
         if not deployment.deploy(classifier_payload):
             return
 
-        # Aggiorna stato interno
+        # Update internal state
         self._deployed = True
 
-        # Notifica agli altri sistemi (messaging / service)
+        # Notify other systems (messaging / service)
         self._prod_sys_io.send_configuration()
 
         if self._service:
             self._prod_sys_io.send_timestamp(time.time(), "end")
 
 
-    # def _handle_classification(self, prepared_session_raw: str) -> None:
-    #     try:
-            
-    #         prepared_session = prepared_session_raw
-    #         # prepared_session = json.loads(prepared_session_raw)
-    #     except json.JSONDecodeError:
-    #         print("Invalid JSON received")
-    #         return
-
-    #     if self._handler.validate_json(prepared_session, self._schema_path) is False:
-    #         print("Prepared session rejected: schema validation failed")
-    #         return
-
-    #     classification = Classification()
-    #     label = classification.classify(prepared_session, self._deployed)
-    #     if label is None:
-    #         print("Classification skipped: classifier not yet deployed")
-    #         return
-
-    #     print("Moderation label generated")
-    #     # 1. Invio OBBLIGATORIO al Client Side
-    #     self._send_label_to_target("Service Class", label, "client")
-
-    #     # 2. Invio OPZIONALE all'Evaluation System (deciso dal Phase Manager)
-    #     if self._phase_manager.evaluation_phase:
-    #         self._send_label_to_target("Evaluation System", label, "send")
-
-    #     if self._service:
-    #         self._prod_sys_io.send_timestamp(time.time(), "Session Classified")
-
-    #     switched = self._phase_manager.on_session_completed()
-    #     if switched:
-    #         print(f"[DEBUG] Phase switched -> {self._phase_manager.current_phase}")
-
     def _handle_classification(self, prepared_session_raw: Any) -> None:
-        # 1. Normalizzazione input (dict o JSON string)
+        # 1. Input normalization (dict or JSON string)
         if isinstance(prepared_session_raw, dict):
             prepared_session = prepared_session_raw
         else:
@@ -180,23 +127,23 @@ class ProductionOrchestrator:
                 print("Invalid prepared session received (not valid JSON)")
                 return
 
-        # 2. Validazione schema
+        # 2. Schema validation
         if not self._handler.validate_json(prepared_session, self._schema_path):
             print("Prepared session rejected: schema validation failed")
             return
 
-        # 3. Classificazione
+        # 3. Classification
         classification = Classification()
         label = classification.classify(prepared_session, self._deployed)
 
         if label is None:
-            # modello non ancora disponibile
+            # model not yet available
             return
 
-        # 4. Invio OBBLIGATORIO al Client Side
+        # 4. Mandatory sending to Client Side
         self._send_label_to_target("Service Class", label, rule="client")
 
-        # 5. Invio OPZIONALE all'Evaluation System (decisione Phase Manager)
+        # 5. Optional sending to Evaluation System
         if self._phase_manager.evaluation_phase:
             self._send_label_to_target("Evaluation System", label, rule="send")
 
@@ -205,9 +152,9 @@ class ProductionOrchestrator:
             try:
                 self._prod_sys_io.send_timestamp(time.time(), "Session Classified")
             except Exception:
-                pass  # non deve mai rompere il flusso
+                pass  
 
-        # 7. Aggiornamento fase
+        # 7. Phase update
         switched = self._phase_manager.on_session_completed()
         if switched:
             print(f"[PHASE] switched to {self._phase_manager.current_phase}")
@@ -223,7 +170,7 @@ class ProductionOrchestrator:
                 rule
             )
         except KeyError:
-            print(f"[ORCH ERROR] Target '{target_key}' not configured properly")
+            print(f"[ERROR] Target '{target_key}' not configured properly")
 
 
 

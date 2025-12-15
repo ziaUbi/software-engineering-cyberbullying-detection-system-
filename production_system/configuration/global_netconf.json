@@ -1,26 +1,26 @@
 {
     "Preparation System": {
-        "ip": "127.0.0.1",
+        "ip": "172.20.10.7",
         "port": 5002
     },
     "Development System": {
-        "ip": "127.0.0.1",
+        "ip": "172.20.10.12",
         "port": 5004
     },
     "Production System": {
-        "ip": "127.0.0.1",
+        "ip": "172.20.10.11",
         "port": 5105
     },
     "Evaluation System": {
-        "ip": "127.0.0.1",
+        "ip": "172.20.10.2",
         "port": 5210
     },
     "Messaging System": {
-        "ip": "127.0.0.1",
+        "ip": "172.20.10.12",
         "port": 5010
     },
     "Service Class": {
-        "ip": "127.0.0.1",
+        "ip": "172.20.10.12",
         "port": 5010
     }
 }
