@@ -1,6 +1,6 @@
 {
   "Ingestion System": {
-    "ip": "127.0.0.1",
+    "ip": "172.20.10.7",
     "port": 5001
   },
   "Preparation System": {
@@ -12,11 +12,11 @@
     "port": 5003
   },
   "Development System": {
-    "ip": "87.19.204.54",
+    "ip": "172.20.10.12",
     "port": 5004
   },
   "Production System": {
-    "ip": "127.0.0.1",
+    "ip": "172.20.10.11",
     "port": 5105
   },
   "Evaluation System": {
@@ -28,7 +28,7 @@
     "port": 5004
   },
   "Service Class": {
-    "ip": "93.67.96.103",
+    "ip": "172.20.10.12",
     "port": 5010
   }
 }
