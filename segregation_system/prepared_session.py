@@ -3,9 +3,6 @@ from typing import List, Tuple
 
 @dataclass
 class PreparedSession:
-    """
-    The `PreparedSession` class represents a prepared session for a data segregation system.
-    """
     def __init__(self, data: dict):
         self.uuid = data['uuid']
         self.label = data['label']

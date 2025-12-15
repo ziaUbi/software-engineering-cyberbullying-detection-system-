@@ -38,7 +38,6 @@ class SegregationSystemOrchestrator:
                                                                                    "coverage_report")
 
         if (coverage_report_status == "-" and balancing_report_status == "-" and enough_collected_sessions == "-") or self.get_testing():
-            # In this phase we must gather the prepared sessions, generate the balancing report and ask the user response.
             print("Waiting for a message...")
 
             min_num = SegregationSystemConfiguration.LOCAL_PARAMETERS['min_sessions_for_processing']
@@ -64,8 +63,7 @@ class SegregationSystemOrchestrator:
                             break
 
                     except Exception:
-                        print("Prepared Session Invalid! Can't store it.")
-                        # Ignore invalid prepared sessions
+                        print("Prepared Session Invalid! Can't store it.")      # Ignore invalid prepared sessions
                         continue
 
             print("Enough prepared session stored!")
@@ -80,7 +78,7 @@ class SegregationSystemOrchestrator:
             print("Balancing report generated!")
 
 
-            if self.get_testing():      # Simulating the user response...
+            if self.get_testing():      # Simulating the user response
                 if balancing_report_model.is_balanced and balancing_report_model.is_minimum:
                     SegregationSystemJsonHandler.write_field_to_json(execution_state_file_path, "balancing_report", "OK")
                     balancing_report_status = "OK"
@@ -128,8 +126,6 @@ class SegregationSystemOrchestrator:
                 return
             
         if (coverage_report_status == "OK" and balancing_report_status == "OK" and enough_collected_sessions == "OK"):
-            # In this phase we must generate the learning sets according to the configuration and then send it to the Development system.
-            # Get all the prepared sessions in the database.
             all_prepared_sessions = self.db.get_all_prepared_sessions()
 
             print("Generating the learning sets...")

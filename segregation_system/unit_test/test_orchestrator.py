@@ -2,7 +2,7 @@ import pytest
 from segregation_system.segregation_orchestrator import SegregationSystemOrchestrator
 from segregation_system.segregation_configuration import SegregationSystemConfiguration
 
-# Classi Fake per mockare il DB e il Message Broker
+# Fake classes to mock messaging system and database handler
 class FakeBroker:
     def __init__(self):
         self.sent_messages = []
@@ -48,39 +48,35 @@ class FakeDB:
         self.removed = True
 
 def test_orchestrator_flow(monkeypatch):
-    """Test completo del flusso: ricezione -> store -> check soglia -> invio learning set."""
-    
-    # 1. Configurazione Mock
+    """Complete test of the flow: reception -> store -> threshold check -> send learning set."""
     SegregationSystemConfiguration.LOCAL_PARAMETERS = {"min_sessions_for_processing": 1}
     SegregationSystemConfiguration.GLOBAL_PARAMETERS = {
         "Development System": {"ip": "1.2.3.4", "port": 9999},
         "Messaging System": {"ip": "1.2.3.4", "port": 8888}
     }
     
-    # Mock dei componenti interni dell'Orchestrator
+    # Mocking components
     monkeypatch.setattr("segregation_system.segregation_orchestrator.SessionReceiverAndConfigurationSender", FakeBroker)
     monkeypatch.setattr("segregation_system.segregation_orchestrator.PreparedSessionDatabaseController", FakeDB)
     
-    # Evita lettura/scrittura su file reali per lo stato
+    # Avoid file I/O by mocking JSON handler methods
     state = {"service_flag": True, "enough_collected_sessions": "-", "balancing_report": "-", "coverage_report": "-"}
     monkeypatch.setattr("segregation_system.segregation_orchestrator.SegregationSystemJsonHandler.read_field_from_json", 
                         lambda path, field: state.get(field))
     monkeypatch.setattr("segregation_system.segregation_orchestrator.SegregationSystemJsonHandler.write_field_to_json", 
                         lambda path, field, val: state.update({field: val}))
     monkeypatch.setattr("segregation_system.segregation_orchestrator.SegregationSystemJsonHandler.validate_json", 
-                        lambda data, schema: True) # Sempre valido
+                        lambda data, schema: True) 
     
-    # Evita generazione grafici
+    # Avoid showing plots during tests
     monkeypatch.setattr("segregation_system.segregation_orchestrator.BalancingReportView.show_balancing_report", lambda m, w: None)
     monkeypatch.setattr("segregation_system.segregation_orchestrator.CoverageReportView.show_coverage_report", lambda m, w: None)
     
-    # Forza random a 0 per comportamento deterministico nei test
+    # Force random to 0 for deterministic behavior in tests
     monkeypatch.setattr("segregation_system.segregation_orchestrator.randrange", lambda x: 0)
 
-    # 2. Inizializzazione
     orch = SegregationSystemOrchestrator(testing=True)
     
-    # Iniettiamo un messaggio simulato
     fake_msg = {
         "message": {
             "uuid": "Test", "label": "cyberbullying", "tweet_length": 5, 
@@ -93,13 +89,10 @@ def test_orchestrator_flow(monkeypatch):
         }
     }
     orch.message_broker._incoming_messages.append(fake_msg)
-    # 3. Esecuzione
     orch.run()
 
-    # 4. Asserzioni
-    # Deve aver salvato la sessione nel DB
-    assert orch.db.get_number_of_sessions_stored() == 0 # È 0 perché alla fine del run() rimuove tutto se ha successo
+    assert orch.db.get_number_of_sessions_stored() == 0 # It's zero because they have been processed and removed
     assert orch.db.removed is True
     
-    # Lo stato deve essere stato resettato
+    # The state must have been reset
     assert state["enough_collected_sessions"] == "-"

@@ -15,22 +15,18 @@ class LearningSetSplitter:
 
     def generateLearningSets(self, prepared_sessions: List[PreparedSession] , ) -> LearningSet:
 
-        # Shuffle the prepared sessions to ensure random distribution
         random.shuffle(prepared_sessions)
 
-        # Calculate the number of sessions for each set
         total_sessions = len(prepared_sessions)
         training_count = int(total_sessions * self._training_percentage)
         validation_count = int(total_sessions * self._validation_percentage)
 
-        # Split the sessions
         training_set = prepared_sessions[:training_count]
         validation_set = prepared_sessions[training_count:training_count + validation_count]
         test_set = prepared_sessions[training_count + validation_count:]
 
         print(f"Generated learning sets: {len(training_set)} training, {len(validation_set)} validation, {len(test_set)} test.")
 
-        # Return the LearningSet object
         return LearningSet(training_set, validation_set, test_set)
 
 

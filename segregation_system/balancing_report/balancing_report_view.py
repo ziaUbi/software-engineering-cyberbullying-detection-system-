@@ -22,7 +22,6 @@ class BalancingReportView:
         plt.title('Class Distribution in Prepared Sessions')
         plt.xticks(rotation=45)
         plt.tight_layout()
-        # plt.show()
         plt_path = "segregation_system/" + workspace_dir + '/balancing_report.png'
         plt.savefig(plt_path)
         return

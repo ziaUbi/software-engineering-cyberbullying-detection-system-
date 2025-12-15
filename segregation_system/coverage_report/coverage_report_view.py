@@ -1,21 +1,12 @@
 import os
 import math
-from typing import Optional
-
-import matplotlib.pyplot as plt
 import numpy as np
+from typing import Optional
+import matplotlib.pyplot as plt
 
 from segregation_system.coverage_report.coverage_report import CoverageReportData
 
-
 class CoverageReportView:
-    """
-    four axes:
-    - Tweet lenght [5,40]
-    - Game Events
-    - Bad Words
-    - dB Gain [40,120]
-    """
     @staticmethod
     def show_coverage_report(report: CoverageReportData, workspace_dir, title: Optional[str] = "Coverage Report"):
         fig = plt.figure(figsize=(10, 10))
@@ -51,10 +42,8 @@ class CoverageReportView:
         for length, count in tl_map.items():
             if count < 3:
                 continue
-            # Normalize position along axis [5,40] -> [0.2, 1.0]
-            normalized_r = 0.2 + 0.8 * (length - min_len) / (max_len - min_len)
-            # Bubble size proportional to count
-            bubble_size = 100 + (count / max_count) * 1500
+            normalized_r = 0.2 + 0.8 * (length - min_len) / (max_len - min_len)     # Normalize position along axis [5,40] -> [0.2, 1.0]
+            bubble_size = 100 + (count / max_count) * 1500      # Bubble size proportional to count
             ax.scatter(angle_tweet, normalized_r, s=bubble_size, alpha=0.6, color='lightblue', edgecolors='black', linewidth=1.5)
 
         ax.text(angle_tweet, r_max + 0.15, f'Tweet length\n[{min_len},{max_len}]', ha='center', va='center', fontsize=12, fontweight='bold')
@@ -67,7 +56,6 @@ class CoverageReportView:
             
             for i, event_name in enumerate(event_names):
                 count = events_map.get(event_name, 0)
-                # Position along axis
                 normalized_r = 0.3 + (i / (len(event_names) - 1)) * 0.6
                 bubble_size = 100 + (count / max_event_count) * 1500
                 ax.scatter(angle_events, normalized_r, s=bubble_size, alpha=0.6, color='lightgreen', edgecolors='black', linewidth=1.5)
@@ -101,7 +89,6 @@ class CoverageReportView:
                 max_db += 1  
             max_db_count = max(db_map.values()) if db_map else 1
             
-            # Group by ranges for cleaner visualization
             sorted_dbs = sorted(db_map.items())
             for db_value, count in sorted_dbs: 
                 if count < 4:
@@ -118,7 +105,6 @@ class CoverageReportView:
 
         plt.title(title, fontsize=16, fontweight='bold', pad=20)
         plt.tight_layout()
-        # plt.show()
         plt_path = "segregation_system/" + workspace_dir + '/coverage_report.png'
         plt.savefig(plt_path)
         return

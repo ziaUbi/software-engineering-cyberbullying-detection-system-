@@ -28,13 +28,8 @@ class SegregationSystemJsonHandler:
     @staticmethod
     def write_field_to_json(file_path: str, field_name: str, value):
         try:
-            # Load the existing data
             data = SegregationSystemJsonHandler.read_json_file(file_path)
-
-            # Update the field
             data[field_name] = value
-
-            # Save the updated data using the provided write_json_file helper
             return SegregationSystemJsonHandler.write_json_file(data, file_path)
         except FileNotFoundError:
             print(f"File not found: {file_path}")
@@ -49,23 +44,8 @@ class SegregationSystemJsonHandler:
 
     @staticmethod
     def get_system_address(json_filepath: str, system_name: str) -> Optional[Any]:
-        """
-        Reads the IP address and port of a specified system from a JSON file.
-
-        Args:
-            json_filepath (str): Path to the JSON file containing system configurations.
-            system_name (str): Name of the system whose address is to be fetched.
-
-        Returns:
-            dict: A dictionary containing the IP address and port of the specified system.
-                  Example: {"ip": "192.168.149.66", "port": 8001}
-            None: If the system name is not found or an error occurs.
-        """
         try:
-            # Load the JSON file
             systems_data = SegregationSystemJsonHandler.read_json_file(json_filepath)
-
-            # Fetch the system configuration
             system_info = systems_data.get(system_name)
             if system_info:
                 return system_info
@@ -85,9 +65,6 @@ class SegregationSystemJsonHandler:
 
     @staticmethod
     def validate_json(json_data: dict, schema_path: str) -> bool:
-        """
-            Validate a json object against a json schema in a file.
-        """
         with open(schema_path, "r", encoding="UTF-8") as file:
             json_schema = json.load(file)
         try:
@@ -99,18 +76,12 @@ class SegregationSystemJsonHandler:
 
     @staticmethod
     def validate_json_from_path(json_path: str, schema_path: str) -> bool:
-        """
-        Validate a json file against a json schema in a file.
-        """
         with open(json_path, "r", encoding="UTF-8") as file:
             json_data = json.load(file)
         return SegregationSystemJsonHandler.validate_json(json_data, schema_path)
 
     @staticmethod
     def string_to_dict(string: str) -> dict:
-        """
-        Converts a JSON-formatted string back to a dictionary.
-        """
         try:
             return json.loads(string)
         except json.JSONDecodeError as e:
@@ -118,9 +89,6 @@ class SegregationSystemJsonHandler:
 
     @staticmethod
     def dict_to_string(dictionary: dict) -> str:
-        """
-        Converts a dictionary to a JSON-formatted string.
-        """
         try:
             return json.dumps(dictionary, indent=4)
         except TypeError as e:

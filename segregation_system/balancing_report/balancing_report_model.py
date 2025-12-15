@@ -13,7 +13,6 @@ class BalancingReportModel:
         for s in sessions:
             if type(s) is dict:
                 s = PreparedSession(s)
-            # label = s["label"]
             label = s.label
             if label not in counts:
                 counts[label] = 0

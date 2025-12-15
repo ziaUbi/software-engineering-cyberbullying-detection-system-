@@ -17,34 +17,28 @@ def sample_session_data():
     }
 
 def test_prepared_session_initialization(sample_session_data):
-    """Testa che la classe PreparedSession mappi correttamente i campi."""
+    """Tests that the PreparedSession class correctly maps fields."""
     session = PreparedSession(sample_session_data)
     assert session.uuid == "test-uuid-1234"
     assert session.label == "cyberbullying"
     assert session.word_fuck == 1
 
 def test_database_store_and_retrieve(tmp_path, sample_session_data):
-    """Testa le operazioni CRUD sul database SQLite."""
-    # Usa un db temporaneo
+    """Tests CRUD operations on a temporary SQLite database."""
     db_path = tmp_path / "test_segregation.db"
     db = PreparedSessionDatabaseController(db_path=str(db_path))
 
-    # Assicurati che sia vuoto all'inizio (se creato nuovo) o dopo pulizia
     db.remove_all_prepared_sessions()
     assert db.get_number_of_sessions_stored() == 0
 
-    # Salva una sessione
     session = PreparedSession(sample_session_data)
     db.store_prepared_session(session)
     
-    # Verifica conteggio
     assert db.get_number_of_sessions_stored() == 1
 
-    # Verifica recupero dati
     sessions = db.get_all_prepared_sessions()
     assert len(sessions) == 1
     assert sessions[0]["uuid"] == sample_session_data["uuid"]
-    
-    # Test cancellazione
+
     db.remove_all_prepared_sessions()
     assert db.get_number_of_sessions_stored() == 0

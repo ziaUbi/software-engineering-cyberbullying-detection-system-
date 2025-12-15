@@ -5,15 +5,11 @@ from typing import List, Dict
 from segregation_system.prepared_session import PreparedSession
 
 class PreparedSessionDatabaseController:
-    """
-    Gestisce la persistenza delle Prepared Sessions utilizzando SQLite.
-    """
     def __init__(self, db_path="segregation_system/segregation_system.db"):
         self.db_path = db_path
         self._init_db()
 
     def _init_db(self):
-        """Inizializza il database creando la tabella se non esiste."""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         cursor.execute('''
@@ -61,10 +57,6 @@ class PreparedSessionDatabaseController:
         conn.close()
 
     def store_prepared_session(self, session_data: PreparedSession):
-        """
-        Salva una sessione nel database.
-        I campi lista (audio_db, events) vengono serializzati in JSON.
-        """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
@@ -116,7 +108,6 @@ class PreparedSessionDatabaseController:
             conn.close()
 
     def get_all_prepared_sessions(self) -> List[PreparedSession]:
-        """Recupera tutte le sessioni dal database."""
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
@@ -173,7 +164,6 @@ class PreparedSessionDatabaseController:
         return count
 
     def remove_all_prepared_sessions(self):
-        """Cancella tutte le sessioni dopo aver generato i learning sets."""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         cursor.execute('DELETE FROM prepared_sessions')
