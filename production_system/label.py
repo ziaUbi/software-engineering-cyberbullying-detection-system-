@@ -12,14 +12,10 @@ from typing import Dict, Optional
 @dataclass
 class Label:
     """Describe the moderation outcome restricted to the allowed enum values.
-
-    The allowed values are:
-    - "not cyberbullying"
-    - "cyberbullying"
     """
 
     uuid: str
-    label: Optional[str]  # Enum: "not cyberbullying", "cyberbullying" or None
+    label: Optional[str]  # Enum: "not cyberbullying" or "cyberbullying"
 
     def to_dictionary(self) -> Dict[str, Optional[str]]:
         """Convert the label to a dictionary."""

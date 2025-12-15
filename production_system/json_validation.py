@@ -18,7 +18,7 @@ class JsonHandler:
         try:
             with file_path.open("r", encoding="utf-8") as json_file:
                 return json.load(json_file)
-        except Exception as exc:  # pragma: no cover - log + graceful fallback is enough
+        except Exception as exc: 
             logging.error("Error reading JSON file %s: %s", file_path, exc)
             return None
 
@@ -32,7 +32,7 @@ class JsonHandler:
             with file_path.open("w", encoding="utf-8") as json_file:
                 json.dump(data, json_file, ensure_ascii=False, indent=4)
             return True
-        except Exception as exc:  # pragma: no cover - log + graceful fallback is enough
+        except Exception as exc:
             logging.error("Error saving JSON file %s: %s", file_path, exc)
             return False
 

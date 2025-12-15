@@ -24,7 +24,7 @@ class Classification:
         if self._classifier is None:
             if not self._model_path.exists():
                 raise FileNotFoundError(f"Classifier artefact not found at {self._model_path}")
-            self._classifier = joblib.load(self._model_path)    # Carica il modello ML salvato
+            self._classifier = joblib.load(self._model_path)
 
     def classify(self, prepared_session: Dict[str, Any], classifier_deployed: bool) -> Optional[Label]:
         """Return a :class:`Label` when a classifier is available."""
@@ -33,14 +33,14 @@ class Classification:
 
         self._ensure_classifier()
         
-        # Costruzione del feature vector basato sulle nuove specifiche PDF
+        # Construction of the feature vector based on the new PDF specifications
         features_df = self._build_feature_frame(prepared_session)
         
-        # Esecuzione predizione
+        # Execution of the prediction
         prediction = self._classifier.predict(features_df)[0]
         prediction_int = int(prediction)
 
-        # Mapping binario: 0 -> not cyberbullying, 1 -> cyberbullying
+        # 0 -> not cyberbullying, 1 -> cyberbullying
         if prediction_int == 0:
             verdict = "not_cyberbullying"
         else:
@@ -55,13 +55,13 @@ class Classification:
         """
         Convert the prepared session dict into a DataFrame.
         Input: Dict (dalla PreparedSession)
-        Output: DataFrame (pronto per il modello scikit-learn)
+        Output: DataFrame
         """
         feature_struct = {
-            # 1. Feature testuale
+            # 1. Textual features
             "tweet_length": prepared_session["tweet_length"],
             
-            # 2. Bag of Words (conteggi parole specifiche)
+            # 2. Bag of Words (specific word counts)
             "word_fuck": prepared_session["word_fuck"],
             "word_bulli": prepared_session["word_bulli"],
             "word_muslim": prepared_session["word_muslim"],
@@ -69,14 +69,14 @@ class Classification:
             "word_nigger": prepared_session["word_nigger"],
             "word_rape": prepared_session["word_rape"],
             
-            # 3. Eventi di gioco (conteggi)
+            # 3. Events
             "event_score": prepared_session["event_score"],
             "event_sending_off": prepared_session["event_sending-off"],
             "event_caution": prepared_session["event_caution"],
             "event_substitution": prepared_session["event_substitution"],
             "event_foul": prepared_session["event_foul"],
             
-            # 4. Feature Audio (flattened vector 0-19)
+            # 4. Feature Audios
             "audio_0": prepared_session["audio_0"],
             "audio_1": prepared_session["audio_1"],
             "audio_2": prepared_session["audio_2"],
@@ -99,7 +99,7 @@ class Classification:
             "audio_19": prepared_session["audio_19"],
         }
         
-        # Creazione del DataFrame con una sola riga (index=[0])
+        # Creation of the DataFrame with a single row (index=[0])
         return pd.DataFrame([feature_struct])
 
 
