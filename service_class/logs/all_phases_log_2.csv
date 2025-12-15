@@ -1,0 +1,10 @@
+phase,timestamp,status
+development,1765816423.8644214,start
+development,1765816466.7703714,records_sent
+development,1765816570.084914,production
+production,1765816570.3084087,start
+production,1765816584.0980122,records_sent
+production,1765816584.4664035,labels_received
+evaluation,1765816584.5744588,start
+evaluation,1765816591.4815104,records_sent
+evaluation,1765816592.9527962,labels_received
